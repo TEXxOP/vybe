@@ -1,0 +1,204 @@
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: 260px;
+    background: #1A1A1A;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.admin-brand {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+.brand-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #E87D6F;
+    letter-spacing: 1px;
+}
+
+.admin-nav {
+    flex: 1;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    color: #888;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: rgba(232, 125, 111, 0.1);
+    color: #E87D6F;
+}
+
+.admin-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border-radius: 12px;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+/* Main Content */
+.admin-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 40px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1A1A1A;
+}
+
+.view-shop-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 50px;
+    color: #1A1A1A;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.view-shop-btn:hover {
+    border-color: #E87D6F;
+    color: #E87D6F;
+}
+
+.content-wrapper {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Common Admin Card Styles */
+.admin-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    margin-bottom: 30px;
+}
+
+.admin-card h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    color: #1A1A1A;
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+    .admin-sidebar {
+        width: 80px;
+    }
+
+    .admin-brand span,
+    .nav-item span,
+    .logout-btn span {
+        display: none;
+    }
+
+    .admin-brand,
+    .admin-nav,
+    .admin-footer {
+        align-items: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .nav-item,
+    .logout-btn {
+        padding: 15px;
+        justify-content: center;
+    }
+
+    .admin-content {
+        margin-left: 80px;
+        padding: 30px;
+    }
+}

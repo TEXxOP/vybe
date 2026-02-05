@@ -1,0 +1,150 @@
+.page-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.add-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #1A1A1A;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+    background: #E87D6F;
+    transform: translateY(-2px);
+}
+
+.table-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.font-medium {
+    font-weight: 600;
+}
+
+.capitalize {
+    text-transform: capitalize;
+}
+
+.stock-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.stock-badge.instock {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.stock-badge.outstock {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.icon-btn.edit {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.icon-btn.edit:hover {
+    background: #3498db;
+    color: white;
+}
+
+.icon-btn.delete {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+
+.icon-btn.delete:hover {
+    background: #e74c3c;
+    color: white;
+}
+
+/* Order Specific Styles */
+.customer-info .text-small {
+    font-size: 12px;
+    color: #888;
+}
+
+.status-select {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    background: #f0f0f0;
+    color: #333;
+}
+
+.status-select.processing {
+    background: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.status-select.shipped {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.status-select.delivered {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.status-select.cancelled {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.view-btn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.view-btn:hover {
+    border-color: #1A1A1A;
+    color: #1A1A1A;
+}

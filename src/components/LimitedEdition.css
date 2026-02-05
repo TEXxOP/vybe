@@ -1,0 +1,347 @@
+.limited-edition {
+    padding: 70px 0;
+    background: #FFFBFA;
+}
+
+.limited-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 50px;
+}
+
+/* Header */
+.limited-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.limited-title-wrapper {
+    flex-shrink: 0;
+}
+
+.limited-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    font-style: italic;
+    color: #1A1A1A;
+    margin-bottom: 8px;
+}
+
+.limited-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #888;
+}
+
+/* Countdown */
+.countdown-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #FFF5F3;
+    padding: 16px 24px;
+    border-radius: 50px;
+}
+
+.countdown-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #555;
+}
+
+.countdown-timer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.countdown-item {
+    text-align: center;
+}
+
+.countdown-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1A1A1A;
+}
+
+.countdown-unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    margin-left: 2px;
+}
+
+.countdown-sep {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    color: #ccc;
+    margin: 0 4px;
+}
+
+/* Navigation */
+.limited-nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.pagination-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #FBDED9;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.dot.active {
+    background: #E87D6F;
+    width: 24px;
+    border-radius: 4px;
+}
+
+.dot:hover {
+    background: #E87D6F;
+    opacity: 0.7;
+}
+
+.nav-arrows {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-arrow {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.nav-arrow.prev {
+    background: #FFF5F3;
+    color: #1A1A1A;
+}
+
+.nav-arrow.next {
+    background: #E87D6F;
+    color: white;
+}
+
+.nav-arrow:hover {
+    transform: scale(1.1);
+}
+
+/* Products Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+/* Product Card */
+.product-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+}
+
+.product-badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 6px 12px;
+    background: #E87D6F;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 50px;
+    z-index: 2;
+}
+
+.product-image {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.08);
+}
+
+.quick-add {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: #1A1A1A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.product-card:hover .quick-add {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.quick-add:hover {
+    background: #E87D6F;
+    color: white;
+}
+
+.product-info {
+    padding: 18px;
+}
+
+.product-info h4 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #555;
+}
+
+.product-price {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #E87D6F;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .limited-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .limited-title {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 600px) {
+    .limited-container {
+        padding: 0 25px;
+    }
+
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .countdown-wrapper {
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px 20px;
+    }
+}
+
+/* Loading Skeleton */
+.product-card.loading {
+    pointer-events: none;
+}
+
+.product-card.loading .product-image {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-text {
+    height: 16px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.skeleton-text.short {
+    width: 60%;
+    height: 14px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

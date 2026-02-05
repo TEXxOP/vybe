@@ -1,0 +1,231 @@
+.order-success-page {
+    min-height: 100vh;
+    background: #FCEAE7;
+    padding-top: 120px;
+    padding-bottom: 60px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.success-card {
+    background: white;
+    padding: 50px 60px;
+    border-radius: 30px;
+    text-align: center;
+    max-width: 550px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    margin: 0 20px;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: #10B981;
+    color: white;
+    border-radius: 50%;
+    font-size: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    animation: scaleIn 0.5s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-card h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    color: #1A1A1A;
+    margin-bottom: 10px;
+}
+
+.order-number {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.order-number strong {
+    color: #E87D6F;
+    font-weight: 600;
+}
+
+.order-info {
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #666;
+    padding: 8px 0;
+}
+
+.info-row:first-child {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+    margin-bottom: 4px;
+}
+
+.info-row .amount {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #E87D6F;
+}
+
+.what-next {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.what-next h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 20px;
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.step-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(232, 125, 111, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.step strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #1A1A1A;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.step p {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.continue-btn {
+    flex: 1;
+    padding: 15px 25px;
+    background: #E87D6F;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.continue-btn:hover {
+    background: #d66b5e;
+    transform: translateY(-2px);
+}
+
+.home-btn {
+    flex: 1;
+    padding: 15px 25px;
+    background: white;
+    color: #1A1A1A;
+    text-decoration: none;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.home-btn:hover {
+    border-color: #E87D6F;
+    color: #E87D6F;
+}
+
+.thank-you {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: #E87D6F;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.thank-you .heart {
+    display: inline-flex;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .success-card {
+        padding: 35px 25px;
+    }
+
+    .success-card h1 {
+        font-size: 24px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+}
