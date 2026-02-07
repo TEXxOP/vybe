@@ -248,16 +248,28 @@
     }
 
     .logo {
-        position: static;
-        transform: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        /* Ensure logo is clickable but doesn't block drawer */
     }
 
     .logo-text {
         font-size: 20px;
     }
 
+    .mobile-menu-btn {
+        z-index: 1002;
+        /* Ensure button is above logo area */
+        position: relative;
+    }
+
     .nav-right {
         gap: 12px;
+        z-index: 1002;
+        /* Ensure right icons are clickable */
+        position: relative;
     }
 
     .icon-btn {
