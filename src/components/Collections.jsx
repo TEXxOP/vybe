@@ -9,8 +9,8 @@ const Collections = () => {
             slug: 'jackets',
             color: '#1A8B8B',
             images: [
-                'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=250&h=350&fit=crop',
-                'https://images.unsplash.com/photo-1475180429745-21d79e2e5d90?w=250&h=350&fit=crop'
+                'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=500&h=700&fit=crop',
+                'https://images.unsplash.com/photo-1475180429745-21d79e2e5d90?w=500&h=700&fit=crop'
             ]
         },
         {
