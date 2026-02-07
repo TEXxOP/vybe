@@ -238,19 +238,139 @@
     }
 
     .nav-left {
-        gap: 20px;
+        display: none;
+        /* Hide desktop nav on mobile */
     }
 
-    .nav-link {
-        font-size: 12px;
+    .header-container {
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .logo {
+        position: static;
+        transform: none;
     }
 
     .logo-text {
-        font-size: 18px;
+        font-size: 20px;
     }
 
-    .login-link {
-        font-size: 12px;
+    .nav-right {
+        gap: 12px;
+    }
+
+    .icon-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .cart-btn {
         padding: 6px 12px;
+    }
+}
+
+/* Mobile Menu Button */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: #1A1A1A;
+    cursor: pointer;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+}
+
+/* Mobile Drawer */
+.mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+    z-index: 1100;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.mobile-drawer.open {
+    left: 0;
+}
+
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #1A1A1A;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mobile-nav a {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #1A1A1A;
+    text-decoration: none;
+    padding: 10px 0;
+    transition: color 0.2s;
+}
+
+.mobile-nav a:hover {
+    color: #E87D6F;
+}
+
+.mobile-login {
+    margin-top: 20px;
+    padding: 12px !important;
+    background: #1A1A1A;
+    color: white !important;
+    text-align: center;
+    border-radius: 8px;
+}
+
+/* Backdrop */
+.drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Header.css';
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { cart, user, logout } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,14 +18,32 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close menu when route changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = () => {
     logout();
+    setMobileMenuOpen(false);
     navigate('/');
   };
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
+        {/* Mobile Menu Button */}
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+
         <nav className="nav-left">
           <Link to="/shop" className="nav-link">Shop</Link>
           <Link to="/#collections" className="nav-link">Collections</Link>
@@ -71,6 +91,35 @@ const Header = () => {
           </Link>
         </div>
       </div>
+
+      {/* Mobile Drawer */}
+      <div className={`mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="drawer-header">
+          <span className="logo-text">VYBE</span>
+          <button className="close-btn" onClick={() => setMobileMenuOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <nav className="mobile-nav">
+          <Link to="/shop" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
+          <Link to="/#collections" onClick={() => setMobileMenuOpen(false)}>Collections</Link>
+          <Link to="/#about" onClick={() => setMobileMenuOpen(false)}>About</Link>
+          <Link to="/#contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+          {!user && (
+            <Link to="/login" className="mobile-login" onClick={() => setMobileMenuOpen(false)}>
+              Login / Register
+            </Link>
+          )}
+        </nav>
+      </div>
+
+      {/* Backdrop */}
+      {mobileMenuOpen && (
+        <div className="drawer-backdrop" onClick={() => setMobileMenuOpen(false)} />
+      )}
     </header>
   );
 };

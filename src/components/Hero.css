@@ -492,6 +492,14 @@
 }
 
 @media (max-width: 768px) {
+    .hero {
+        padding-top: 110px;
+        /* Increase padding to prevent header overlap */
+        padding-bottom: 20px;
+        min-height: auto;
+        /* Remove 100vh constraint on mobile */
+    }
+
     .hero-headline {
         flex-direction: column;
         gap: 0;
