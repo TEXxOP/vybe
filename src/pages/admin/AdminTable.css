@@ -148,3 +148,24 @@
     border-color: #1A1A1A;
     color: #1A1A1A;
 }
+
+/* Color Dots */
+.color-dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.color-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.color-more {
+    font-size: 11px;
+    color: #888;
+    margin-left: 4px;
+}
