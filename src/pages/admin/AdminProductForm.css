@@ -15,13 +15,14 @@
 }
 
 .modal-content {
-    background: var(--admin-bg, #1a1a1a);
+    background: #1a1a1a !important;
     border-radius: 16px;
     width: 100%;
     max-width: 700px;
     max-height: 90vh;
     overflow-y: auto;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
 .modal-header {
@@ -60,19 +61,24 @@
 /* Form Styles */
 .product-form {
     padding: 24px;
+    background: #1a1a1a;
 }
 
 .form-section {
     margin-bottom: 28px;
+    padding: 20px;
+    background: #252525 !important;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .form-section h3 {
-    font-size: 1rem;
-    color: #888;
+    font-size: 0.85rem;
+    color: var(--accent, #E87D6F);
     margin: 0 0 16px 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 500;
+    letter-spacing: 1px;
+    font-weight: 600;
 }
 
 .section-header {
@@ -112,10 +118,10 @@
 .form-group select,
 .form-group textarea {
     padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #1a1a1a !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 8px;
-    color: #fff;
+    color: #fff !important;
     font-size: 0.95rem;
     transition: all 0.2s;
 }
@@ -153,10 +159,10 @@
 .dynamic-item select,
 .dynamic-item input {
     padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #1a1a1a !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 8px;
-    color: #fff;
+    color: #fff !important;
     font-size: 0.9rem;
 }
 
