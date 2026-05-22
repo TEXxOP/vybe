@@ -137,7 +137,7 @@
 
 .challenge-image {
     width: 100%;
-    height: 190px;
+    aspect-ratio: 4 / 3;      /* intentional editorial ratio, not arbitrary px */
     border-radius: 14px;
     overflow: hidden;
     position: relative;
@@ -147,13 +147,14 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.4) 100%);
+    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.5) 100%);
 }
 
 .challenge-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top center;  /* show face/upper body, not cropped feet */
     transition: transform 600ms ease;
 }
 
@@ -182,13 +183,16 @@
 .remix-image {
     border-radius: 14px;
     overflow: hidden;
-    height: 210px;
+    /* Stretch to match sibling content height — no arbitrary fixed px */
+    align-self: stretch;
+    min-height: 200px;
 }
 
 .remix-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top center;  /* show model face, not shoes */
     transition: transform 600ms ease;
 }
 
@@ -500,9 +504,11 @@
 
 .fashion-image-container img {
     width: 100%;
-    height: 440px;
+    aspect-ratio: 2 / 3;          /* portrait — magazine-cover proportions */
     object-fit: cover;
+    object-position: top center;  /* face first, not centred on body */
     border-radius: 20px;
+    display: block;
     transition: transform 600ms ease;
 }
 
