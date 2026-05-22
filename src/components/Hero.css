@@ -4,7 +4,7 @@
     min-height: calc(100vh - 20px);
     position: relative;
     background: #FCEAE7;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 .hero::before {
@@ -105,19 +105,75 @@
     pointer-events: none;
 }
 
+/* ========== MODEL WRAPPER (perspective + glitch host) ========== */
+.model-wrapper {
+    position: absolute;
+    left: 44%;
+    top: -184px;
+    /* JS overrides transform for tilt+glitch; base is translateX(-50%) */
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
+    will-change: transform, opacity, filter, clip-path;
+    /* size the wrapper so glitch layers align */
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
 /* ========== MODEL IMAGE ========== */
 .model-image {
-    position: absolute;
-    left: 50%;
-    transform: translate3d(-50%, 0, 0);
-    top: -184px;
+    display: block;
     height: 610px;
     width: auto;
-    z-index: 10;
     object-fit: contain;
-    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.12));
+    position: relative;
+    z-index: 2;
+}
+
+/* ========== GLITCH CHANNEL LAYERS ========== */
+.model-glitch-layer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 610px;
+    width: auto;
+    object-fit: contain;
+    opacity: 0;
     pointer-events: none;
-    will-change: transform;
+    will-change: transform, opacity;
+}
+
+/* Red channel: warm coral tint */
+.model-glitch-r {
+    filter: sepia(1) saturate(6) hue-rotate(-38deg) brightness(1.15);
+    mix-blend-mode: screen;
+    z-index: 3;
+}
+
+/* Blue/cyan channel */
+.model-glitch-b {
+    filter: sepia(1) saturate(6) hue-rotate(165deg) brightness(1.0);
+    mix-blend-mode: screen;
+    z-index: 1;
+}
+
+/* ========== SCANLINES ========== */
+.glitch-scanlines {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0;
+    will-change: opacity;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.18) 3px,
+        rgba(0, 0, 0, 0.18) 4px
+    );
 }
 
 /* ========== HERO CARD ========== */
@@ -543,9 +599,13 @@
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1200px) {
-    .model-image {
-        height: 480px;
+    .model-wrapper {
         top: -60px;
+    }
+
+    .model-image,
+    .model-glitch-layer {
+        height: 480px;
     }
 
     .hero-card {
@@ -598,16 +658,24 @@
         padding-top: 42px;
     }
 
-    .model-image {
+    .model-wrapper {
         position: relative;
         left: auto;
         top: auto;
-        display: block;
-        height: 390px;
-        margin: -4px auto -104px;
         transform: none !important;
         will-change: auto;
+        margin: -4px auto -104px;
+        height: 390px;
     }
+
+    .model-image,
+    .model-glitch-layer {
+        height: 390px;
+    }
+
+    /* disable glitch on tablet */
+    .model-glitch-layer { display: none; }
+    .glitch-scanlines   { display: none; }
 
     .hero-card {
         margin-top: 0;
@@ -659,9 +727,14 @@
         padding-top: 8px;
     }
 
-    .model-image {
+    .model-wrapper {
         height: 320px;
         margin: 0 auto -84px;
+    }
+
+    .model-image,
+    .model-glitch-layer {
+        height: 320px;
     }
 
     .hero-card {
