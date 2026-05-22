@@ -82,7 +82,7 @@ const Cart = () => {
                     {/* Order Summary */}
                     <div className="order-summary">
                         <h2>Order Summary</h2>
-
+                        <div className="order-summary-body">
                         <div className="summary-row">
                             <span>Subtotal</span>
                             <span>₹{formatPrice(subtotal)}</span>
@@ -129,6 +129,7 @@ const Cart = () => {
                                 <span><Icons.Smartphone size={16} /> UPI</span>
                                 <span><Icons.Cash size={16} /> COD</span>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>

@@ -1,145 +1,215 @@
+/* ═══════════════════════════════════════════════════════════════
+   AUTH PAGES — Split Panel Premium Design
+═══════════════════════════════════════════════════════════════ */
+
 .auth-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #FCEAE7 0%, #FDF2F0 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
+/* ── Left panel: dark editorial brand side ─────────────────── */
+.auth-page::before {
+    content: '';
+    display: block;
+    background:
+        radial-gradient(circle at 30% 40%, rgba(232, 125, 111, 0.25) 0%, transparent 55%),
+        linear-gradient(160deg, #1A1A1A 0%, #2A1F1D 50%, #0F0D0E 100%);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 0;
+}
+
+/* The auth content sits on the right */
 .auth-card {
-    background: white;
+    grid-column: 2;
+    background: #FAF5F3;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 70px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Brand panel overlay content via pseudo-element trick:
+   We add the .auth-brand-panel div in JSX for real content */
+.auth-brand-panel {
+    grid-column: 1;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 50px;
-    border-radius: 30px;
+    pointer-events: none;
+}
+
+.auth-brand-logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    text-decoration: none;
+    letter-spacing: -1px;
+    pointer-events: all;
+}
+
+.auth-brand-statement {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.auth-brand-statement h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+    letter-spacing: -2px;
+}
+
+.auth-brand-statement h2 em {
+    color: #E87D6F;
+    font-style: italic;
+}
+
+.auth-brand-footer {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.04em;
+}
+
+/* ── Right: Form area ───────────────────────────────────────── */
+.auth-inner {
     width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
 }
 
 .auth-header {
-    text-align: center;
-    margin-bottom: 35px;
+    margin-bottom: 36px;
 }
 
 .auth-header .brand {
-    font-family: 'Outfit', sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    color: #E87D6F;
-    text-decoration: none;
-    display: block;
-    margin-bottom: 20px;
+    display: none; /* hidden — logo is in the brand panel */
 }
 
 .auth-header h1 {
     font-family: 'Outfit', sans-serif;
-    font-size: 26px;
+    font-size: 32px;
+    font-weight: 900;
     color: #1A1A1A;
     margin-bottom: 8px;
+    letter-spacing: -0.03em;
 }
 
 .auth-header p {
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    color: #888;
+    font-size: 14px;
+    color: #999;
 }
 
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
 }
 
 .error-alert {
     background: #FEE2E2;
     color: #DC2626;
     padding: 12px 16px;
-    border-radius: 10px;
+    border-radius: 12px;
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
+    border: 1px solid rgba(220, 38, 38, 0.15);
 }
 
 .auth-form .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
 }
 
 .auth-form label {
     font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    color: #1A1A1A;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    letter-spacing: 0.01em;
 }
 
 .auth-form input {
-    padding: 15px 18px;
-    background: #f8f8f8;
-    border: 2px solid transparent;
-    border-radius: 12px;
+    padding: 14px 18px;
+    background: white;
+    border: 1.5px solid #E8E0DE;
+    border-radius: 14px;
     font-family: 'Inter', sans-serif;
     font-size: 15px;
-    transition: all 0.2s ease;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
     outline: none;
+    color: #1A1A1A;
 }
 
 .auth-form input:focus {
-    background: white;
     border-color: #E87D6F;
+    box-shadow: 0 0 0 3px rgba(232, 125, 111, 0.12);
 }
 
-.auth-form input::placeholder {
-    color: #bbb;
-}
+.auth-form input::placeholder { color: #ccc; }
 
 .submit-btn {
     padding: 16px;
-    background: #E87D6F;
+    background: linear-gradient(135deg, #E87D6F 0%, #D66B5D 100%);
     color: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 50px;
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s ease;
-    margin-top: 10px;
+    margin-top: 8px;
+    transition: all 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 20px rgba(232, 125, 111, 0.35);
+    letter-spacing: 0.02em;
 }
 
 .submit-btn:hover:not(:disabled) {
-    background: #d66b5e;
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 32px rgba(232, 125, 111, 0.45);
 }
 
-.submit-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .auth-footer {
     text-align: center;
-    margin-top: 25px;
+    margin-top: 28px;
 }
 
 .auth-footer p {
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    color: #888;
+    color: #999;
 }
 
 .auth-footer a {
     color: #E87D6F;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
 }
 
-.auth-footer a:hover {
-    text-decoration: underline;
-}
+.auth-footer a:hover { text-decoration: underline; }
 
 .auth-divider {
     text-align: center;
-    margin: 25px 0;
+    margin: 22px 0;
     position: relative;
 }
 
@@ -150,32 +220,32 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: #eee;
+    background: #EDE7E5;
 }
 
 .auth-divider span {
     position: relative;
-    background: white;
-    padding: 0 15px;
+    background: #FAF5F3;
+    padding: 0 14px;
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    color: #888;
+    font-size: 12px;
+    color: #bbb;
 }
 
 .guest-btn {
     display: block;
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     background: white;
-    border: 2px solid #eee;
-    border-radius: 12px;
+    border: 1.5px solid #E8E0DE;
+    border-radius: 50px;
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     color: #666;
     text-decoration: none;
     text-align: center;
-    transition: all 0.2s ease;
+    transition: all 220ms ease;
 }
 
 .guest-btn:hover {
@@ -183,13 +253,21 @@
     color: #E87D6F;
 }
 
-/* Responsive */
-@media (max-width: 500px) {
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .auth-page {
+        grid-template-columns: 1fr;
+    }
+    .auth-page::before { display: none; }
+    .auth-brand-panel { display: none; }
     .auth-card {
-        padding: 35px 25px;
+        grid-column: 1;
+        background: linear-gradient(135deg, #FCEAE7 0%, #FDF2F0 100%);
+        padding: 60px 30px;
     }
+}
 
-    .auth-header h1 {
-        font-size: 22px;
-    }
+@media (max-width: 480px) {
+    .auth-card { padding: 40px 24px; }
+    .auth-header h1 { font-size: 26px; }
 }

@@ -56,67 +56,56 @@ const Register = () => {
 
     return (
         <div className="auth-page">
-            <div className="auth-card">
-                <div className="auth-header">
-                    <Link to="/" className="brand">VYBE</Link>
-                    <h1>Create Account</h1>
-                    <p>Join the VYBE tribe</p>
+            <div className="auth-brand-panel">
+                <Link to="/" className="auth-brand-logo">VYBE</Link>
+                <div className="auth-brand-statement">
+                    <h2>Join the <em>tribe</em>.<br />Own your look.</h2>
                 </div>
+                <span className="auth-brand-footer">© 2025 VYBE Streetwear</span>
+            </div>
 
-                <form onSubmit={handleSubmit} className="auth-form">
-                    {error && <div className="error-alert">{error}</div>}
-
-                    <div className="form-group">
-                        <label>Full Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Enter your name"
-                        />
+            <div className="auth-card">
+                <div className="auth-inner">
+                    <div className="auth-header">
+                        <h1>Create Account</h1>
+                        <p>Join the VYBE tribe today</p>
                     </div>
 
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="Enter your email"
-                        />
+                    <form onSubmit={handleSubmit} className="auth-form">
+                        {error && <div className="error-alert">{error}</div>}
+
+                        <div className="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="name" value={formData.name}
+                                onChange={handleChange} placeholder="Enter your name" />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email" value={formData.email}
+                                onChange={handleChange} placeholder="Enter your email" />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" value={formData.password}
+                                onChange={handleChange} placeholder="At least 8 characters" />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Confirm Password</label>
+                            <input type="password" name="confirmPassword" value={formData.confirmPassword}
+                                onChange={handleChange} placeholder="Confirm your password" />
+                        </div>
+
+                        <button type="submit" className="submit-btn" disabled={loading}>
+                            {loading ? 'Creating Account...' : 'Create Account'}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        <p>Already have an account? <Link to="/login">Log in</Link></p>
                     </div>
-
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="At least 8 characters"
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Confirm Password</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            placeholder="Confirm your password"
-                        />
-                    </div>
-
-                    <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? 'Creating Account...' : 'Create Account'}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    <p>Already have an account? <Link to="/login">Log in</Link></p>
                 </div>
             </div>
         </div>

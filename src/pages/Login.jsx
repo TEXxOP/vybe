@@ -40,54 +40,65 @@ const Login = () => {
 
     return (
         <div className="auth-page">
+            {/* Left dark brand panel */}
+            <div className="auth-brand-panel">
+                <Link to="/" className="auth-brand-logo">VYBE</Link>
+                <div className="auth-brand-statement">
+                    <h2>Your <em>style</em>,<br />your rules.</h2>
+                </div>
+                <span className="auth-brand-footer">© 2025 VYBE Streetwear</span>
+            </div>
+
+            {/* Right form panel */}
             <div className="auth-card">
-                <div className="auth-header">
-                    <Link to="/" className="brand">VYBE</Link>
-                    <h1>Welcome Back</h1>
-                    <p>Log in to your account</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="auth-form">
-                    {error && <div className="error-alert">{error}</div>}
-
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="Enter your email"
-                        />
+                <div className="auth-inner">
+                    <div className="auth-header">
+                        <h1>Welcome Back</h1>
+                        <p>Log in to your account</p>
                     </div>
 
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="Enter your password"
-                        />
+                    <form onSubmit={handleSubmit} className="auth-form">
+                        {error && <div className="error-alert">{error}</div>}
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Enter your email"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Enter your password"
+                            />
+                        </div>
+
+                        <button type="submit" className="submit-btn" disabled={loading}>
+                            {loading ? 'Logging in...' : 'Log In'}
+                        </button>
+                    </form>
+
+                    <div className="auth-footer">
+                        <p>Don't have an account? <Link to="/register">Sign up</Link></p>
                     </div>
 
-                    <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Log In'}
-                    </button>
-                </form>
+                    <div className="auth-divider">
+                        <span>or continue as</span>
+                    </div>
 
-                <div className="auth-footer">
-                    <p>Don't have an account? <Link to="/register">Sign up</Link></p>
+                    <Link to="/shop" className="guest-btn">
+                        Guest Checkout
+                    </Link>
                 </div>
-
-                <div className="auth-divider">
-                    <span>or continue as</span>
-                </div>
-
-                <Link to="/shop" className="guest-btn">
-                    Guest Checkout
-                </Link>
             </div>
         </div>
     );
