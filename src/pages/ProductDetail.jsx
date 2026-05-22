@@ -86,16 +86,17 @@ const ProductDetail = () => {
                     <span style={{ transform: 'rotate(180deg)', display: 'flex' }}><Icons.ArrowRight size={16} /></span> Back
                 </button>
 
-                <div className="product-detail-content">
+                <div className="product-detail-content" data-reveal>
                     {/* Images Section */}
                     <div className="product-images">
                         <div className="main-image">
                             <img
                                 src={product.images?.[currentImage]?.url}
                                 alt={product.name}
+                                decoding="async"
                             />
                             {product.badge && (
-                                <span className="badge">{product.badge}</span>
+                                <span className="badge glass-badge">{product.badge}</span>
                             )}
                         </div>
                         {product.images?.length > 1 && (
@@ -106,7 +107,7 @@ const ProductDetail = () => {
                                         className={`thumb ${currentImage === idx ? 'active' : ''}`}
                                         onClick={() => setCurrentImage(idx)}
                                     >
-                                        <img src={img.url} alt={`${product.name} ${idx + 1}`} />
+                                        <img src={img.url} alt={`${product.name} ${idx + 1}`} loading="lazy" decoding="async" />
                                     </button>
                                 ))}
                             </div>

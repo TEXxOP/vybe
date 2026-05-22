@@ -39,13 +39,13 @@ const Shop = () => {
         <div className="shop-page">
             <div className="shop-container">
                 {/* Header */}
-                <div className="shop-header">
+                <div className="shop-header" data-reveal>
                     <h1>Shop Collection</h1>
                     <p>Discover the future of streetwear</p>
                 </div>
 
                 {/* Filters */}
-                <div className="shop-filters">
+                <div className="shop-filters" data-reveal>
                     <div className="category-filters">
                         {categories.map(cat => (
                             <button
@@ -68,9 +68,16 @@ const Shop = () => {
 
                 {/* Products Grid */}
                 {loading ? (
-                    <div className="shop-loading">
-                        <div className="loader"></div>
-                        <p>Loading products...</p>
+                    <div className="products-grid product-skeleton-grid" aria-label="Loading products">
+                        {[...Array(8)].map((_, index) => (
+                            <div key={index} className="product-card loading-card" style={{ '--reveal-delay': `${index * 60}ms` }}>
+                                <div className="product-image animate-shimmer"></div>
+                                <div className="product-info">
+                                    <div className="skeleton-line animate-shimmer"></div>
+                                    <div className="skeleton-line short animate-shimmer"></div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : products.length === 0 ? (
                     <div className="no-products">
@@ -78,16 +85,25 @@ const Shop = () => {
                     </div>
                 ) : (
                     <div className="products-grid">
-                        {products.map(product => (
-                            <Link to={`/product/${product._id}`} key={product._id} className="product-card">
+                        {products.map((product, index) => (
+                            <Link
+                                to={`/product/${product._id}`}
+                                key={product._id}
+                                className="product-card card-hover-lift"
+                                data-reveal
+                                style={{ '--reveal-delay': `${index * 80}ms` }}
+                            >
                                 {product.badge && (
-                                    <span className={`badge ${product.badge}`}>{product.badge}</span>
+                                    <span className={`badge glass-badge ${product.badge}`}>{product.badge}</span>
                                 )}
                                 <div className="product-image">
                                     <img
                                         src={product.images?.[0]?.url}
                                         alt={product.name}
+                                        loading="lazy"
+                                        decoding="async"
                                     />
+                                    <span className="quick-view-btn">Quick View</span>
                                 </div>
                                 <div className="product-info">
                                     <h3>{product.name}</h3>

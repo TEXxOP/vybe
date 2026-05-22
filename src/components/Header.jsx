@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import './Header.css';
@@ -6,21 +6,39 @@ import './Header.css';
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const previousCartTotal = useRef(0);
+  const cartButtonRef = useRef(null);
   const { cart, user, logout } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 80);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (cart.totalItems > previousCartTotal.current) {
+      cartButtonRef.current?.classList.add('cart-bounce');
+      const timer = window.setTimeout(() => {
+        cartButtonRef.current?.classList.remove('cart-bounce');
+      }, 360);
+      previousCartTotal.current = cart.totalItems;
+      return () => window.clearTimeout(timer);
+    }
+
+    previousCartTotal.current = cart.totalItems;
+    return undefined;
+  }, [cart.totalItems]);
+
   // Close menu when route changes
   useEffect(() => {
-    setMobileMenuOpen(false);
+    const closeTimer = window.setTimeout(() => setMobileMenuOpen(false), 0);
+    return () => window.clearTimeout(closeTimer);
   }, [location.pathname]);
 
   const handleLogout = () => {
@@ -36,6 +54,7 @@ const Header = () => {
         <button
           className="mobile-menu-btn"
           onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open menu"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -56,7 +75,7 @@ const Header = () => {
         </Link>
 
         <div className="nav-right">
-          <button className="icon-btn search-btn">
+          <button className="icon-btn search-btn" aria-label="Search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
@@ -66,7 +85,7 @@ const Header = () => {
           {user ? (
             <div className="user-dropdown">
               <div className="user-avatar">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt={user.name} />
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt={user.name} loading="lazy" decoding="async" />
               </div>
               <div className="dropdown-menu">
                 <span className="user-name">{user.name}</span>
@@ -81,7 +100,7 @@ const Header = () => {
             <Link to="/login" className="login-link">Login</Link>
           )}
 
-          <Link to="/cart" className="cart-btn">
+          <Link to="/cart" className="cart-btn" aria-label="Cart" ref={cartButtonRef}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
             </svg>
@@ -96,7 +115,7 @@ const Header = () => {
       <div className={`mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="drawer-header">
           <span className="logo-text">VYBE</span>
-          <button className="close-btn" onClick={() => setMobileMenuOpen(false)}>
+          <button className="close-btn" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />

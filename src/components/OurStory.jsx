@@ -9,10 +9,10 @@ const OurStory = () => {
     ];
 
     return (
-        <section className="our-story" id="about">
+        <section className="our-story" id="about" data-reveal>
             <div className="our-story-container">
                 {/* Left Section - Title, Description, Timeline */}
-                <div className="story-left">
+                <div className="story-left" data-reveal>
                     <h2 className="story-title">Our Story</h2>
                     <p className="story-description">
                         VYBE started as a passion project — a rebellion against mass trends and an embrace of raw, unapologetic style. We design for those who own their vibe and live it loud.
@@ -51,12 +51,14 @@ const OurStory = () => {
                             src="/Gemini_Generated_Image_ahmdzoahmdzoahmd.png"
                             alt="Fashion illustration"
                             className="illustration-img"
+                            loading="lazy"
+                            decoding="async"
                         />
                     </div>
                 </div>
 
                 {/* Center - 2025 Content + Stats */}
-                <div className="story-center">
+                <div className="story-center" data-reveal style={{ '--reveal-delay': '80ms' }}>
                     <div className="featured-2025">
                         <div className="featured-header">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="#E87D6F">
@@ -105,11 +107,13 @@ const OurStory = () => {
                 </div>
 
                 {/* Right - Large Fashion Image */}
-                <div className="story-right">
+                <div className="story-right" data-reveal style={{ '--reveal-delay': '160ms' }}>
                     <div className="fashion-image">
                         <img
                             src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500&h=650&fit=crop"
                             alt="Fashion model"
+                            loading="lazy"
+                            decoding="async"
                         />
                     </div>
                 </div>

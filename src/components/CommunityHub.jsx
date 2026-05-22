@@ -3,10 +3,10 @@ import './CommunityHub.css';
 
 const CommunityHub = () => {
     return (
-        <section className="community-hub" id="community">
+        <section className="community-hub" id="community" data-reveal>
             <div className="community-container">
                 {/* Left Section - Title */}
-                <div className="community-left">
+                <div className="community-left" data-reveal>
                     <h2 className="community-title">Community Hub</h2>
                     <p className="community-subtitle">Join the tribe. Express your vibe</p>
 
@@ -17,7 +17,7 @@ const CommunityHub = () => {
                 </div>
 
                 {/* Main Cards Area */}
-                <div className="community-cards">
+                <div className="community-cards" data-reveal style={{ '--reveal-delay': '80ms' }}>
                     {/* Row 1 */}
                     <div className="cards-row-1">
                         {/* Upcoming Challenge Card */}
@@ -32,6 +32,8 @@ const CommunityHub = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=300&fit=crop"
                                     alt="Style Challenge"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
                         </Link>
@@ -42,6 +44,8 @@ const CommunityHub = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=300&fit=crop"
                                     alt="Remix Challenge"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             </div>
                             <div className="remix-content">
@@ -83,6 +87,8 @@ const CommunityHub = () => {
                                 <img
                                     src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop"
                                     alt="Elena Jackson"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                                 <div className="user-info">
                                     <h4>Elena Jackson</h4>
@@ -128,12 +134,14 @@ const CommunityHub = () => {
                 </div>
 
                 {/* Right Section - Join Tribe & CTA */}
-                <div className="community-right">
+                <div className="community-right" data-reveal style={{ '--reveal-delay': '160ms' }}>
                     {/* Fashion Image */}
                     <div className="fashion-image-container">
                         <img
                             src="https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=400&h=500&fit=crop"
                             alt="Fashion"
+                            loading="lazy"
+                            decoding="async"
                         />
                         {/* Join Tribe Button - Vertical */}
                         <Link to="/register" className="join-tribe-btn">

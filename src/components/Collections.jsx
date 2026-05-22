@@ -6,16 +6,18 @@ const Collections = () => {
         {
             id: 1,
             name: 'EDGE',
+            eyebrow: 'Outerwear',
             slug: 'jackets',
             color: '#1A8B8B',
             images: [
                 'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=500&h=700&fit=crop',
-                'https://images.unsplash.com/photo-1475180429745-21d79e2e5d90?w=500&h=700&fit=crop'
+                'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=500&h=700&fit=crop'
             ]
         },
         {
             id: 2,
             name: 'CANVAS',
+            eyebrow: 'Graphic tees',
             slug: 'shirts',
             color: '#E87D6F',
             images: [
@@ -26,6 +28,7 @@ const Collections = () => {
         {
             id: 3,
             name: 'ENERGY',
+            eyebrow: 'Hoodies',
             slug: 'hoodies',
             color: '#2D2D2D',
             images: [
@@ -35,8 +38,13 @@ const Collections = () => {
         }
     ];
 
+    const handleImageError = (event, fallbackUrl) => {
+        event.currentTarget.src = fallbackUrl;
+        event.currentTarget.classList.add('image-loaded');
+    };
+
     return (
-        <section className="collections" id="collections">
+        <section className="collections" id="collections" data-reveal>
             {/* Dark Container - extends full width */}
             <div className="collections-box">
                 {/* Left Arrow */}
@@ -50,21 +58,39 @@ const Collections = () => {
                 <div className="collections-center">
                     {/* Cards Row */}
                     <div className="cards-row">
-                        {collections.map((collection) => (
+                        {collections.map((collection, index) => (
                             <Link
                                 to={`/shop?category=${collection.slug}`}
                                 key={collection.id}
-                                className="card"
-                                style={{ '--label-color': collection.color }}
+                                className="card card-hover-lift"
+                                data-reveal
+                                style={{ '--label-color': collection.color, '--reveal-delay': `${index * 80}ms` }}
                             >
                                 {/* Two tall images side by side */}
                                 <div className="card-images">
-                                    <div className="card-img">
-                                        <img src={collection.images[0]} alt={collection.name} />
+                                    <div className="card-img card-img-primary">
+                                        <img
+                                            src={collection.images[0]}
+                                            alt={collection.name}
+                                            loading="lazy"
+                                            decoding="async"
+                                            onError={(event) => handleImageError(event, collection.images[1])}
+                                        />
                                     </div>
-                                    <div className="card-img">
-                                        <img src={collection.images[1]} alt={collection.name} />
+                                    <div className="card-img card-img-secondary">
+                                        <img
+                                            src={collection.images[1]}
+                                            alt={collection.name}
+                                            loading="lazy"
+                                            decoding="async"
+                                            onError={(event) => handleImageError(event, collection.images[0])}
+                                        />
                                     </div>
+                                </div>
+
+                                <div className="card-copy">
+                                    <span>{collection.eyebrow}</span>
+                                    <strong>{collection.name}</strong>
                                 </div>
 
                                 {/* Vertical label */}

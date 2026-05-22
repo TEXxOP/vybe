@@ -21,30 +21,11 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
 import { CartProvider } from './context/CartContext';
+import { useImageLoadClass, useScrollReveal } from './hooks/usePageMotion';
 import './App.css';
 
 // Home page component
 const HomePage = () => {
-  useEffect(() => {
-    const revealElements = document.querySelectorAll('.reveal');
-
-    const revealOnScroll = () => {
-      revealElements.forEach(el => {
-        const elementTop = el.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
-
-        if (elementTop < windowHeight - 100) {
-          el.classList.add('active');
-        }
-      });
-    };
-
-    window.addEventListener('scroll', revealOnScroll);
-    revealOnScroll();
-
-    return () => window.removeEventListener('scroll', revealOnScroll);
-  }, []);
-
   return (
     <>
       <Hero />
@@ -70,6 +51,8 @@ const ScrollToTop = () => {
 const AppContent = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  useScrollReveal(location.pathname);
+  useImageLoadClass(location.pathname);
 
   return (
     <div className="app">

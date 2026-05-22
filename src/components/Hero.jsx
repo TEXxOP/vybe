@@ -1,9 +1,54 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
 import './Hero.css';
 import modelImage from '../assets/model.png';
 
 const Hero = () => {
+    const modelRef = useRef(null);
+
+    useEffect(() => {
+        const preload = document.createElement('link');
+        preload.rel = 'preload';
+        preload.as = 'image';
+        preload.href = modelImage;
+        document.head.appendChild(preload);
+
+        return () => document.head.removeChild(preload);
+    }, []);
+
+    useEffect(() => {
+        const model = modelRef.current;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!model || reduceMotion) return undefined;
+
+        let frameId = 0;
+
+        const updateParallax = () => {
+            frameId = 0;
+            if (window.innerWidth <= 768) {
+                model.style.transform = '';
+                return;
+            }
+            model.style.transform = `translate3d(-50%, ${window.scrollY * 0.3}px, 0)`;
+        };
+
+        const requestUpdate = () => {
+            if (!frameId) frameId = window.requestAnimationFrame(updateParallax);
+        };
+
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate);
+        updateParallax();
+
+        return () => {
+            window.removeEventListener('scroll', requestUpdate);
+            window.removeEventListener('resize', requestUpdate);
+            if (frameId) window.cancelAnimationFrame(frameId);
+            model.style.transform = '';
+        };
+    }, []);
+
     return (
         <section className="hero">
             <div className="hero-container">
@@ -27,9 +72,11 @@ const Hero = () => {
 
                     {/* Model Image - Positioned to pop out above card */}
                     <img
+                        ref={modelRef}
                         src={modelImage}
                         alt="Fashion Model"
                         className="model-image"
+                        decoding="async"
                     />
 
                     {/* Main Hero Card */}
@@ -43,16 +90,16 @@ const Hero = () => {
 
                                 <Link to="/shop" className="new-drops-btn">
                                     <span>New Drops</span>
-                                    <span className="btn-arrow">→</span>
+                                    <span className="btn-arrow">&rarr;</span>
                                 </Link>
 
                                 {/* Rating */}
                                 <div className="rating-section">
                                     <div className="rating-avatars">
-                                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" alt="User 1" />
-                                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop" alt="User 2" />
-                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop" alt="User 3" />
-                                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop" alt="User 4" />
+                                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" alt="User 1" loading="lazy" decoding="async" />
+                                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop" alt="User 2" loading="lazy" decoding="async" />
+                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop" alt="User 3" loading="lazy" decoding="async" />
+                                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop" alt="User 4" loading="lazy" decoding="async" />
                                     </div>
                                     <div className="rating-text">
                                         <span className="rating-stars"><Icons.Star size={16} color="#E87D6F" filled /></span>
@@ -64,8 +111,13 @@ const Hero = () => {
                                 </div>
                             </div>
 
-                            {/* Center spacer for model image */}
-                            <div className="hero-center"></div>
+                            {/* Center brand layer behind the model */}
+                            <div className="hero-center">
+                                <div className="hero-center-mark">
+                                    <span>Drop 01</span>
+                                    <strong>VYBE</strong>
+                                </div>
+                            </div>
 
                             {/* Right side - Feature Icons + Featured Product */}
                             <div className="hero-right">
@@ -109,6 +161,8 @@ const Hero = () => {
                                             <img
                                                 src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=550&fit=crop"
                                                 alt="Urban Vanguard Tee"
+                                                loading="lazy"
+                                                decoding="async"
                                             />
                                         </div>
                                         <div className="product-info">
@@ -116,7 +170,7 @@ const Hero = () => {
                                             <p>Unmatched comfort.</p>
                                             <div className="product-price">
                                                 <span className="cart-icon"><Icons.ShoppingBag size={16} color="#E87D6F" /></span>
-                                                <span className="price">₹2,672</span>
+                                                <span className="price">&#8377;2,672</span>
                                             </div>
                                         </div>
                                     </Link>

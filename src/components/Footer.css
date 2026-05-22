@@ -56,7 +56,7 @@
     background: white;
     border-radius: 10px;
     color: #1A1A1A;
-    transition: all 0.25s ease;
+    transition: transform 200ms var(--ease-out-premium), color 200ms var(--ease-out-premium), background-color 200ms var(--ease-out-premium), border-color 200ms var(--ease-out-premium);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -88,7 +88,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: #555;
-    transition: all 0.2s ease;
+    transition: transform 200ms var(--ease-out-premium), color 200ms var(--ease-out-premium);
 }
 
 .footer-links a:hover {

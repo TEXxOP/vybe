@@ -86,7 +86,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
-  transition: all var(--transition-medium);
+  transition: transform 200ms var(--ease-out-premium), color 200ms var(--ease-out-premium), background-color 200ms var(--ease-out-premium), filter 200ms var(--ease-out-premium);
   border: none;
   text-decoration: none;
 }
@@ -99,7 +99,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:hover {
   background: var(--pink-light);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  filter: drop-shadow(0 4px 14px rgba(0,0,0,0.08));
 }
 
 .btn-coral {
@@ -110,7 +110,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-coral:hover {
   background: var(--coral-dark);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-coral);
+  filter: drop-shadow(0 8px 18px rgba(232, 125, 111, 0.22));
 }
 
 .btn-icon {
@@ -125,12 +125,12 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--white);
   border: none;
   cursor: pointer;
-  transition: all var(--transition-medium);
+  transition: transform 200ms var(--ease-out-premium), color 200ms var(--ease-out-premium), background-color 200ms var(--ease-out-premium), filter 200ms var(--ease-out-premium);
 }
 
 .btn-icon:hover {
   transform: scale(1.1);
-  box-shadow: var(--shadow-coral);
+  filter: drop-shadow(0 8px 18px rgba(232, 125, 111, 0.22));
 }
 
 /* Cards */
@@ -138,12 +138,12 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--white);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all var(--transition-medium);
+  transition: transform 200ms var(--ease-out-premium), filter 200ms var(--ease-out-premium);
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.1));
 }
 
 /* Animations */
@@ -229,7 +229,7 @@ h1, h2, h3, h4, h5, h6 {
 .reveal {
   opacity: 0;
   transform: translateY(30px);
-  transition: all 0.8s ease;
+  transition: opacity var(--motion-reveal) var(--ease-out-premium), transform var(--motion-reveal) var(--ease-out-premium);
 }
 
 .reveal.active {
