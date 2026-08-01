@@ -44,7 +44,12 @@ exports.createOrder = async (req, res) => {
 
         // Calculate prices
         const itemsPrice = cart.totalPrice;
-        const shippingPrice = itemsPrice > 999 ? 0 : 99; // Free shipping above ₹999
+        // FIXED: this was `itemsPrice > 999`, while the cart and checkout both
+        // used `>= 999`. At a subtotal of exactly ₹999 the storefront promised
+        // free delivery and then the server charged ₹99 — the customer was
+        // billed a total they had never been shown. The threshold now matches
+        // FREE_SHIPPING_THRESHOLD in src/lib/cart.js, inclusive on both sides.
+        const shippingPrice = itemsPrice >= 999 ? 0 : 99; // Free shipping from ₹999
         const taxPrice = Math.round(itemsPrice * 0.18); // 18% GST
         const totalPrice = itemsPrice + shippingPrice + taxPrice;
 
