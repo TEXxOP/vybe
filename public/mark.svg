@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" fill="#14100E"/>
+  <!-- Two-pass misregistration, frozen: the pink plate sits 3px off the ink plate. -->
+  <path d="M13 15 L32 49 L51 15" fill="none" stroke="#FF3B7B" stroke-width="10" stroke-linejoin="miter" transform="translate(3,2)" opacity="0.9"/>
+  <path d="M13 15 L32 49 L51 15" fill="none" stroke="#DCD8CE" stroke-width="10" stroke-linejoin="miter"/>
+</svg>
