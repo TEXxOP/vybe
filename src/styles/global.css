@@ -1,0 +1,259 @@
+/* ==========================================================================
+   VYBE — GLOBAL BASE
+   Reset, base typography, the press-grain field, the single reveal system,
+   and the accessibility floor. Nothing component-specific belongs here.
+   ========================================================================== */
+
+@import './tokens.css';
+
+/* ---- RESET --------------------------------------------------------------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+* { margin: 0; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* Anchor links must clear the fixed header. This replaces the old
+     ScrollToTop hack that silently killed every hash link on the site. */
+  scroll-padding-top: calc(var(--header-h) + var(--space-md));
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-body);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+  overflow-x: hidden;   /* belt-and-braces against rotated paste-up elements */
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+/* NOTE: the old animations.css set `img { opacity: 0 }` and only ever
+   listened for `load`, never `error` — so any Unsplash block or dead
+   placeholder rendered as an invisible element and the layout showed blank
+   holes. Images are visible by default here; the Ink primitive opts in to
+   its own fade and handles onError explicitly. */
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+p,
+h1, h2, h3, h4, h5, h6 { overflow-wrap: break-word; }
+
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Firefox needs this to stop number inputs growing spinners we didn't ask for */
+input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ---- BASE TYPOGRAPHY ----------------------------------------------------- */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+h1 { font-size: var(--text-3xl); }
+h2 { font-size: var(--text-2xl); }
+h3 { font-size: var(--text-xl); }
+h4 { font-size: var(--text-lg); }
+
+p { text-wrap: pretty; }
+
+strong, b { font-weight: var(--weight-bold); }
+
+::selection {
+  background: var(--riso-pink);
+  color: var(--paper-bright);
+}
+
+/* ---- ACCESSIBILITY FLOOR ------------------------------------------------- */
+
+/* Carried over from the old App.css:60-63 — the one piece of a11y
+   infrastructure the previous build got right. Nothing may override it. */
+*:focus-visible {
+  outline: 3px solid var(--stencil-blue);
+  outline-offset: 2px;
+}
+
+/* Only remove the ring for pointer users who already got a visible state */
+*:focus:not(:focus-visible) { outline: none; }
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skipLink {
+  position: absolute;
+  top: var(--space-2xs);
+  left: var(--space-2xs);
+  z-index: var(--z-toast);
+  padding: var(--space-2xs) var(--space-sm);
+  background: var(--ink);
+  color: var(--newsprint);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.skipLink:focus { transform: translateY(0); }
+
+/* ---- THE PRESS GRAIN ----------------------------------------------------
+   A fixed halftone dot field over the whole page. This is what makes the
+   thing read as printed rather than rendered. Pointer-events off, and it
+   must never be part of the layout.                                       */
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  background-image: radial-gradient(
+    var(--ink) 0.5px,
+    transparent 0.5px
+  );
+  background-size: var(--halftone-size) var(--halftone-size);
+  opacity: var(--halftone-alpha);
+  mix-blend-mode: multiply;
+}
+
+/* ---- LAYOUT UTILITIES ---------------------------------------------------- */
+
+.page {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+.pageNarrow {
+  width: 100%;
+  max-width: var(--page-narrow);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+.section { padding-block: var(--section-y); }
+.sectionTight { padding-block: var(--section-y-tight); }
+
+/* ---- THE REVEAL SYSTEM --------------------------------------------------
+   One system, driven by a single IntersectionObserver in lib/useReveal.js
+   which flips [data-reveal="in"]. Replaces the four rival motion systems
+   the previous build accumulated.
+
+   Only transform and opacity are animated — both compositor-friendly. The
+   old build animated width, height, top and left.                        */
+
+[data-reveal] {
+  opacity: 0;
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform var(--dur-reveal) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal='up']    { transform: translate3d(0, 28px, 0); }
+[data-reveal='down']  { transform: translate3d(0, -28px, 0); }
+[data-reveal='left']  { transform: translate3d(32px, 0, 0); }
+[data-reveal='right'] { transform: translate3d(-32px, 0, 0); }
+[data-reveal='scale'] { transform: scale(0.94); }
+[data-reveal='fade']  { transform: none; }
+
+/* A stamp doesn't fade in — it lands. */
+[data-reveal='stamp'] {
+  transform: scale(1.35) rotate(-6deg);
+  transition-timing-function: var(--ease-press);
+  transition-duration: var(--dur-slow);
+}
+
+[data-reveal][data-inview='true'] {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* ---- REDUCED MOTION -----------------------------------------------------
+   Declared once, centrally, and honoured everywhere. The previous build
+   had no prefers-reduced-motion handling at all.
+
+   Note this does NOT hide content — reveals resolve to their final state
+   immediately rather than being skipped.                                  */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
