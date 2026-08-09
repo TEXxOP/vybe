@@ -1,0 +1,185 @@
+/* BUTTON — ink laid on paper, then pressed.
+   The "shadow" is a hard offset duplicate, never a blur. Pressing moves the
+   face onto the shadow, which is what a rubber stamp does. */
+
+.btn {
+  --btn-face: var(--ink);
+  --btn-text: var(--newsprint);
+  --btn-edge: var(--ink);
+  --btn-shadow: var(--riso-pink);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+
+  font-family: var(--font-display);
+  font-weight: var(--weight-display);
+  font-size: var(--text-md);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+
+  color: var(--btn-text);
+  background-color: var(--btn-face);
+  border: 2px solid var(--btn-edge);
+  border-radius: var(--radius-none);
+
+  padding: var(--space-xs) var(--space-md);
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow: 4px 4px 0 var(--btn-shadow);
+  transition:
+    translate var(--dur-fast) var(--ease-snap),
+    box-shadow var(--dur-fast) var(--ease-snap),
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover {
+  translate: -2px -2px;
+  box-shadow: 6px 6px 0 var(--btn-shadow);
+}
+
+.btn:active {
+  translate: 4px 4px;
+  box-shadow: 0 0 0 var(--btn-shadow);
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  opacity: 0.45;
+  translate: none;
+  box-shadow: 4px 4px 0 var(--ink-hairline);
+}
+
+/* ---- VARIANTS ----------------------------------------------------------- */
+
+.ink {
+  --btn-face: var(--ink);
+  --btn-text: var(--newsprint);
+  --btn-edge: var(--ink);
+  --btn-shadow: var(--riso-pink);
+}
+
+.riso {
+  --btn-face: var(--riso-pink);
+  --btn-text: var(--ink);
+  --btn-edge: var(--ink);
+  --btn-shadow: var(--ink);
+}
+
+.blue {
+  --btn-face: var(--stencil-blue);
+  --btn-text: var(--paper-bright);
+  --btn-edge: var(--ink);
+  --btn-shadow: var(--ink);
+}
+
+/* Outline — paper showing through, ink only at the edge. */
+.outline {
+  --btn-face: transparent;
+  --btn-text: var(--ink);
+  --btn-edge: var(--ink);
+  --btn-shadow: var(--ink);
+}
+.outline:hover {
+  --btn-face: var(--ink);
+  --btn-text: var(--newsprint);
+}
+
+/* For use on inked (dark) surfaces. */
+.onInk {
+  --btn-face: transparent;
+  --btn-text: var(--newsprint);
+  --btn-edge: var(--newsprint);
+  --btn-shadow: var(--riso-pink);
+}
+.onInk:hover {
+  --btn-face: var(--newsprint);
+  --btn-text: var(--ink);
+}
+
+/* Text-only. No box, so it gets an underline instead — a link that reads as
+   a link. */
+.quiet {
+  --btn-face: transparent;
+  --btn-text: var(--ink);
+  padding: var(--space-3xs) 0;
+  border: none;
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-label);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--riso-pink);
+}
+.quiet:hover {
+  translate: none;
+  box-shadow: none;
+  color: var(--pink-text);
+}
+.quiet:active { translate: 0 1px; box-shadow: none; }
+
+.danger {
+  --btn-face: transparent;
+  --btn-text: var(--danger);
+  --btn-edge: var(--danger);
+  --btn-shadow: var(--ink);
+}
+.danger:hover {
+  --btn-face: var(--danger);
+  --btn-text: var(--paper-bright);
+}
+
+/* ---- SIZES -------------------------------------------------------------- */
+
+.sm {
+  font-size: var(--text-sm);
+  padding: var(--space-3xs) var(--space-2xs);
+  box-shadow: 3px 3px 0 var(--btn-shadow);
+}
+.sm:hover { box-shadow: 4px 4px 0 var(--btn-shadow); }
+
+.md { font-size: var(--text-md); }
+
+.lg {
+  font-size: var(--text-lg);
+  padding: var(--space-sm) var(--space-lg);
+  box-shadow: 5px 5px 0 var(--btn-shadow);
+}
+.lg:hover { box-shadow: 8px 8px 0 var(--btn-shadow); }
+
+.full { width: 100%; }
+
+/* ---- LOADING ------------------------------------------------------------ */
+
+.loading .label { opacity: 0.55; }
+
+.spinner {
+  position: absolute;
+  right: var(--space-2xs);
+  width: 0.85em;
+  height: 0.85em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-pill);
+  animation: btnSpin 620ms linear infinite;
+}
+
+@keyframes btnSpin {
+  to { rotate: 360deg; }
+}
+
+/* Quiet buttons keep their underline but lose the box on small screens too;
+   nothing size-specific needed. Full-width buttons stop shifting on hover so
+   they don't detach from the form they belong to. */
+.full:hover { translate: none; box-shadow: 4px 4px 0 var(--btn-shadow); }
+.full:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--btn-shadow); }
