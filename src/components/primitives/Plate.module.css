@@ -1,0 +1,118 @@
+/* PLATE — a numbered section with print registration furniture. */
+
+.plate {
+  position: relative;
+  padding-block: var(--section-y);
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.paper { --bg: var(--newsprint); --fg: var(--ink); }
+
+.raised { --bg: var(--paper); --fg: var(--ink); }
+
+/* Inked plate — an inverted spread. Redeclares the derived text tokens so
+   muted copy stays readable on dark ground. Values come from the --on-ink-*
+   group in tokens.css, shared with .onInk and the footer. */
+.ink {
+  --bg: var(--ink);
+  --fg: var(--newsprint);
+  --ink-soft: var(--on-ink-soft);
+  --ink-muted: var(--on-ink-muted);
+  --rule: var(--on-ink-rule);
+  --pink-text: var(--riso-pink);
+  --blue-text: var(--on-ink-blue);
+  --paper-bright: var(--on-ink-raised);
+  --paper: var(--on-ink-paper);
+}
+
+.pink {
+  --bg: var(--riso-pink);
+  --fg: var(--ink);
+  --ink-soft: var(--on-pink-soft);
+  --ink-muted: var(--on-pink-muted);
+  --rule: var(--on-pink-rule);
+  --pink-text: var(--ink);
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+/* Full-bleed plates manage their own horizontal padding internally. */
+.innerBleed {
+  position: relative;
+  width: 100%;
+}
+
+.bleed { padding-block: 0; }
+
+/* ---- MARGIN LABEL -----------------------------------------------------
+   Sits in the gutter, set vertically, like a plate stamp on the edge of a
+   press sheet. Hidden below lg — there is no margin to put it in.        */
+.marginLabel {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .marginLabel {
+    display: block;
+    position: absolute;
+    top: var(--section-y);
+    left: calc(var(--page-gutter) * 0.28);
+    writing-mode: vertical-rl;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    user-select: none;
+  }
+}
+
+/* ---- CROP MARKS -------------------------------------------------------
+   Hairline corner marks, the way a press sheet is trimmed. Deliberately
+   restrained — they're furniture, not ornament.                          */
+.cropTL,
+.cropTR,
+.cropBL,
+.cropBR {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.cropTL {
+  top: var(--space-md);
+  left: var(--space-md);
+  border-top: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+}
+.cropTR {
+  top: var(--space-md);
+  right: var(--space-md);
+  border-top: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+}
+.cropBL {
+  bottom: var(--space-md);
+  left: var(--space-md);
+  border-bottom: 1px solid var(--rule);
+  border-left: 1px solid var(--rule);
+}
+.cropBR {
+  bottom: var(--space-md);
+  right: var(--space-md);
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+}
+
+@media (max-width: 767px) {
+  .cropTL, .cropTR, .cropBL, .cropBR { display: none; }
+}
