@@ -1,0 +1,121 @@
+/* FIELD — a typewriter form. Labels are stamped above, values typed in. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.required {
+  margin-left: 0.25em;
+  color: var(--pink-text);
+}
+
+.control {
+  width: 100%;
+  padding: var(--space-2xs) var(--space-xs);
+
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  line-height: 1.4;
+
+  color: var(--fg);
+  background-color: var(--paper-bright);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-none);
+
+  transition:
+    box-shadow var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.control::placeholder {
+  color: var(--ink-faint);
+  /* A placeholder is an example of the format, never the field's name. */
+  font-style: italic;
+}
+
+.control:hover { background-color: var(--paper); }
+
+.control:focus {
+  outline: none;                            /* replaced, not removed */
+  box-shadow: 4px 4px 0 var(--stencil-blue);
+  background-color: var(--paper-bright);
+}
+
+/* Keyboard users still get the global ring, on top of the ink shadow. */
+.control:focus-visible {
+  outline: 3px solid var(--stencil-blue);
+  outline-offset: 2px;
+}
+
+.control:disabled {
+  background-color: var(--newsprint-deep);
+  color: var(--ink-muted);
+  cursor: not-allowed;
+}
+
+/* ---- SELECT ------------------------------------------------------------- */
+
+.selectWrap {
+  position: relative;
+  display: block;
+}
+
+.selectWrap .control {
+  appearance: none;
+  padding-right: var(--space-lg);
+  cursor: pointer;
+}
+
+.caret {
+  position: absolute;
+  top: 50%;
+  right: var(--space-xs);
+  translate: 0 -50%;
+  pointer-events: none;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+/* ---- MESSAGES ----------------------------------------------------------- */
+
+.hint {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  color: var(--danger);
+}
+
+.error::before {
+  content: '✕';
+  font-weight: var(--weight-bold);
+}
+
+.hasError .control {
+  border-color: var(--danger);
+}
+
+.hasError .control:focus {
+  box-shadow: 4px 4px 0 var(--danger);
+}
