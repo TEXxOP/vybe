@@ -1,0 +1,72 @@
+/* MARQUEE — running stencilled type. */
+
+.marquee {
+  --marq-bg: var(--ink);
+  --marq-fg: var(--newsprint);
+
+  position: relative;
+  overflow: hidden;
+  background-color: var(--marq-bg);
+  color: var(--marq-fg);
+  border-block: 2px solid var(--ink);
+  padding-block: 0.55rem;
+}
+
+.ink   { --marq-bg: var(--ink);           --marq-fg: var(--newsprint); }
+.pink  { --marq-bg: var(--riso-pink);     --marq-fg: var(--ink); }
+.blue  { --marq-bg: var(--stencil-blue);  --marq-fg: var(--paper-bright); }
+.paper { --marq-bg: var(--newsprint);     --marq-fg: var(--ink); }
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marqueeRun var(--speed, 38s) linear infinite;
+}
+
+.run {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-md);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sep {
+  padding-inline: var(--space-md);
+  color: var(--riso-pink);
+  font-size: 0.8em;
+}
+
+.pink .sep,
+.blue .sep { color: currentColor; opacity: 0.55; }
+
+@keyframes marqueeRun {
+  from { translate: 0 0; }
+  to   { translate: -50% 0; }
+}
+
+/* Let people stop it to read it. */
+.marquee:hover .track,
+.marquee:focus-within .track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+    /* Without the loop the duplicate is dead weight, and a max-content track
+       would overflow — so clamp it and let it truncate cleanly. */
+    width: 100%;
+    max-width: 100%;
+  }
+  .track > span[aria-hidden='true'] { display: none; }
+  .run { overflow: hidden; }
+}
