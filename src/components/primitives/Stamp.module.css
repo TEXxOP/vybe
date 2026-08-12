@@ -1,0 +1,41 @@
+/* STAMP — mono type in a hard box, optionally struck at an angle. */
+
+.stamp {
+  --stamp-ink: var(--ink);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  letter-spacing: var(--tracking-stamp);
+  text-transform: uppercase;
+  white-space: nowrap;
+
+  padding: 0.4em 0.6em;
+  color: var(--stamp-ink);
+  border: 1.5px solid var(--stamp-ink);
+  rotate: var(--angle, 0deg);
+}
+
+.solid {
+  background-color: var(--stamp-ink);
+  color: var(--newsprint);
+}
+
+/* Blue and pink as *text* use the darkened accessible variants; as solid
+   fills the fluoro original is fine because the text goes dark on top. */
+.ink    { --stamp-ink: var(--ink); }
+.pink   { --stamp-ink: var(--pink-text); }
+.blue   { --stamp-ink: var(--blue-text); }
+.muted  { --stamp-ink: var(--ink-muted); }
+.danger { --stamp-ink: var(--danger); }
+.ok     { --stamp-ink: var(--ok); }
+
+.pink.solid { background-color: var(--riso-pink); color: var(--ink); }
+.blue.solid { background-color: var(--stencil-blue); color: var(--paper-bright); }
+.ok.solid   { background-color: var(--ok); color: var(--paper-bright); }
+.danger.solid { background-color: var(--danger); color: var(--paper-bright); }
