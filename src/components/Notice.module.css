@@ -1,0 +1,104 @@
+/* ===========================================================================
+   NOTICE — the empty, loading, failed and signed-out states.
+
+   Centred, narrow, and quiet. These screens are read by someone who expected
+   content and didn't get it, so the priority is an explanation they can act on
+   rather than an illustration of a sad box.
+
+   `.body` styles its children with element selectors: the pages pass sentences,
+   not classNames. Scoped inside a hashed module class, so it can't reach
+   anything else.
+   =========================================================================== */
+
+.notice {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: var(--space-2xl) 0;
+    text-align: center;
+}
+
+.title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.body {
+    margin-top: var(--space-sm);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.body p {
+    max-width: 48ch;
+    margin: 0 auto var(--space-sm);
+}
+
+.body p:last-child {
+    margin-bottom: 0;
+}
+
+.body strong {
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+.body a {
+    color: var(--pink-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+/* The failure message keeps its ruled left edge even when centred — it's the one
+   thing on the page that isn't just prose. */
+.body p[role='alert'] {
+    max-width: 52ch;
+    padding: var(--space-2xs) var(--space-sm);
+    border: 1px solid var(--danger);
+    border-left-width: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+    text-align: left;
+    color: var(--danger);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2xs);
+    margin-top: var(--space-lg);
+}
+
+.note {
+    max-width: 54ch;
+    margin: var(--space-xl) auto 0;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    color: var(--ink-muted);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 768px) {
+    .title {
+        font-size: var(--text-4xl);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .body a:hover {
+        color: var(--ink);
+    }
+}
