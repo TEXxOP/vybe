@@ -1,5 +1,11 @@
-// SVG Icons for VYBE E-commerce
-// Clean, minimal icons matching the coral theme
+// SVG icons for VYBE.
+// Stroke-based line icons at a 2px weight, which reads as drawn rather than
+// rendered and sits correctly next to Courier Prime utility type. Brand glyphs
+// (BrandX, BrandInstagram, …) are filled paths because that's how they're
+// specified by their owners.
+//
+// Every icon takes { size, color } and inherits currentColor by default, so
+// colour comes from the surrounding CSS rather than being passed down.
 
 export const Icons = {
     // Shopping & Cart
@@ -201,12 +207,98 @@ export const Icons = {
         </svg>
     ),
 
-    X: ({ size = 20, color = 'currentColor' }) => (
-        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-    )
-};
+    // NOTE: a second `X:` used to be defined here, which silently shadowed the
+    // one at the top of this object (a no-dupe-keys violation — the first
+    // definition was dead code). Removed; there is now exactly one X.
 
-export default Icons;
+    // ---- Navigation & chrome ----
+    Menu: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="7" x2="21" y2="7" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="17" x2="21" y2="17" />
+        </svg>
+    ),
+
+    Search: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" />
+        </svg>
+    ),
+
+    User: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+        </svg>
+    ),
+
+    ChevronDown: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+        </svg>
+    ),
+
+    ArrowLeft: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+        </svg>
+    ),
+
+    Filter: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="7" y1="12" x2="17" y2="12" />
+            <line x1="10" y1="17" x2="14" y2="17" />
+        </svg>
+    ),
+
+    Clock: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <polyline points="12 7 12 12 15.5 14" />
+        </svg>
+    ),
+
+    Mail: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="1" />
+            <polyline points="2.5 5.5 12 13 21.5 5.5" />
+        </svg>
+    ),
+
+    Phone: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z" />
+        </svg>
+    ),
+
+    // ---- Social. Brand glyphs, so filled paths rather than strokes. ----
+    BrandX: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+            <path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.63l-5.2-6.8-5.94 6.8H1.74l7.52-8.6L1.1 2.25h6.8l4.71 6.23 5.63-6.23Zm-1.16 17.52h1.83L5.9 4.13H3.94l13.14 15.64Z" />
+        </svg>
+    ),
+
+    BrandInstagram: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
+            <circle cx="12" cy="12" r="4.2" />
+            <circle cx="17.4" cy="6.6" r="1.1" fill={color} stroke="none" />
+        </svg>
+    ),
+
+    BrandYouTube: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+            <path d="M23 12s0-3.6-.46-5.33a2.78 2.78 0 0 0-1.95-1.96C18.86 4.25 12 4.25 12 4.25s-6.86 0-8.59.46A2.78 2.78 0 0 0 1.46 6.67C1 8.4 1 12 1 12s0 3.6.46 5.33a2.78 2.78 0 0 0 1.95 1.96c1.73.46 8.59.46 8.59.46s6.86 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96C23 15.6 23 12 23 12ZM9.75 15.5v-7l6 3.5-6 3.5Z" />
+        </svg>
+    ),
+
+    BrandTikTok: ({ size = 20, color = 'currentColor' }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+            <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.1v12.4a2.59 2.59 0 1 1-1.84-2.48V9.77a5.68 5.68 0 1 0 4.94 5.63V8.99a7.31 7.31 0 0 0 4.28 1.38V7.27a4.28 4.28 0 0 1-3.22-1.45Z" />
+        </svg>
+    ),
+};
