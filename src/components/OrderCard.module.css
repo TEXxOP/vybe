@@ -1,0 +1,426 @@
+/* ===========================================================================
+   ORDER CARD — one order as a printed docket.
+
+   Shared by /orders and /track-order. A ruled sheet: reference at the top left
+   where a docket number belongs, status stamped at the top right, five-stage
+   press progress, then items, money and destination.
+
+   The stepper is a grid of equal columns with the connecting rule drawn by each
+   step's ::before, which means it needs no knowledge of how many stages there
+   are — add a sixth to lib/orders and it still lines up.
+   =========================================================================== */
+
+.card {
+    padding: var(--space-md);
+    border: 2px solid var(--ink);
+    background-color: var(--paper);
+    transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+/* Dimmed and inert while a cancel request is in flight. The card stays exactly
+   where it is — no collapse, no spinner overlay, nothing that moves the page
+   under a thumb that's still on the button. */
+.card[data-busy='true'] {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+/* ---- HEAD -------------------------------------------------------------- */
+.head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--ink);
+}
+
+.ref {
+    min-width: 0;
+}
+
+.refLabel {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.refNumber {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+    /* One gesture selects the whole reference — it gets pasted into the tracking
+       box and read out over the phone. */
+    user-select: all;
+}
+
+.headMeta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3xs);
+}
+
+.placed {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.blurb {
+    max-width: 58ch;
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- STEPPER ----------------------------------------------------------- */
+.stepper {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3xs);
+    text-align: center;
+}
+
+/* The rule joining this step to the one before it. Sits behind the dots. */
+.step::before {
+    content: '';
+    position: absolute;
+    top: 0.3rem;
+    right: 50%;
+    left: -50%;
+    height: 2px;
+    background-color: var(--ink-hairline);
+}
+
+.step:first-child::before {
+    display: none;
+}
+
+.stepDot {
+    position: relative;
+    z-index: var(--z-raised);
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 2px solid var(--ink-hairline);
+    background-color: var(--paper);
+}
+
+.stepLabel {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+/* Stages already passed: inked in, solid rule behind them. */
+.step[data-state='done'] .stepDot {
+    border-color: var(--ink);
+    background-color: var(--ink);
+}
+
+.step[data-state='done']::before,
+.step[data-state='current']::before {
+    background-color: var(--ink);
+}
+
+.step[data-state='done'] .stepLabel {
+    color: var(--ink-soft);
+}
+
+/* Where the order actually is — the one thing on the card the eye should find
+   first after the status stamp. */
+.step[data-state='current'] .stepDot {
+    border-color: var(--riso-pink);
+    background-color: var(--riso-pink);
+    box-shadow: 0 0 0 3px var(--pink-20);
+}
+
+.step[data-state='current'] .stepLabel {
+    font-weight: var(--weight-bold);
+    color: var(--pink-text);
+}
+
+/* ---- CANCELLED / TRACKING ---------------------------------------------- */
+.cancelled,
+.tracking {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    margin: var(--space-md) 0 0;
+    padding: var(--space-2xs) var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+
+.cancelled {
+    border: 1px solid var(--danger);
+    border-left-width: 3px;
+    color: var(--danger);
+}
+
+.tracking {
+    border: 1px solid var(--ink-hairline);
+    border-left: 3px solid var(--ink);
+    color: var(--ink-soft);
+}
+
+.tracking strong {
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+    user-select: all;
+}
+
+/* ---- ITEMS ------------------------------------------------------------- */
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.item {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr) auto;
+    gap: var(--space-sm);
+    align-items: center;
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--ink-hairline);
+}
+
+.item:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.thumb {
+    width: 3.25rem;
+}
+
+.noThumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--ink-hairline);
+    background-color: var(--newsprint);
+    font-family: var(--font-display);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-shout);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-faint);
+}
+
+.itemBody {
+    min-width: 0;
+}
+
+.itemName {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+}
+
+.itemLink {
+    color: inherit;
+    text-decoration: none;
+}
+
+.itemMeta {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.itemPrice {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+/* ---- TOTALS ------------------------------------------------------------ */
+.totals {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    margin: var(--space-md) 0 0;
+    padding-top: var(--space-sm);
+    border-top: 2px solid var(--ink);
+}
+
+.totalRow,
+.totalGrand {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.totalRow {
+    font-size: var(--text-xs);
+    color: var(--ink-soft);
+}
+
+.totalRow dt,
+.totalGrand dt {
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+
+.totalRow dd,
+.totalGrand dd {
+    margin: 0;
+    text-align: right;
+}
+
+.totalGrand {
+    margin-top: var(--space-3xs);
+    padding-top: var(--space-2xs);
+    border-top: 1px solid var(--ink-hairline);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+/* ---- FOOT -------------------------------------------------------------- */
+.foot {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--ink-hairline);
+}
+
+.ship {
+    min-width: 0;
+}
+
+.shipLabel {
+    margin: 0 0 var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.address {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.payment {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+}
+
+.actionsNote {
+    max-width: 44ch;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    color: var(--ink-muted);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 600px) {
+    .card {
+        padding: var(--space-lg);
+    }
+
+    .headMeta {
+        align-items: flex-end;
+    }
+
+    .item {
+        grid-template-columns: 4rem minmax(0, 1fr) auto;
+    }
+
+    .thumb {
+        width: 4rem;
+    }
+}
+
+@media (min-width: 860px) {
+    .foot {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .actions {
+        align-items: flex-end;
+        text-align: right;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .itemLink:hover {
+        color: var(--pink-text);
+    }
+}
+
+/* Someone who has asked for less motion still gets the state change, just
+   without the fade. */
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none;
+    }
+}
