@@ -1,146 +1,401 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import './Header.css';
+import { Icons } from './Icons';
+import { ROUTES, ANCHORS } from '../lib/routes';
+import { initials, money } from '../lib/format';
+import { FREE_SHIPPING_THRESHOLD } from '../lib/cart';
+import styles from './Header.module.css';
 
-const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const previousCartTotal = useRef(0);
-  const cartButtonRef = useRef(null);
-  const { cart, user, logout } = useCart();
-  const navigate = useNavigate();
-  const location = useLocation();
+/** Nav labels are unchanged from the previous build. What changed is that all
+ *  four of them now actually go somewhere: Collections and About resolve to
+ *  real homepage anchors, and Contact resolves to the footer, which is where
+ *  the contact details actually live. */
+const NAV = [
+    { label: 'Shop', to: ROUTES.shop, kind: 'route' },
+    { label: 'Collections', to: ANCHORS.collections, kind: 'anchor' },
+    { label: 'About', to: ANCHORS.story, kind: 'anchor' },
+    { label: 'Contact', to: ANCHORS.contact, kind: 'anchor' },
+];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+export default function Header() {
+    const { cart, user, logout } = useCart();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  useEffect(() => {
-    if (cart.totalItems > previousCartTotal.current) {
-      cartButtonRef.current?.classList.add('cart-bounce');
-      const timer = window.setTimeout(() => {
-        cartButtonRef.current?.classList.remove('cart-bounce');
-      }, 360);
-      previousCartTotal.current = cart.totalItems;
-      return () => window.clearTimeout(timer);
-    }
+    /**
+     * One enum instead of three booleans: 'drawer' | 'menu' | 'search' | null.
+     *
+     * This makes it structurally impossible for two layers to be open at once
+     * (the old build could show the search panel behind the mobile drawer), and
+     * `openedAt` lets us *derive* the closed state on navigation rather than
+     * synchronising it in an effect. Deriving also fixes the case an effect
+     * would miss cheaply: browser back/forward while a layer is open, because
+     * location.key changes on pops too.
+     */
+    const [openLayer, setOpenLayer] = useState(null);
+    const [openedAt, setOpenedAt] = useState(location.key);
+    const layer = openedAt === location.key ? openLayer : null;
 
-    previousCartTotal.current = cart.totalItems;
-    return undefined;
-  }, [cart.totalItems]);
+    const [query, setQuery] = useState('');
 
-  // Close menu when route changes
-  useEffect(() => {
-    const closeTimer = window.setTimeout(() => setMobileMenuOpen(false), 0);
-    return () => window.clearTimeout(closeTimer);
-  }, [location.pathname]);
+    const menuRef = useRef(null);
+    const menuButtonRef = useRef(null);
+    const drawerRef = useRef(null);
+    const drawerButtonRef = useRef(null);
+    const searchInputRef = useRef(null);
 
-  const handleLogout = () => {
-    logout();
-    setMobileMenuOpen(false);
-    navigate('/');
-  };
+    const count = cart?.totalItems || 0;
 
-  return (
-    <header className={`header ${scrolled ? 'scrolled' : ''}`}>
-      <div className="header-container">
-        {/* Mobile Menu Button */}
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setMobileMenuOpen(true)}
-          aria-label="Open menu"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
+    const open = useCallback(
+        (name) => {
+            setOpenLayer(name);
+            setOpenedAt(location.key);
+        },
+        [location.key]
+    );
 
-        <nav className="nav-left">
-          <Link to="/shop" className="nav-link">Shop</Link>
-          <Link to="/#collections" className="nav-link">Collections</Link>
-          <Link to="/#about" className="nav-link">About</Link>
-          <Link to="/#contact" className="nav-link">Contact</Link>
-        </nav>
+    const close = useCallback(() => setOpenLayer(null), []);
 
-        <Link to="/" className="logo">
-          <span className="logo-text">VYBE</span>
-        </Link>
+    const toggle = useCallback(
+        (name) => {
+            if (layer === name) close();
+            else open(name);
+        },
+        [layer, open, close]
+    );
 
-        <div className="nav-right">
-          <button className="icon-btn search-btn" aria-label="Search">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-          </button>
+    // Escape closes the open layer and returns focus to whatever opened it.
+    useEffect(() => {
+        if (!layer) return undefined;
+        const onKey = (e) => {
+            if (e.key !== 'Escape') return;
+            close();
+            if (layer === 'menu') menuButtonRef.current?.focus();
+            if (layer === 'drawer') drawerButtonRef.current?.focus();
+        };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [layer, close]);
 
-          {user ? (
-            <div className="user-dropdown">
-              <div className="user-avatar">
-                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt={user.name} loading="lazy" decoding="async" />
-              </div>
-              <div className="dropdown-menu">
-                <span className="user-name">{user.name}</span>
-                {user.role === 'admin' && (
-                  <Link to="/admin" className="admin-link">Admin Dashboard</Link>
-                )}
-                <Link to="/orders">My Orders</Link>
-                <button onClick={handleLogout}>Logout</button>
-              </div>
+    // Click-outside for the account menu.
+    // FIXED: the previous build opened this on :hover only, which made it
+    // unreachable by keyboard and unusable on touch — and logout was the only
+    // control inside it.
+    useEffect(() => {
+        if (layer !== 'menu') return undefined;
+        const onDown = (e) => {
+            if (
+                !menuRef.current?.contains(e.target) &&
+                !menuButtonRef.current?.contains(e.target)
+            ) {
+                close();
+            }
+        };
+        document.addEventListener('mousedown', onDown);
+        return () => document.removeEventListener('mousedown', onDown);
+    }, [layer, close]);
+
+    // Lock the page behind the drawer and move focus into it.
+    useEffect(() => {
+        if (layer !== 'drawer') return undefined;
+        const previous = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        drawerRef.current?.querySelector('a, button')?.focus();
+        return () => {
+            document.body.style.overflow = previous;
+        };
+    }, [layer]);
+
+    useEffect(() => {
+        if (layer === 'search') searchInputRef.current?.focus();
+    }, [layer]);
+
+    const onSearch = useCallback(
+        (e) => {
+            e.preventDefault();
+            const q = query.trim();
+            if (!q) return;
+            close();
+            setQuery('');
+            navigate(`${ROUTES.shop}?q=${encodeURIComponent(q)}`);
+        },
+        [query, navigate, close]
+    );
+
+    const handleLogout = useCallback(() => {
+        close();
+        logout();
+        navigate(ROUTES.home);
+    }, [logout, navigate, close]);
+
+    const searchOpen = layer === 'search';
+    const menuOpen = layer === 'menu';
+    const drawerOpen = layer === 'drawer';
+
+    return (
+        <>
+            {/* Real, useful facts rather than a decorative ribbon. Static: a
+                fixed header is the wrong place for perpetual motion. */}
+            <div className={styles.announce}>
+                <span>Free delivery from {money(FREE_SHIPPING_THRESHOLD)}</span>
+                <span className={styles.announceDot} aria-hidden="true">✳</span>
+                <span>7-day returns</span>
+                <span className={styles.announceDot} aria-hidden="true">✳</span>
+                <span>Drop 01 shipping now</span>
             </div>
-          ) : (
-            <Link to="/login" className="login-link">Login</Link>
-          )}
 
-          <Link to="/cart" className="cart-btn" aria-label="Cart" ref={cartButtonRef}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-            </svg>
-            {cart.totalItems > 0 && (
-              <span className="cart-count">{cart.totalItems}</span>
-            )}
-          </Link>
-        </div>
-      </div>
+            <header className={styles.header}>
+                <div className={styles.bar}>
+                    {/* LOGO — printed in two passes, like everything else here.
+                        The pink plate tracks --mis-x/--mis-y from press.js, so
+                        the signature lives in the most-seen element on the site. */}
+                    <Link to={ROUTES.home} className={styles.logo} aria-label="VYBE — home">
+                        <span className={styles.logoGhost} aria-hidden="true">VYBE</span>
+                        <span className={styles.logoInk}>VYBE</span>
+                    </Link>
 
-      {/* Mobile Drawer */}
-      <div className={`mobile-drawer ${mobileMenuOpen ? 'open' : ''}`}>
-        <div className="drawer-header">
-          <span className="logo-text">VYBE</span>
-          <button className="close-btn" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-        <nav className="mobile-nav">
-          <Link to="/shop" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
-          <Link to="/#collections" onClick={() => setMobileMenuOpen(false)}>Collections</Link>
-          <Link to="/#about" onClick={() => setMobileMenuOpen(false)}>About</Link>
-          <Link to="/#contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-          {!user && (
-            <Link to="/login" className="mobile-login" onClick={() => setMobileMenuOpen(false)}>
-              Login / Register
-            </Link>
-          )}
-        </nav>
-      </div>
+                    <nav className={styles.nav} aria-label="Main">
+                        {NAV.map((item) =>
+                            item.kind === 'route' ? (
+                                <NavLink
+                                    key={item.label}
+                                    to={item.to}
+                                    className={({ isActive }) =>
+                                        isActive
+                                            ? `${styles.navLink} ${styles.navLinkActive}`
+                                            : styles.navLink
+                                    }
+                                >
+                                    {item.label}
+                                </NavLink>
+                            ) : (
+                                <Link key={item.label} to={item.to} className={styles.navLink}>
+                                    {item.label}
+                                </Link>
+                            )
+                        )}
+                    </nav>
 
-      {/* Backdrop */}
-      {mobileMenuOpen && (
-        <div className="drawer-backdrop" onClick={() => setMobileMenuOpen(false)} />
-      )}
-    </header>
-  );
-};
+                    <div className={styles.actions}>
+                        <button
+                            type="button"
+                            className={styles.iconBtn}
+                            aria-label={searchOpen ? 'Close search' : 'Search products'}
+                            aria-expanded={searchOpen}
+                            aria-controls="header-search"
+                            onClick={() => toggle('search')}
+                        >
+                            {searchOpen ? <Icons.X size={19} /> : <Icons.Search size={19} />}
+                        </button>
 
-export default Header;
+                        <Link
+                            to={ROUTES.cart}
+                            className={styles.iconBtn}
+                            aria-label={
+                                count === 0
+                                    ? 'Cart, empty'
+                                    : `Cart, ${count} item${count === 1 ? '' : 's'}`
+                            }
+                        >
+                            <Icons.Cart size={19} />
+                            {count > 0 ? (
+                                // key={count} remounts the badge whenever the
+                                // number changes, which restarts the CSS stamp
+                                // animation — no state, no timers, no effect.
+                                <span key={count} className={styles.badge} aria-hidden="true">
+                                    {count > 99 ? '99+' : count}
+                                </span>
+                            ) : null}
+                        </Link>
+
+                        {user ? (
+                            <div className={styles.account}>
+                                <button
+                                    type="button"
+                                    ref={menuButtonRef}
+                                    className={styles.avatar}
+                                    aria-expanded={menuOpen}
+                                    aria-controls="account-menu"
+                                    aria-haspopup="menu"
+                                    onClick={() => toggle('menu')}
+                                >
+                                    {/* Initials — not the stock photograph of a
+                                        stranger the old build used as every
+                                        single user's avatar. */}
+                                    <span aria-hidden="true">
+                                        {initials(user.name, user.email)}
+                                    </span>
+                                    <span className="visuallyHidden">
+                                        Account menu for {user.name || user.email}
+                                    </span>
+                                </button>
+
+                                {menuOpen ? (
+                                    <div
+                                        className={styles.menu}
+                                        id="account-menu"
+                                        ref={menuRef}
+                                        role="menu"
+                                        onClick={close}
+                                    >
+                                        <p className={styles.menuHead}>
+                                            <span className={styles.menuName}>
+                                                {user.name || 'Your account'}
+                                            </span>
+                                            <span className={styles.menuMail}>{user.email}</span>
+                                        </p>
+                                        <Link
+                                            to={ROUTES.orders}
+                                            className={styles.menuItem}
+                                            role="menuitem"
+                                        >
+                                            My orders
+                                        </Link>
+                                        <Link
+                                            to={ROUTES.trackOrder}
+                                            className={styles.menuItem}
+                                            role="menuitem"
+                                        >
+                                            Track an order
+                                        </Link>
+                                        {user.role === 'admin' ? (
+                                            <Link
+                                                to={ROUTES.admin}
+                                                className={styles.menuItem}
+                                                role="menuitem"
+                                            >
+                                                Admin
+                                            </Link>
+                                        ) : null}
+                                        <button
+                                            type="button"
+                                            className={styles.menuItem}
+                                            role="menuitem"
+                                            onClick={handleLogout}
+                                        >
+                                            Log out
+                                        </button>
+                                    </div>
+                                ) : null}
+                            </div>
+                        ) : (
+                            <Link to={ROUTES.login} className={styles.loginLink}>
+                                Log in
+                            </Link>
+                        )}
+
+                        <button
+                            type="button"
+                            ref={drawerButtonRef}
+                            className={`${styles.iconBtn} ${styles.hamburger}`}
+                            aria-label="Open menu"
+                            aria-expanded={drawerOpen}
+                            aria-controls="mobile-drawer"
+                            onClick={() => open('drawer')}
+                        >
+                            <Icons.Menu size={21} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* SEARCH — wired to the real /products/search endpoint. The old
+                    build rendered this icon as pure decoration. */}
+                <div className={styles.searchPanel} id="header-search" hidden={!searchOpen}>
+                    <form className={styles.searchForm} onSubmit={onSearch} role="search">
+                        <label className="visuallyHidden" htmlFor="header-search-input">
+                            Search products
+                        </label>
+                        <input
+                            id="header-search-input"
+                            ref={searchInputRef}
+                            className={styles.searchInput}
+                            type="search"
+                            value={query}
+                            placeholder="jackets, cargos, caps…"
+                            onChange={(e) => setQuery(e.target.value)}
+                        />
+                        <button type="submit" className={styles.searchSubmit}>
+                            Search
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            {/* MOBILE DRAWER */}
+            {drawerOpen ? (
+                <div className={styles.scrim} role="presentation" onClick={close}>
+                    <div
+                        className={styles.drawer}
+                        id="mobile-drawer"
+                        ref={drawerRef}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Menu"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className={styles.drawerTop}>
+                            <span className={styles.drawerMark}>VYBE</span>
+                            <button
+                                type="button"
+                                className={styles.iconBtn}
+                                aria-label="Close menu"
+                                onClick={close}
+                            >
+                                <Icons.X size={21} />
+                            </button>
+                        </div>
+
+                        {/* Any click on a link in here closes the drawer. Every
+                            child is a navigation control, so delegating is
+                            correct and avoids an onClick on each one. */}
+                        <nav className={styles.drawerNav} aria-label="Mobile" onClick={close}>
+                            {NAV.map((item) => (
+                                <Link key={item.label} to={item.to} className={styles.drawerLink}>
+                                    {item.label}
+                                </Link>
+                            ))}
+                            <Link to={ROUTES.sizeGuide} className={styles.drawerLink}>
+                                Size guide
+                            </Link>
+                            <Link to={ROUTES.trackOrder} className={styles.drawerLink}>
+                                Track order
+                            </Link>
+                        </nav>
+
+                        <div className={styles.drawerFoot} onClick={close}>
+                            {user ? (
+                                <>
+                                    <Link to={ROUTES.orders} className={styles.drawerSmall}>
+                                        My orders
+                                    </Link>
+                                    {user.role === 'admin' ? (
+                                        <Link to={ROUTES.admin} className={styles.drawerSmall}>
+                                            Admin
+                                        </Link>
+                                    ) : null}
+                                    <button
+                                        type="button"
+                                        className={styles.drawerSmall}
+                                        onClick={handleLogout}
+                                    >
+                                        Log out
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to={ROUTES.login} className={styles.drawerSmall}>
+                                        Log in
+                                    </Link>
+                                    <Link to={ROUTES.register} className={styles.drawerSmall}>
+                                        Create account
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+        </>
+    );
+}

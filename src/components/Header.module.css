@@ -1,0 +1,475 @@
+/* ===========================================================================
+   HEADER — the masthead of a printed sheet.
+   Newsprint ground, one heavy ink rule at the baseline, and a wordmark that
+   prints in two passes. Everything here is scoped: nothing in this file can
+   reach another component, which is the whole reason the old global
+   Header.css/Navbar.css pair had to go.
+   =========================================================================== */
+
+/* ---- ANNOUNCEMENT STRIP ------------------------------------------------
+   Scrolls away with the page; only the header itself sticks.              */
+.announce {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) var(--page-gutter);
+    background-color: var(--ink);
+    color: var(--newsprint);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.announceDot {
+    color: var(--riso-pink);
+}
+
+/* ---- STICKY BAR -------------------------------------------------------- */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background-color: var(--newsprint);
+    border-bottom: 2px solid var(--ink);
+}
+
+.bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    width: 100%;
+    max-width: var(--page-max);
+    min-height: var(--header-h);
+    margin-inline: auto;
+    padding-inline: var(--page-gutter);
+}
+
+/* ---- WORDMARK ---------------------------------------------------------- */
+.logo {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    margin-right: auto;
+    font-family: var(--font-display);
+    font-size: clamp(1.65rem, 4.5vw, 2.15rem);
+    font-weight: var(--weight-shout);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    /* Contains the multiply blend so it can't reach the header background. */
+    isolation: isolate;
+}
+
+/* The off-register pink plate. Tracks the scroll spring from press.js; the
+   fallback keeps a visible 2px offset if the script never runs. */
+.logoGhost {
+    position: absolute;
+    inset: 0;
+    color: var(--riso-pink);
+    translate: var(--mis-x, 2px) var(--mis-y, 2px);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    user-select: none;
+}
+
+.logoInk {
+    position: relative;
+}
+
+/* ---- NAV --------------------------------------------------------------- */
+.nav {
+    display: none;
+}
+
+.navLink {
+    position: relative;
+    padding: var(--space-3xs) 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+    transition: color var(--dur-fast) var(--ease-out);
+}
+
+/* A hard pink block, struck through the label like a stamp. No underline
+   slides, no gradient fills. */
+.navLink::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 3px;
+    background-color: var(--riso-pink);
+    scale: 0 1;
+    transform-origin: left center;
+    transition: scale var(--dur-fast) var(--ease-snap);
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+    color: var(--ink);
+}
+
+.navLink:hover::after,
+.navLink:focus-visible::after,
+.navLinkActive::after {
+    scale: 1 1;
+}
+
+.navLinkActive {
+    color: var(--ink);
+}
+
+/* ---- ACTIONS ----------------------------------------------------------- */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    flex: none;
+}
+
+.iconBtn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    transition: color var(--dur-fast) var(--ease-out);
+}
+
+.iconBtn:hover {
+    color: var(--pink-text);
+}
+
+.badge {
+    position: absolute;
+    top: 0.28rem;
+    right: 0.16rem;
+    display: grid;
+    place-items: center;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding-inline: 0.22rem;
+    border-radius: var(--radius-pill);
+    background-color: var(--riso-pink);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    /* Runs on mount. Header.jsx remounts this via key={count}, so the stamp
+       replays every time the number changes. */
+    animation: badgeStamp 420ms var(--ease-press);
+}
+
+@keyframes badgeStamp {
+    0% { scale: 1; }
+    35% { scale: 1.45; }
+    100% { scale: 1; }
+}
+
+.loginLink {
+    padding: var(--space-3xs) var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transition: color var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
+}
+
+.loginLink:hover {
+    color: var(--pink-text);
+    border-color: var(--riso-pink);
+}
+
+/* ---- ACCOUNT MENU ----------------------------------------------------- */
+.account {
+    position: relative;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 2px solid var(--ink);
+    background-color: var(--paper-bright);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.avatar:hover,
+.avatar[aria-expanded='true'] {
+    background-color: var(--riso-pink);
+}
+
+.menu {
+    position: absolute;
+    top: calc(100% + var(--space-2xs));
+    right: 0;
+    z-index: var(--z-raised);
+    display: flex;
+    flex-direction: column;
+    min-width: 14rem;
+    background-color: var(--paper-bright);
+    border: 2px solid var(--ink);
+    box-shadow: var(--print-offset);
+    animation: menuIn var(--dur-fast) var(--ease-out);
+}
+
+@keyframes menuIn {
+    from { opacity: 0; translate: 0 -6px; }
+    to   { opacity: 1; translate: 0 0; }
+}
+
+.menuHead {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    margin: 0;
+    padding: var(--space-2xs) var(--space-xs);
+    border-bottom: 1px solid var(--ink-hairline);
+}
+
+.menuName {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--ink);
+}
+
+.menuMail {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--ink-muted);
+    overflow-wrap: anywhere;
+}
+
+.menuItem {
+    padding: var(--space-2xs) var(--space-xs);
+    border: 0;
+    border-bottom: 1px solid var(--ink-hairline);
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: left;
+    text-decoration: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background-color var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out);
+}
+
+.menuItem:last-child {
+    border-bottom: 0;
+}
+
+.menuItem:hover,
+.menuItem:focus-visible {
+    background-color: var(--ink);
+    color: var(--newsprint);
+}
+
+/* ---- SEARCH ----------------------------------------------------------- */
+.searchPanel {
+    border-top: 1px solid var(--ink-hairline);
+    background-color: var(--paper-bright);
+}
+
+.searchForm {
+    display: flex;
+    gap: var(--space-2xs);
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-xs) var(--page-gutter);
+}
+
+.searchInput {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--space-2xs) var(--space-xs);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-none);
+    background-color: var(--newsprint);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+}
+
+.searchInput::placeholder {
+    color: var(--ink-faint);
+}
+
+.searchSubmit {
+    flex: none;
+    padding: var(--space-2xs) var(--space-sm);
+    border: 2px solid var(--ink);
+    background-color: var(--ink);
+    color: var(--newsprint);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.searchSubmit:hover {
+    background-color: var(--riso-pink);
+    color: var(--ink);
+}
+
+/* ---- MOBILE DRAWER ---------------------------------------------------- */
+.scrim {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-drawer);
+    background-color: var(--scrim);
+    animation: scrimIn var(--dur-fast) var(--ease-out);
+}
+
+@keyframes scrimIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.drawer {
+    display: flex;
+    flex-direction: column;
+    width: min(20rem, 86vw);
+    height: 100%;
+    margin-left: auto;
+    background-color: var(--newsprint);
+    border-left: 2px solid var(--ink);
+    overflow-y: auto;
+    animation: drawerIn var(--dur-mid) var(--ease-out);
+}
+
+@keyframes drawerIn {
+    from { translate: 100% 0; }
+    to   { translate: 0 0; }
+}
+
+.drawerTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--header-h);
+    padding-inline: var(--space-sm);
+    border-bottom: 2px solid var(--ink);
+}
+
+.drawerMark {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-shout);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.drawerNav {
+    display: flex;
+    flex-direction: column;
+}
+
+.drawerLink {
+    padding: var(--space-sm);
+    border-bottom: 1px solid var(--ink-hairline);
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+}
+
+.drawerLink:active {
+    background-color: var(--riso-pink);
+}
+
+.drawerFoot {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+    border-top: 2px solid var(--ink);
+}
+
+.drawerSmall {
+    padding: var(--space-xs) var(--space-sm);
+    border: 0;
+    border-bottom: 1px solid var(--ink-hairline);
+    background: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: left;
+    text-decoration: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.drawerSmall:last-child {
+    border-bottom: 0;
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 768px) {
+    .nav {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        margin-right: var(--space-md);
+    }
+
+    .actions {
+        gap: var(--space-2xs);
+    }
+
+    .hamburger {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .badge,
+    .menu,
+    .scrim,
+    .drawer {
+        animation: none;
+    }
+
+    .navLink::after {
+        transition: none;
+    }
+}
