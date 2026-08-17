@@ -1,131 +1,113 @@
 import { Link } from 'react-router-dom';
-import './Collections.css';
+import Plate from './primitives/Plate';
+import Ink from './primitives/Ink';
+import Button from './primitives/Button';
+import Reveal from './primitives/Reveal';
+import { shopCategory, ROUTES } from '../lib/routes';
+import styles from './Collections.module.css';
 
-const Collections = () => {
-    const collections = [
-        {
-            id: 1,
-            name: 'EDGE',
-            eyebrow: 'Outerwear',
-            slug: 'jackets',
-            color: '#1A8B8B',
-            images: [
-                'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=500&h=700&fit=crop',
-                'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=500&h=700&fit=crop'
-            ]
-        },
-        {
-            id: 2,
-            name: 'CANVAS',
-            eyebrow: 'Graphic tees',
-            slug: 'shirts',
-            color: '#E87D6F',
-            images: [
-                'https://images.unsplash.com/photo-1544441893-675973e31985?w=250&h=350&fit=crop',
-                'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=250&h=350&fit=crop'
-            ]
-        },
-        {
-            id: 3,
-            name: 'ENERGY',
-            eyebrow: 'Hoodies',
-            slug: 'hoodies',
-            color: '#2D2D2D',
-            images: [
-                'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?w=250&h=350&fit=crop',
-                'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=250&h=350&fit=crop'
-            ]
-        }
-    ];
+/**
+ * PLATE 01 — Collections.
+ *
+ * Three collections, three inks. Each card is a single link with the image,
+ * the name and the category all inside it, which is what it always looked
+ * like but never was: the previous markup nested a vertical label and a copy
+ * block inside an <a> alongside two competing images, and flanked the whole
+ * thing with a pair of arrow <button>s that carouselled nothing — there were
+ * only ever three cards, and they were all already on screen.
+ *
+ * Two real fixes carried in here:
+ *
+ *   - The section had no heading of any kind, so the header's "Collections"
+ *     nav link scrolled to an unlabelled region. It has an <h2> now.
+ *   - Links went to a hand-written `/shop?category=…`, which Shop.jsx never
+ *     read. They resolve through shopCategory() and Shop now honours it.
+ *
+ * The second image per card is gone. It existed as an onError fallback for the
+ * first, which Ink handles properly; two 250px-wide photographs crammed into a
+ * third of a row was never legible anyway.
+ */
 
-    const handleImageError = (event, fallbackUrl) => {
-        event.currentTarget.src = fallbackUrl;
-        event.currentTarget.classList.add('image-loaded');
-    };
+const COLLECTIONS = [
+  {
+    name: 'EDGE',
+    eyebrow: 'Outerwear',
+    slug: 'jackets',
+    plate: 'pink',
+    image:
+      'https://images.unsplash.com/photo-1551537482-f2075a1d41f2?w=800&h=1000&fit=crop',
+    alt: 'A model in an oversized technical jacket',
+  },
+  {
+    name: 'CANVAS',
+    eyebrow: 'Graphic tees',
+    slug: 'shirts',
+    plate: 'orange',
+    image:
+      'https://images.unsplash.com/photo-1544441893-675973e31985?w=800&h=1000&fit=crop',
+    alt: 'A folded stack of printed cotton tees',
+  },
+  {
+    name: 'ENERGY',
+    eyebrow: 'Hoodies',
+    slug: 'hoodies',
+    plate: 'blue',
+    image:
+      'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?w=800&h=1000&fit=crop',
+    alt: 'A model wearing a heavyweight hooded sweatshirt',
+  },
+];
 
-    return (
-        <section className="collections" id="collections" data-reveal>
-            {/* Dark Container - extends full width */}
-            <div className="collections-box">
-                {/* Left Arrow */}
-                <button className="nav-arrow left-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M15 18l-6-6 6-6" />
-                    </svg>
-                </button>
+export default function Collections() {
+  return (
+    <Plate id="collections" index={1} ink="three inks" tone="ink">
+      <header className={styles.head}>
+        <h2 className={styles.title}>Collections</h2>
+        <p className={styles.note}>
+          Three runs, three inks. Pick a plate.
+        </p>
+      </header>
 
-                {/* Center Content */}
-                <div className="collections-center">
-                    {/* Cards Row */}
-                    <div className="cards-row">
-                        {collections.map((collection, index) => (
-                            <Link
-                                to={`/shop?category=${collection.slug}`}
-                                key={collection.id}
-                                className="card card-hover-lift"
-                                data-reveal
-                                style={{ '--label-color': collection.color, '--reveal-delay': `${index * 80}ms` }}
-                            >
-                                {/* Two tall images side by side */}
-                                <div className="card-images">
-                                    <div className="card-img card-img-primary">
-                                        <img
-                                            src={collection.images[0]}
-                                            alt={collection.name}
-                                            loading="lazy"
-                                            decoding="async"
-                                            onError={(event) => handleImageError(event, collection.images[1])}
-                                        />
-                                    </div>
-                                    <div className="card-img card-img-secondary">
-                                        <img
-                                            src={collection.images[1]}
-                                            alt={collection.name}
-                                            loading="lazy"
-                                            decoding="async"
-                                            onError={(event) => handleImageError(event, collection.images[0])}
-                                        />
-                                    </div>
-                                </div>
+      <ul className={styles.grid}>
+        {COLLECTIONS.map((collection, i) => (
+          <Reveal
+            as="li"
+            key={collection.slug}
+            variant="up"
+            delay={i * 90}
+            className={styles.cell}
+          >
+            <Link className={styles.card} to={shopCategory(collection.slug)}>
+              <span className={styles.cardNum} aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
 
-                                <div className="card-copy">
-                                    <span>{collection.eyebrow}</span>
-                                    <strong>{collection.name}</strong>
-                                </div>
+              <Ink
+                src={collection.image}
+                alt={collection.alt}
+                ratio="4 / 5"
+                plate={collection.plate}
+                className={styles.cardInk}
+                sizes="(min-width: 900px) 30vw, 88vw"
+              />
 
-                                {/* Vertical label */}
-                                <div className="card-label">
-                                    <span className="label-arrow">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M7 17L17 7M17 7H7M17 7v10" />
-                                        </svg>
-                                    </span>
-                                    <span className="label-text">{collection.name}</span>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+              <span className={styles.cardCopy}>
+                <span className={styles.cardEyebrow}>{collection.eyebrow}</span>
+                <strong className={styles.cardName}>{collection.name}</strong>
+                <span className={styles.cardCue} aria-hidden="true">
+                  Shop {collection.name} →
+                </span>
+              </span>
+            </Link>
+          </Reveal>
+        ))}
+      </ul>
 
-                    {/* View All Button - inside the box */}
-                    <Link to="/shop" className="view-all-btn">
-                        <span>View All Collections</span>
-                        <span className="btn-arrow">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                            </svg>
-                        </span>
-                    </Link>
-                </div>
-
-                {/* Right Arrow */}
-                <button className="nav-arrow right-arrow">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M9 18l6-6-6-6" />
-                    </svg>
-                </button>
-            </div>
-        </section>
-    );
-};
-
-export default Collections;
+      <div className={styles.foot}>
+        <Button to={ROUTES.shop} variant="onInk" size="lg">
+          View All Collections
+        </Button>
+      </div>
+    </Plate>
+  );
+}
