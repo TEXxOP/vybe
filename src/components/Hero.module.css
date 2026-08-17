@@ -1,0 +1,314 @@
+/* ===========================================================================
+   HERO — the cover.
+
+   Mobile is one column: slug, headline, standfirst, photograph, features.
+   At 900px it becomes a spread, with the photograph rising into the headline's
+   right margin so the two overlap the way a pasted-up cover does. The overlap
+   is the whole point — a hero where the type and the image sit in tidy,
+   separate boxes is a slide, not a cover.
+   =========================================================================== */
+
+.hero {
+    position: relative;
+    background-color: var(--newsprint);
+    border-bottom: 2px solid var(--ink);
+}
+
+.sheet {
+    width: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-lg) var(--page-gutter) var(--space-xl);
+}
+
+/* ---- ISSUE SLUG --------------------------------------------------------
+   The line a printed sheet carries above the masthead: which issue, what's
+   inside. Real information, so it earns the space.                       */
+.slug {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--ink);
+}
+
+.slugText,
+.slugIssue {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.slugRule {
+    flex: 1 1 auto;
+    height: 1px;
+    background-color: var(--ink-hairline);
+}
+
+.slugIssue {
+    color: var(--ink);
+    font-weight: var(--weight-bold);
+}
+
+/* ---- HEADLINE ---------------------------------------------------------- */
+.title {
+    display: flex;
+    flex-direction: column;
+    margin: var(--space-md) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-mega);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+    /* Keeps the multiply blend on the shouted words from reaching the page. */
+    isolation: isolate;
+}
+
+.line {
+    display: block;
+}
+
+/* The two shouted words. Two stacked passes in the same box: the ink pass on
+   top, a solid colour pass behind it, nudged out of register by the shared
+   scroll spring. */
+.shout {
+    position: relative;
+}
+
+.shoutInk {
+    position: relative;
+    display: block;
+}
+
+.shoutGhost {
+    position: absolute;
+    inset: 0;
+    display: block;
+    color: var(--riso-pink);
+    translate: var(--mis-x, 3px) var(--mis-y, 3px);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    user-select: none;
+}
+
+.shoutBlue .shoutGhost {
+    color: var(--stencil-blue);
+}
+
+/* ---- STANDFIRST -------------------------------------------------------- */
+.standfirst {
+    margin-top: var(--space-md);
+    max-width: 34rem;
+}
+
+.kicker {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.lede {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    line-height: var(--leading-snug);
+    color: var(--ink-soft);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-top: var(--space-sm);
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin: var(--space-md) 0 0;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    line-height: var(--leading-snug);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+.stars {
+    font-size: var(--text-base);
+    letter-spacing: 0.08em;
+    color: var(--riso-orange);
+}
+
+/* ---- PHOTOGRAPH -------------------------------------------------------- */
+.plateArea {
+    position: relative;
+    margin-top: var(--space-lg);
+}
+
+.model {
+    width: 100%;
+}
+
+/* The clipping. On mobile it sits under the photograph; on the spread it
+   overlaps the bottom-left corner, taped down. */
+.clipping {
+    margin-top: var(--space-sm);
+    padding: var(--space-xs);
+    background-color: var(--paper-bright);
+    border: 2px solid var(--ink);
+    box-shadow: var(--print-offset);
+}
+
+.clippingLabel {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.clippingTitle {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.clippingNote {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+}
+
+.clippingPrice {
+    margin: var(--space-2xs) 0 var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+/* ---- FEATURE STRIP ---------------------------------------------------- */
+.features {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: var(--space-lg) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--ink);
+}
+
+.feature {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2xs);
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid var(--ink-hairline);
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.featureNum {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-body);
+    color: var(--pink-text);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 600px) {
+    .features {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: var(--space-md);
+    }
+}
+
+@media (min-width: 900px) {
+    .sheet {
+        display: grid;
+        /* Two columns that deliberately don't add up to the container: the
+           photograph column starts before the type column ends. */
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        grid-template-areas:
+            'slug  slug'
+            'title plate'
+            'text  plate'
+            'feat  feat';
+        align-items: start;
+        column-gap: var(--space-lg);
+        padding-block: var(--space-xl) var(--space-2xl);
+    }
+
+    .slug {
+        grid-area: slug;
+    }
+
+    .title {
+        grid-area: title;
+        /* Lets the longest line run into the photograph's gutter. */
+        position: relative;
+        z-index: var(--z-raised);
+        margin-top: var(--space-lg);
+    }
+
+    .standfirst {
+        grid-area: text;
+        margin-top: var(--space-md);
+    }
+
+    .plateArea {
+        grid-area: plate;
+        margin-top: var(--space-lg);
+        /* Pulls the photograph left, under the headline's overhang. */
+        margin-left: calc(var(--space-lg) * -1);
+    }
+
+    .clipping {
+        position: absolute;
+        left: calc(var(--space-md) * -1);
+        bottom: calc(var(--space-lg) * -1);
+        width: min(15rem, 62%);
+        margin-top: 0;
+        rotate: -1.4deg;
+    }
+
+    .features {
+        grid-area: feat;
+        margin-top: var(--space-2xl);
+    }
+}
+
+@media (min-width: 1200px) {
+    .plateArea {
+        margin-left: calc(var(--space-2xl) * -1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shoutGhost {
+        translate: 3px 3px;
+    }
+}

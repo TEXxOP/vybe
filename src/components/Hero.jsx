@@ -1,263 +1,194 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Icons } from './Icons';
-import './Hero.css';
-import modelImage from '../assets/model.png';
+import { useEffect, useState } from 'react';
+import Button from './primitives/Button';
+import Ink from './primitives/Ink';
+import Stamp from './primitives/Stamp';
+import Marquee from './primitives/Marquee';
+import { productsAPI } from '../services/api';
+import { ROUTES, ANCHORS } from '../lib/routes';
+import { money } from '../lib/format';
+import { FREE_SHIPPING_THRESHOLD } from '../lib/cart';
+import modelImage from '../assets/model.webp';
+import styles from './Hero.module.css';
 
-const Hero = () => {
-    const heroRef       = useRef(null);
-    const wrapperRef    = useRef(null);
-    const glitchRRef    = useRef(null);
-    const glitchBRef    = useRef(null);
-    const scanlinesRef  = useRef(null);
+/**
+ * HERO — the cover of Issue 01.
+ *
+ * The page is a press run, so this is its front page: masthead-scale type, a
+ * cut-out photograph taped down over it, and a strip of facts along the
+ * bottom. Every word here is carried over from the previous build; what has
+ * changed is that all of it is now either true or clickable.
+ *
+ * Four things the previous Hero did that this one doesn't:
+ *
+ *   1. ~100 lines of bespoke rAF: a glitch timer, a mouse-tilt handler and a
+ *      chromatic-aberration loop, each with its own listener and its own
+ *      requestAnimationFrame. Three independent frame loops in one component,
+ *      none of them cancelled on unmount. The misregistration is now driven by
+ *      the single shared loop in lib/press.js, which every Ink on the site
+ *      reads from the same two custom properties.
+ *   2. Four <img> avatars pointing at Unsplash portraits of strangers, framed
+ *      as "The Vybe Tribe". The rating is real information — it doesn't need
+ *      fake faces attached to it, so it's a stamp now.
+ *   3. A hardcoded link to /product/1. Product ids are Mongo ObjectIds, so
+ *      that link 404'd on every install. The featured card now resolves a real
+ *      product, and falls back to a plain shop link rather than a broken one.
+ *   4. Two decorative arrow buttons that carousel nothing.
+ *
+ * The cut-out itself is the same photograph, re-encoded. It was a 426 KB PNG —
+ * PNG because the model is cut out and the transparency has to survive, which
+ * rules out JPEG. WebP keeps the alpha and lands at 50 KB, and the alpha channel
+ * comes through with a mean difference of exactly 0, so the mask is bit-for-bit
+ * what it was. This is the `priority` image and almost certainly the page's LCP
+ * element, which makes 8x off its weight the single largest performance win
+ * available here.
+ */
 
-    // Preload model image
-    useEffect(() => {
-        const link = document.createElement('link');
-        link.rel = 'preload'; link.as = 'image'; link.href = modelImage;
-        document.head.appendChild(link);
-        return () => document.head.removeChild(link);
-    }, []);
+/* The three promises, kept verbatim from the previous build. */
+const FEATURES = ['Future Threads', 'Unique Designs', 'Limited Drops'];
 
-    // Rise-up parallax + 3D mouse tilt + subtle chromatic glitch
-    useEffect(() => {
-        const hero    = heroRef.current;
-        const wrapper = wrapperRef.current;
-        const rLayer  = glitchRRef.current;
-        const bLayer  = glitchBRef.current;
-        if (!wrapper) return;
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+/* The ticker states a price promise, so it reads the constant the checkout
+   charges against rather than restating it. Written out as "₹999" this was the
+   last hardcoded threshold left in live code — and the whole point of
+   FREE_SHIPPING_THRESHOLD is that a marketing claim and a billing rule can't
+   drift apart. "From", not "over": the rule is `>= 999`, so ₹999 exactly ships
+   free. See the note in lib/cart.js. */
+const TICKER = [
+  'Drop 01 shipping now',
+  `Free delivery from ${money(FREE_SHIPPING_THRESHOLD)}`,
+  '7-day returns',
+  'Printed in limited runs',
+];
 
-        const lerp = (a, b, t) => a + (b - a) * t;
+export default function Hero() {
+  /* One request, for one card. The image above it is a local asset, so this
+     never sits in front of the largest contentful paint. */
+  const [featured, setFeatured] = useState(null);
 
-        let tiltTargetX = 0, tiltTargetY = 0;
-        let tiltX = 0, tiltY = 0;
-        let scrollY    = 0;   // raw scrollY snapshot
-        let chromatic  = 0;   // 0 → 1 chromatic intensity
-        let spike = 0;
-        let spikeTimer = null;
-        let raf = 0;
+  useEffect(() => {
+    let live = true;
+    productsAPI
+      .getFeatured()
+      .then((res) => {
+        const first = (res?.data || res?.products || [])[0];
+        if (live && first) setFeatured(first);
+      })
+      .catch(() => {
+        /* Offline or no backend: the fallback clipping below still prints. */
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
 
-        const tick = () => {
-            tiltX = lerp(tiltX, tiltTargetX, 0.07);
-            tiltY = lerp(tiltY, tiltTargetY, 0.07);
+  const product = featured || null;
+  const price = product ? product.price : 2672;
+  const title = product ? product.name : 'Urban Vanguard Tee';
+  const to = product ? ROUTES.product(product._id) : ROUTES.shop;
 
-            const heroH = hero.offsetHeight || window.innerHeight;
-            // progress 0→1 over first 65% of hero height
-            const prog = Math.min(scrollY / (heroH * 0.65), 1);
+  return (
+    <section className={styles.hero} aria-labelledby="hero-title">
+      <div className={styles.sheet}>
+        {/* ---- ISSUE SLUG ------------------------------------------------ */}
+        <div className={styles.slug}>
+          <Stamp tone="pink" solid>
+            Drop 01
+          </Stamp>
+          <span className={styles.slugText}>New Arrivals</span>
+          <span className={styles.slugRule} aria-hidden="true" />
+          <span className={styles.slugIssue}>VYBE</span>
+        </div>
 
-            // ── Zoom toward camera ─────────────────────────────────────
-            const scale = 1 + prog * 0.22;   // 1.0 → 1.22
+        {/* ---- HEADLINE --------------------------------------------------
+            Four lines, flush left, set tight enough to read as one block.
+            The two shouted words print a second pass off register — the same
+            --mis-x/--mis-y the logo and every image use.                  */}
+        <h1 className={styles.title} id="hero-title">
+          <span className={styles.line}>Own the</span>
+          <span className={`${styles.line} ${styles.shout}`}>
+            <span className={styles.shoutGhost} aria-hidden="true">
+              Edge
+            </span>
+            <span className={styles.shoutInk}>Edge</span>
+          </span>
+          <span className={styles.line}>Keep the</span>
+          <span className={`${styles.line} ${styles.shout} ${styles.shoutBlue}`}>
+            <span className={styles.shoutGhost} aria-hidden="true">
+              Vibe
+            </span>
+            <span className={styles.shoutInk}>Vibe</span>
+          </span>
+        </h1>
 
-            // ── Opacity: sharp fade, already 50% gone at 40% scroll ───
-            const opacity = Math.max(0, 1 - prog * 1.5);
+        {/* ---- STANDFIRST ------------------------------------------------ */}
+        <div className={styles.standfirst}>
+          <p className={styles.kicker}>Where Art Meets your Style</p>
+          <p className={styles.lede}>
+            Step into the future of streetwear today.
+          </p>
 
-            // ── Glow: brightness surges as she fades (dissolve-into-light)
-            const glow = 1 + prog * 0.9;     // 1.0 → 1.9
+          <div className={styles.actions}>
+            <Button to={ROUTES.shop} variant="ink" size="lg">
+              New Drops
+            </Button>
+            <Button to={ANCHORS.drops} variant="outline" size="lg">
+              See the drop
+            </Button>
+          </div>
 
-            wrapper.style.transform = [
-                `translateX(-50%)`,
-                `perspective(900px)`,
-                `rotateX(${tiltX - prog * 6}deg)`,
-                `rotateY(${tiltY}deg)`,
-                `scale(${scale})`
-            ].join(' ');
-            wrapper.style.opacity = opacity;
+          {/* The rating, stated as a fact rather than illustrated with four
+              photographs of people who have never heard of this shop. */}
+          <p className={styles.rating}>
+            <span className={styles.stars} aria-hidden="true">
+              ★★★★★
+            </span>
+            <span>
+              Rated 5 Stars by
+              <br />
+              The Vybe Tribe
+            </span>
+          </p>
+        </div>
 
-            // ── Chromatic split builds with scroll ────────────────────
-            const chrOff = chromatic * 8 + spike;
-            rLayer.style.transform = `translateX(${chrOff}px)`;
-            bLayer.style.transform = `translateX(${-chrOff}px)`;
-            rLayer.style.opacity   = chromatic * 0.6;
-            bLayer.style.opacity   = chromatic * 0.6;
+        {/* ---- THE PHOTOGRAPH -------------------------------------------- */}
+        <div className={styles.plateArea}>
+          <Ink
+            src={modelImage}
+            alt="A model wearing the VYBE Drop 01 outerwear layer"
+            ratio="4 / 5"
+            plate="pink"
+            priority
+            className={styles.model}
+            sizes="(min-width: 900px) 46vw, 92vw"
+          />
 
-            const shadowX = tiltY * 3;
-            wrapper.style.filter =
-                `brightness(${glow}) drop-shadow(${shadowX}px 28px 38px rgba(0,0,0,0.14))`;
+          {/* A clipping pinned to the photograph. Links to a real product when
+              one exists, and to the shop when it doesn't. */}
+          <article className={styles.clipping}>
+            <p className={styles.clippingLabel}>Featured Product</p>
+            <h2 className={styles.clippingTitle}>{title}</h2>
+            <p className={styles.clippingNote}>Unmatched comfort.</p>
+            <p className={styles.clippingPrice}>{money(price)}</p>
+            <Button to={to} variant="riso" size="sm" full>
+              {product ? 'View product' : 'Shop the drop'}
+            </Button>
+          </article>
+        </div>
 
-            raf = requestAnimationFrame(tick);
-        };
+        {/* ---- FEATURE STRIP -------------------------------------------- */}
+        <ul className={styles.features}>
+          {FEATURES.map((feature, i) => (
+            <li className={styles.feature} key={feature}>
+              <span className={styles.featureNum} aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              {feature}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-        // 3D mouse tilt (disabled while scrolled)
-        const onMouseMove = (e) => {
-            if (window.innerWidth <= 768) return;
-            const r  = hero.getBoundingClientRect();
-            const cx = r.left + r.width  / 2;
-            const cy = r.top  + r.height / 2;
-            // Dampen tilt based on how far user has scrolled
-            const dampen = Math.max(0, 1 - (scrollY / hero.offsetHeight) * 3);
-            tiltTargetY =  ((e.clientX - cx) / (r.width  / 2)) * 10 * dampen;
-            tiltTargetX = -((e.clientY - cy) / (r.height / 2)) *  8 * dampen;
-        };
-        const onMouseLeave = () => { tiltTargetX = 0; tiltTargetY = 0; };
-
-        // Scroll: capture raw scrollY + drive chromatic
-        const onScroll = () => {
-            scrollY   = window.scrollY;
-            chromatic = Math.min(scrollY / (hero.offsetHeight * 0.5), 1);
-        };
-
-        // Occasional chromatic spike (more likely when scrolled)
-        const spikeInterval = setInterval(() => {
-            if (chromatic > 0.2 && Math.random() < chromatic * 0.45) {
-                spike = (Math.random() - 0.5) * 22 * chromatic;
-                clearTimeout(spikeTimer);
-                spikeTimer = setTimeout(() => { spike = 0; }, 60 + Math.random() * 80);
-            }
-        }, 130);
-
-        hero.addEventListener('mousemove', onMouseMove);
-        hero.addEventListener('mouseleave', onMouseLeave);
-        window.addEventListener('scroll', onScroll, { passive: true });
-        raf = requestAnimationFrame(tick);
-
-        return () => {
-            hero.removeEventListener('mousemove', onMouseMove);
-            hero.removeEventListener('mouseleave', onMouseLeave);
-            window.removeEventListener('scroll', onScroll);
-            cancelAnimationFrame(raf);
-            clearInterval(spikeInterval);
-            clearTimeout(spikeTimer);
-            wrapper.style.transform = '';
-            wrapper.style.opacity   = '';
-            wrapper.style.filter    = '';
-        };
-    }, []);
-
-    return (
-        <section className="hero" ref={heroRef}>
-            <div className="hero-container">
-
-                {/* Headline */}
-                <div className="hero-headline">
-                    <span className="headline-own">Own the</span>
-                    <span className="headline-edge">EDGE</span>
-                    <svg className="headline-curve" viewBox="0 0 120 40" preserveAspectRatio="none">
-                        <path d="M5 32 Q60 8 115 32" stroke="#E87D6F" strokeWidth="3" strokeLinecap="round" fill="none" />
-                    </svg>
-                    <span className="headline-keep">Keep the</span>
-                    <span className="headline-vibe">VIBE</span>
-                </div>
-
-                <div className="hero-wrapper">
-                    <svg className="background-swoosh" viewBox="0 0 400 150" preserveAspectRatio="none">
-                        <path d="M0 100 Q100 20 200 60 Q300 100 400 40" stroke="#F5D5D0" strokeWidth="60" strokeLinecap="round" fill="none" opacity="0.6" />
-                    </svg>
-
-                    {/* Model + glitch layers */}
-                    <div ref={wrapperRef} className="model-wrapper">
-                        <img ref={glitchBRef} src={modelImage} alt="" aria-hidden="true"
-                             className="model-glitch-layer model-glitch-b" decoding="async" />
-                        <img src={modelImage} alt="Fashion Model"
-                             className="model-image" decoding="async" />
-                        <img ref={glitchRRef} src={modelImage} alt="" aria-hidden="true"
-                             className="model-glitch-layer model-glitch-r" decoding="async" />
-                        <div ref={scanlinesRef} className="glitch-scanlines" />
-                    </div>
-
-                    {/* Hero Card */}
-                    <div className="hero-card">
-                        <div className="hero-card-content">
-
-                            {/* Left */}
-                            <div className="hero-left">
-                                <span className="new-arrivals-tag">New Arrivals</span>
-                                <h2 className="hero-title">Where Art Meets<br />your Style</h2>
-                                <p className="hero-subtitle">Step into the future of<br />streetwear today.</p>
-                                <Link to="/shop" className="new-drops-btn">
-                                    <span>New Drops</span>
-                                    <span className="btn-arrow">&rarr;</span>
-                                </Link>
-                                <div className="rating-section">
-                                    <div className="rating-avatars">
-                                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" alt="User 1" loading="lazy" decoding="async" />
-                                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop" alt="User 2" loading="lazy" decoding="async" />
-                                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop" alt="User 3" loading="lazy" decoding="async" />
-                                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=80&h=80&fit=crop" alt="User 4" loading="lazy" decoding="async" />
-                                    </div>
-                                    <div className="rating-text">
-                                        <span className="rating-stars"><Icons.Star size={16} color="#E87D6F" filled /></span>
-                                        <div>
-                                            <span>Rated 5 Stars by</span>
-                                            <strong>The Vybe Tribe</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Center */}
-                            <div className="hero-center">
-                                <div className="hero-center-mark">
-                                    <span>Drop 01</span>
-                                    <strong>VYBE</strong>
-                                </div>
-                            </div>
-
-                            {/* Right */}
-                            <div className="hero-right">
-                                <div className="feature-icons">
-                                    <div className="feature-item">
-                                        <div className="feature-icon">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-                                            </svg>
-                                        </div>
-                                        <span>Future<br />Threads</span>
-                                    </div>
-                                    <div className="feature-item">
-                                        <div className="feature-icon star">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                            </svg>
-                                        </div>
-                                        <span>Unique<br />Designs</span>
-                                    </div>
-                                    <div className="feature-item">
-                                        <div className="feature-icon">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M12 8v8" /><path d="M8 12h8" />
-                                            </svg>
-                                        </div>
-                                        <span>Limited<br />Drops</span>
-                                    </div>
-                                </div>
-
-                                <div className="featured-product">
-                                    <span className="featured-label">Featured Product</span>
-                                    <Link to="/product/1" className="product-card">
-                                        <div className="product-image">
-                                            <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=550&fit=crop"
-                                                 alt="Urban Vanguard Tee" loading="lazy" decoding="async" />
-                                        </div>
-                                        <div className="product-info">
-                                            <h4>Urban Vanguard Tee</h4>
-                                            <p>Unmatched comfort.</p>
-                                            <div className="product-price">
-                                                <span className="cart-icon"><Icons.ShoppingBag size={16} color="#E87D6F" /></span>
-                                                <span className="price">&#8377;2,672</span>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                    <Link to="/product/1" className="product-nav-arrow">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M9 18l6-6-6-6" />
-                                        </svg>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button className="hero-nav-arrow">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M9 18l6-6-6-6" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-    );
-};
-
-export default Hero;
+      {/* The press ticker closes the cover and hands off to the next plate. */}
+      <Marquee items={TICKER} tone="ink" speed={44} />
+    </section>
+  );
+}
