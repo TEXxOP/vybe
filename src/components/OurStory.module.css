@@ -1,0 +1,280 @@
+/* ===========================================================================
+   PLATE 02 — OUR STORY
+
+   The centre spread. Newsprint ground, two columns, and a timeline that is
+   literally a printed schedule: year, leader rule, entry.
+   =========================================================================== */
+
+.spread {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+}
+
+.column {
+    min-width: 0;
+}
+
+/* ---- TITLE ------------------------------------------------------------- */
+.title {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+    isolation: isolate;
+}
+
+.titleShout {
+    position: relative;
+    display: block;
+}
+
+.titleInk {
+    position: relative;
+    display: block;
+}
+
+.titleGhost {
+    position: absolute;
+    inset: 0;
+    display: block;
+    color: var(--riso-pink);
+    translate: var(--mis-x, 3px) var(--mis-y, 3px);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    user-select: none;
+}
+
+.lede {
+    max-width: 38ch;
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- TIMELINE ---------------------------------------------------------- */
+.timeline {
+    margin: var(--space-lg) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--ink);
+}
+
+.entry {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    align-items: baseline;
+    column-gap: var(--space-2xs);
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid var(--ink-hairline);
+}
+
+.entryYear {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-label);
+    color: var(--pink-text);
+}
+
+/* The leader rule between a year and its entry — the reason this reads as a
+   schedule rather than a list of headings. */
+.entryRule {
+    display: none;
+}
+
+.entryTitle {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+/* The current entry: same row structure, more weight and a body of text. */
+.entryNow {
+    padding-block: var(--space-sm);
+    border-bottom: 2px solid var(--ink);
+    background-color: var(--paper-bright);
+}
+
+.entryBody {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    min-width: 0;
+}
+
+.entryNow .entryTitle {
+    font-size: var(--text-xl);
+}
+
+.entryStamp {
+    align-self: flex-start;
+}
+
+.entryText {
+    max-width: 42ch;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.entryCta {
+    margin-top: var(--space-3xs);
+}
+
+/* ---- PLATES ------------------------------------------------------------ */
+.portrait {
+    width: 100%;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2xs);
+    margin: var(--space-lg) 0 0;
+    padding-top: var(--space-sm);
+    border-top: 2px solid var(--ink);
+}
+
+/* Reversed column order: the DOM is <dt> label then <dd> value, which is the
+   correct association, but the number should read first. */
+.stat {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.statValue {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+}
+
+.statLabel {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+/* ---- QUOTE ------------------------------------------------------------- */
+.quote {
+    margin: var(--space-lg) 0 0;
+    padding: var(--space-sm);
+    background-color: var(--ink);
+    color: var(--newsprint);
+}
+
+.quoteText {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    text-wrap: balance;
+}
+
+.quoteBy {
+    margin-top: var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--riso-pink);
+}
+
+/* ---- ILLUSTRATION ----------------------------------------------------- */
+.blob {
+    width: 60%;
+    max-width: 14rem;
+    margin: var(--space-md) 0 0;
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 900px) {
+    .spread {
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: var(--space-2xl);
+        align-items: start;
+    }
+
+    .title {
+        font-size: var(--text-4xl);
+    }
+
+    .entry {
+        grid-template-columns: 4.5rem 1fr auto;
+        column-gap: var(--space-xs);
+    }
+
+    /* On the wide layout the year, the rule and the title sit on one line, so
+       the leader rule earns its keep. */
+    .entry .entryRule {
+        display: block;
+        height: 1px;
+        background-image: repeating-linear-gradient(
+            to right,
+            var(--ink-hairline) 0 4px,
+            transparent 4px 8px
+        );
+    }
+
+    .entry .entryTitle {
+        text-align: right;
+    }
+
+    /* The current entry breaks the single-line pattern deliberately: it has a
+       body, so it goes back to two columns and the title returns to the left. */
+    .entryNow {
+        grid-template-columns: 4.5rem 1fr;
+        padding-inline: var(--space-sm);
+        margin-inline: calc(var(--space-sm) * -1);
+    }
+
+    .entryNow .entryRule {
+        display: none;
+    }
+
+    .entryNow .entryTitle {
+        text-align: left;
+    }
+
+    .blob {
+        /* Hangs off the column edge, taped down over the margin. */
+        margin-left: calc(var(--space-lg) * -1);
+        rotate: -2deg;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .titleGhost {
+        translate: 3px 3px;
+    }
+
+    .blob {
+        rotate: none;
+    }
+}

@@ -1,125 +1,165 @@
-import { Link } from 'react-router-dom';
-import './OurStory.css';
+import Plate from './primitives/Plate';
+import Ink from './primitives/Ink';
+import Button from './primitives/Button';
+import Reveal from './primitives/Reveal';
+import Stamp from './primitives/Stamp';
+import { ROUTES } from '../lib/routes';
+import styles from './OurStory.module.css';
 
-const OurStory = () => {
-    const milestones = [
-        { year: '2022', title: 'The Spark' },
-        { year: '2023', title: 'The First Drop' },
-        { year: '2024', title: 'The Culture Collab' }
-    ];
+/**
+ * PLATE 02 — Our Story.
+ *
+ * The centre spread: the timeline runs down the page as a printed schedule,
+ * with the current year set as the standfirst rather than as a separate card.
+ *
+ * That's the structural fix. The previous version split the chronology across
+ * two columns with two unrelated treatments — 2022, 2023 and 2024 as a small
+ * icon list on the left, then 2025 as a bordered "featured" card in the middle
+ * column, styled nothing like the other three. A reader had to work out that
+ * the four were the same sequence. Here they're one ordered list, and 2025 is
+ * simply the last item, which is where the emphasis belongs anyway.
+ *
+ * The section id changes from "about" to "story" so it matches ANCHORS.story,
+ * which is what the header's About link and the footer both point at. Before,
+ * the anchor and the id disagreed, so neither ever resolved.
+ *
+ * The decorative brush-stroke SVG is gone — it was two coral quadratic curves
+ * at 25% and 35% opacity, from the old palette, and it meant nothing.
+ */
 
-    return (
-        <section className="our-story" id="about" data-reveal>
-            <div className="our-story-container">
-                {/* Left Section - Title, Description, Timeline */}
-                <div className="story-left" data-reveal>
-                    <h2 className="story-title">Our Story</h2>
-                    <p className="story-description">
-                        VYBE started as a passion project — a rebellion against mass trends and an embrace of raw, unapologetic style. We design for those who own their vibe and live it loud.
-                    </p>
+const MILESTONES = [
+  { year: '2022', title: 'The Spark' },
+  { year: '2023', title: 'The First Drop' },
+  { year: '2024', title: 'The Culture Collab' },
+];
 
-                    {/* Brush stroke decoration */}
-                    <div className="brush-decoration">
-                        <svg width="140" height="25" viewBox="0 0 140 25">
-                            <path d="M5 18 Q35 8 70 15 Q105 22 135 10" stroke="#E87D6F" strokeWidth="5" fill="none" strokeLinecap="round" opacity="0.35" />
-                            <path d="M15 22 Q45 14 80 18" stroke="#E87D6F" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.25" />
-                        </svg>
-                    </div>
+const STATS = [
+  { value: '50+', label: 'Countries' },
+  { value: '100K', label: 'Community' },
+  { value: '500+', label: 'Designs' },
+];
 
-                    {/* Timeline */}
-                    <div className="timeline">
-                        {milestones.map((item) => (
-                            <div key={item.year} className="timeline-item">
-                                <span className="timeline-icon">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E87D6F" strokeWidth="2">
-                                        <circle cx="12" cy="12" r="10" />
-                                        <path d="M12 6v6l4 2" />
-                                    </svg>
-                                </span>
-                                <div className="timeline-text">
-                                    <span className="timeline-year">{item.year}</span>
-                                    <span className="timeline-dash">–</span>
-                                    <span className="timeline-title">{item.title}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+export default function OurStory() {
+  return (
+    <Plate id="story" index={2} ink="ink + pink" tone="paper">
+      <div className={styles.spread}>
+        {/* ---- COLUMN ONE: the account ----------------------------------- */}
+        <div className={styles.column}>
+          <h2 className={styles.title}>
+            Our
+            <span className={styles.titleShout}>
+              <span className={styles.titleGhost} aria-hidden="true">
+                Story
+              </span>
+              <span className={styles.titleInk}>Story</span>
+            </span>
+          </h2>
 
-                    {/* Small Blob Image - Gemini Generated */}
-                    <div className="illustration-blob">
-                        <img
-                            src="/Gemini_Generated_Image_ahmdzoahmdzoahmd.png"
-                            alt="Fashion illustration"
-                            className="illustration-img"
-                            loading="lazy"
-                            decoding="async"
-                        />
-                    </div>
-                </div>
+          <p className={styles.lede}>
+            VYBE started as a passion project — a rebellion against mass trends
+            and an embrace of raw, unapologetic style. We design for those who
+            own their vibe and live it loud.
+          </p>
 
-                {/* Center - 2025 Content + Stats */}
-                <div className="story-center" data-reveal style={{ '--reveal-delay': '80ms' }}>
-                    <div className="featured-2025">
-                        <div className="featured-header">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#E87D6F">
-                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                            </svg>
-                            <span className="featured-year">2025</span>
-                            <span className="featured-dash">–</span>
-                            <span className="featured-title">Going Global</span>
-                        </div>
-                        <p className="featured-text">
-                            Our official site went live. Now, we're taking VYBE worldwide — one bold fit at a time. The movement has just begun.
-                        </p>
+          {/* One list, four entries, in order. */}
+          <ol className={styles.timeline}>
+            {MILESTONES.map((item, i) => (
+              <Reveal
+                as="li"
+                key={item.year}
+                variant="left"
+                delay={i * 70}
+                className={styles.entry}
+              >
+                <span className={styles.entryYear}>{item.year}</span>
+                <span className={styles.entryRule} aria-hidden="true" />
+                <span className={styles.entryTitle}>{item.title}</span>
+              </Reveal>
+            ))}
 
-                        {/* Read More Button - Vertical */}
-                        <Link to="/register" className="read-more-btn">
-                            <span className="btn-arrow">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M12 19V5M5 12l7-7 7 7" />
-                                </svg>
-                            </span>
-                            <span className="read-more-text">Join The Movement</span>
-                        </Link>
-                    </div>
+            <Reveal
+              as="li"
+              variant="left"
+              delay={210}
+              className={`${styles.entry} ${styles.entryNow}`}
+            >
+              <span className={styles.entryYear}>2025</span>
+              <span className={styles.entryRule} aria-hidden="true" />
+              <span className={styles.entryBody}>
+                <span className={styles.entryTitle}>Going Global</span>
+                <Stamp tone="pink" className={styles.entryStamp}>
+                  You are here
+                </Stamp>
+                <span className={styles.entryText}>
+                  Our official site went live. Now, we&apos;re taking VYBE
+                  worldwide — one bold fit at a time. The movement has just
+                  begun.
+                </span>
+                <Button
+                  to={ROUTES.register}
+                  variant="ink"
+                  size="md"
+                  className={styles.entryCta}
+                >
+                  Join The Movement
+                </Button>
+              </span>
+            </Reveal>
+          </ol>
+        </div>
 
-                    {/* Stats Section */}
-                    <div className="story-stats">
-                        <div className="stat-item">
-                            <span className="stat-number">50+</span>
-                            <span className="stat-label">Countries</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">100K</span>
-                            <span className="stat-label">Community</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-number">500+</span>
-                            <span className="stat-label">Designs</span>
-                        </div>
-                    </div>
+        {/* ---- COLUMN TWO: the plates ------------------------------------ */}
+        <div className={styles.column}>
+          <Ink
+            src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=900&h=1170&fit=crop"
+            alt="A model photographed on the street in a VYBE layered fit"
+            ratio="3 / 4"
+            plate="pink"
+            taped
+            className={styles.portrait}
+            sizes="(min-width: 900px) 42vw, 88vw"
+          />
 
-                    {/* Quote */}
-                    <div className="story-quote">
-                        <p>"Fashion is the armor to survive the reality of everyday life."</p>
-                        <span className="quote-author">— Bill Cunningham</span>
-                    </div>
-                </div>
+          <dl className={styles.stats}>
+            {STATS.map((stat) => (
+              <div className={styles.stat} key={stat.label}>
+                <dt className={styles.statLabel}>{stat.label}</dt>
+                <dd className={styles.statValue}>{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
 
-                {/* Right - Large Fashion Image */}
-                <div className="story-right" data-reveal style={{ '--reveal-delay': '160ms' }}>
-                    <div className="fashion-image">
-                        <img
-                            src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500&h=650&fit=crop"
-                            alt="Fashion model"
-                            loading="lazy"
-                            decoding="async"
-                        />
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-};
+          <figure className={styles.quote}>
+            <blockquote className={styles.quoteText}>
+              &ldquo;Fashion is the armor to survive the reality of everyday
+              life.&rdquo;
+            </blockquote>
+            <figcaption className={styles.quoteBy}>
+              — Bill Cunningham
+            </figcaption>
+          </figure>
 
-export default OurStory;
+          {/* The illustration, kept from the previous build — it's the only
+              piece of original artwork in the project, and its flat red-on-pink
+              two-tone happens to sit right inside the riso palette.
+
+              Re-encoded, not redrawn. It shipped as a 1,296 KB RGBA PNG whose
+              alpha channel was fully opaque on every pixel — a quarter of the
+              file describing transparency that wasn't there — in a format meant
+              for flat graphics, holding 73,000 distinct colours. As WebP at the
+              same 1056px it is 49 KB: 26x smaller, mean per-channel difference
+              of 1/255, indistinguishable at the ~18vw it actually renders at.
+              The filename is also no longer the image generator's default. */}
+          <Ink
+            src="/story-figure.webp"
+            alt="An illustrated figure in a VYBE outfit"
+            ratio="1 / 1"
+            plate="none"
+            className={styles.blob}
+            sizes="(min-width: 900px) 18vw, 44vw"
+          />
+        </div>
+      </div>
+    </Plate>
+  );
+}
