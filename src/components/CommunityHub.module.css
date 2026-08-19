@@ -1,0 +1,354 @@
+/* ===========================================================================
+   PLATE 03 — COMMUNITY HUB
+
+   The letters page. A wide feature, two narrow sidebars, and a closing band.
+   Newsprint ground with pink as the accent ink throughout.
+   =========================================================================== */
+
+/* ---- HEAD -------------------------------------------------------------- */
+.head {
+    max-width: 44rem;
+    margin-bottom: var(--space-lg);
+}
+
+.title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.subtitle {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-tight);
+    color: var(--pink-text);
+}
+
+/* The old "pink description card" — a filled box was the right instinct, it
+   just needs to be a hard block rather than a soft rounded panel. */
+.blurb {
+    max-width: 46ch;
+    margin: var(--space-sm) 0 0;
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--riso-pink);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-snug);
+    box-shadow: var(--print-offset);
+}
+
+/* ---- GRID -------------------------------------------------------------- */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+}
+
+.feature,
+.side {
+    min-width: 0;
+}
+
+/* ---- FEATURE: THE CHALLENGE ------------------------------------------- */
+.challenge {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--paper-bright);
+    border: 2px solid var(--ink);
+}
+
+.challengeInk {
+    width: 100%;
+}
+
+.challengeBody {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    padding: var(--space-sm);
+    border-top: 2px solid var(--ink);
+}
+
+.challengeTag {
+    margin-bottom: var(--space-3xs);
+}
+
+.challengeTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.challengeText {
+    max-width: 46ch;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- FACTS ------------------------------------------------------------- */
+.facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    width: 100%;
+    margin: var(--space-2xs) 0;
+    padding: var(--space-xs) 0;
+    border-block: 1px solid var(--ink-hairline);
+}
+
+.fact {
+    min-width: 0;
+}
+
+.factLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.factValue {
+    margin: 0.1rem 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--ink);
+}
+
+/* ---- UPCOMING --------------------------------------------------------- */
+.upcoming {
+    position: relative;
+    display: block;
+    padding: var(--space-xs);
+    background-color: var(--paper-bright);
+    border: 2px solid var(--ink);
+    text-decoration: none;
+    color: var(--ink);
+    transition: translate var(--dur-fast) var(--ease-snap);
+}
+
+.upcoming:hover,
+.upcoming:focus-visible {
+    translate: 0 -4px;
+}
+
+.upcomingTag {
+    display: inline-flex;
+    margin-bottom: var(--space-xs);
+}
+
+.upcomingCue {
+    display: block;
+    margin-top: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+/* ---- TESTIMONIAL ------------------------------------------------------ */
+.testimonial {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    height: 100%;
+    margin: 0;
+    padding: var(--space-sm);
+    background-color: var(--ink);
+    color: var(--newsprint);
+}
+
+.testimonialQuote {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-snug);
+    text-wrap: balance;
+}
+
+.testimonialBy {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-top: auto;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--rule);
+}
+
+/* Initials, not a photograph of someone who has never seen this shop. */
+.avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: var(--riso-pink);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+}
+
+.byLines {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.byName {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+}
+
+.byRole {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--riso-pink);
+}
+
+.hashtag {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+/* ---- CLOSER ----------------------------------------------------------- */
+.closer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 2px solid var(--ink);
+}
+
+.closerCopy {
+    min-width: 0;
+}
+
+.closerTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.closerText {
+    max-width: 52ch;
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.closerAction {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+}
+
+.closerNote {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.closerNote a {
+    color: var(--ink);
+    text-underline-offset: 3px;
+}
+
+.closerNote a:hover {
+    color: var(--pink-text);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 560px) {
+    .facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-md);
+    }
+}
+
+@media (min-width: 900px) {
+    .title {
+        font-size: var(--text-4xl);
+    }
+
+    .grid {
+        /* Feature spans two rows on the left; the two sidebars stack right. */
+        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+        gap: var(--space-md);
+        align-items: start;
+    }
+
+    .feature {
+        grid-row: span 2;
+    }
+
+    .challenge {
+        flex-direction: column;
+    }
+
+    .closer {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: var(--space-lg);
+    }
+
+    .closerAction {
+        align-items: flex-end;
+        flex: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .upcoming {
+        transition: none;
+    }
+
+    .upcoming:hover,
+    .upcoming:focus-visible {
+        translate: none;
+    }
+}
