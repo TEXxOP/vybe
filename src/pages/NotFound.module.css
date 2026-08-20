@@ -1,0 +1,139 @@
+/* ===========================================================================
+   404 — the sheet that came off the run without its plate.
+   =========================================================================== */
+
+.page {
+    display: grid;
+    place-items: center;
+    min-height: 70vh;
+    padding: var(--section-y) var(--page-gutter);
+    background-color: var(--newsprint);
+}
+
+.sheet {
+    width: 100%;
+    max-width: var(--page-narrow);
+}
+
+.stamp {
+    margin-bottom: var(--space-sm);
+}
+
+.code {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-stamp);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-muted);
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+    isolation: isolate;
+}
+
+.shout {
+    position: relative;
+    display: block;
+}
+
+.shoutInk {
+    position: relative;
+    display: block;
+}
+
+.shoutGhost {
+    position: absolute;
+    inset: 0;
+    display: block;
+    color: var(--riso-pink);
+    translate: var(--mis-x, 3px) var(--mis-y, 3px);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    user-select: none;
+}
+
+.lede {
+    max-width: 46ch;
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-top: var(--space-lg);
+}
+
+/* ---- WAYS OUT ---------------------------------------------------------- */
+.ways {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-sm);
+    border-top: 2px solid var(--ink);
+}
+
+.waysHead {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.waysList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wayLink {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    color: var(--ink);
+    border-bottom: 2px solid var(--ink-hairline);
+    transition: border-color var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out);
+}
+
+.wayLink:hover,
+.wayLink:focus-visible {
+    color: var(--pink-text);
+    border-color: var(--riso-pink);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 768px) {
+    .title {
+        font-size: var(--text-4xl);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shoutGhost {
+        translate: 3px 3px;
+    }
+
+    .wayLink {
+        transition: none;
+    }
+}
