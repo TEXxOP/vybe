@@ -1,0 +1,450 @@
+/* ===========================================================================
+   Shop — the catalogue sheet.
+
+   The grid is a contact sheet: uniform frames, tight gutters, a hairline rule
+   between rows so it reads as a printed page rather than a set of floating
+   cards. Cards do not have shadows or rounded corners; depth comes from the
+   misregistered ink plate behind each photograph.
+   =========================================================================== */
+
+/* ---- MASTHEAD ---------------------------------------------------------- */
+.masthead {
+    max-width: var(--page-narrow);
+    margin-bottom: var(--space-lg);
+}
+
+.title {
+    display: flex;
+    flex-direction: column;
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+/* Indented second line, so the two words step like a stencilled headline. */
+.titleLine {
+    margin-left: 0.14em;
+    color: var(--pink-text);
+}
+
+/* A search term is user input: it must not be allowed to blow out the layout,
+   and it keeps its own case rather than being uppercased into a shout. */
+.query {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: var(--text-2xl);
+    text-transform: none;
+    color: var(--pink-text);
+}
+
+.lede {
+    max-width: 58ch;
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.clearRow {
+    margin: var(--space-sm) 0 0;
+}
+
+/* ---- CONTROLS ---------------------------------------------------------- */
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink-hairline);
+}
+
+.cats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+}
+
+/* Rubber-stamp toggles: a hairline box that fills with ink when pressed.
+   `data-on` rather than a conditional class, so the pressed state is visible
+   in devtools next to aria-pressed and the two can't drift apart. */
+.catBtn {
+    padding: 0.5em 0.85em;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: transparent;
+    border: 1px solid var(--ink-hairline);
+    border-radius: var(--radius-none);
+    cursor: pointer;
+    transition:
+        color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out);
+}
+
+.catBtn[data-on='true'] {
+    color: var(--paper-bright);
+    background-color: var(--ink);
+    border-color: var(--ink);
+}
+
+.sort {
+    max-width: 15rem;
+}
+
+/* ---- RESULT COUNT ------------------------------------------------------ */
+.results {
+    /* The pager scrolls this into view; keep it clear of the sticky header. */
+    scroll-margin-top: calc(var(--header-h) + var(--space-sm));
+    padding-top: var(--space-md);
+}
+
+.count {
+    margin: 0 0 var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.pulse {
+    animation: breathe 1.4s var(--ease-in-out) infinite;
+}
+
+@keyframes breathe {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+/* ---- GRID -------------------------------------------------------------- */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-lg) var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.cell {
+    min-width: 0; /* let long product names wrap instead of stretching a column */
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    text-decoration: none;
+    color: inherit;
+}
+
+.frame {
+    position: relative;
+}
+
+.badge {
+    position: absolute;
+    top: var(--space-2xs);
+    left: var(--space-2xs);
+    z-index: var(--z-raised);
+}
+
+.off {
+    position: absolute;
+    right: var(--space-2xs);
+    bottom: var(--space-2xs);
+    z-index: var(--z-raised);
+}
+
+/* Sold out is struck through the photograph, the way a printer would kill a
+   plate — not a grey veil that makes the garment hard to see. */
+.soldOut {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background-color: color-mix(in srgb, var(--newsprint) 62%, transparent);
+    z-index: var(--z-raised);
+}
+
+.soldOutRule {
+    position: absolute;
+    left: -4%;
+    width: 108%;
+    height: 2px;
+    background-color: var(--ink);
+    rotate: -8deg;
+}
+
+.soldOutWord {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink);
+    background-color: var(--newsprint);
+    padding: 0.35em 0.6em;
+    border: 1px solid var(--ink);
+}
+
+/* ---- CAPTION ----------------------------------------------------------- */
+.caption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28em;
+}
+
+.name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-normal);
+    color: var(--ink);
+}
+
+.prices {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3xs);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.price {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+.was {
+    font-size: var(--text-2xs);
+    color: var(--ink-muted);
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.cat {
+    color: var(--ink-muted);
+}
+
+.rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28em;
+    color: var(--pink-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34em;
+    margin-top: 0.15em;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+/* ---- SKELETON ---------------------------------------------------------- */
+/* Same shape and count as a real page of results, so the grid doesn't jump
+   when the data lands. */
+.skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+}
+
+.skeletonFrame {
+    aspect-ratio: 4 / 5;
+    background-color: var(--newsprint-deep);
+}
+
+.skeletonLine,
+.skeletonLineShort {
+    height: 0.7em;
+    background-color: var(--newsprint-deep);
+}
+
+.skeletonLine { width: 78%; }
+.skeletonLineShort { width: 42%; }
+
+.skeletonFrame,
+.skeletonLine,
+.skeletonLineShort {
+    animation: breathe 1.6s var(--ease-in-out) infinite;
+}
+
+/* ---- NOTICES (error / empty / query too short) ------------------------- */
+.notice {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    max-width: 46ch;
+    padding: var(--space-lg);
+    border: 2px solid var(--ink);
+    background-color: var(--paper);
+}
+
+.noticeTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+}
+
+.noticeBody {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- PAGER ------------------------------------------------------------- */
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-top: var(--space-xl);
+    padding-top: var(--space-sm);
+    border-top: 2px solid var(--ink);
+}
+
+.sheet {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.sheet strong {
+    font-size: var(--text-sm);
+    color: var(--ink);
+}
+
+.sheetOf {
+    color: var(--ink-faint);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 560px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .title {
+        font-size: var(--text-4xl);
+    }
+
+    .controls {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+
+    .cats {
+        flex: 1 1 auto;
+    }
+
+    .sort {
+        flex: 0 0 auto;
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-xl) var(--space-md);
+    }
+}
+
+/* Hover cues are pointer-only; on touch they either never fire or stick after
+   a tap, which reads as a bug. */
+@media (hover: hover) and (pointer: fine) {
+    .cue {
+        opacity: 0;
+        transform: translateX(-4px);
+        transition:
+            opacity var(--dur-fast) var(--ease-out),
+            transform var(--dur-fast) var(--ease-snap);
+    }
+
+    .card:hover .cue,
+    .card:focus-visible .cue {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .card:hover .name,
+    .card:focus-visible .name {
+        color: var(--pink-text);
+    }
+
+    .catBtn:hover {
+        color: var(--ink);
+        border-color: var(--ink);
+    }
+
+    .catBtn[data-on='true']:hover {
+        color: var(--paper-bright);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pulse,
+    .skeletonFrame,
+    .skeletonLine,
+    .skeletonLineShort {
+        animation: none;
+    }
+
+    .catBtn,
+    .cue {
+        transition: none;
+    }
+
+    .cue {
+        opacity: 1;
+        transform: none;
+    }
+}
