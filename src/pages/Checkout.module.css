@@ -1,0 +1,448 @@
+/* ===========================================================================
+   Checkout — the order form.
+
+   Numbered steps set like a printed form: a hairline-ruled block per step, the
+   step number in the margin, and a docket down the right that stays in view
+   while the address is filled in. The docket is bordered in solid ink because
+   it holds the number the customer is agreeing to.
+
+   Nothing here is a floating card, and nothing here styles a form control: every
+   field goes through the Field primitive, so the checkout cannot drift away from
+   the way the rest of the site labels an input.
+   =========================================================================== */
+
+/* ---- MASTHEAD ---------------------------------------------------------- */
+.masthead {
+    max-width: var(--page-narrow);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--ink);
+}
+
+.eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.title {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.lede {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- LAYOUT ------------------------------------------------------------ */
+.layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    align-items: start;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    min-width: 0;
+}
+
+/* ---- STEP -------------------------------------------------------------- */
+.step {
+    min-width: 0;
+}
+
+.stepHead {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2xs);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid var(--ink-hairline);
+}
+
+.stepNo {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--pink-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.stepTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+/* ---- FIELD GRID -------------------------------------------------------- */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+}
+
+/* ---- PAYMENT ----------------------------------------------------------- */
+.fieldset {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.payGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2xs);
+}
+
+/* The whole tile is the label, so the entire area is the hit target — not just
+   a 13px radio dot. */
+.pay {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border: 1px solid var(--ink-hairline);
+    cursor: pointer;
+    transition:
+        border-color var(--dur-fast) var(--ease-out),
+        background-color var(--dur-fast) var(--ease-out);
+}
+
+.pay[data-on='true'] {
+    border: 2px solid var(--ink);
+    background-color: var(--pink-20);
+}
+
+/* The radio itself is hidden from sight but not from the accessibility tree or
+   the keyboard — it still receives focus, and :focus-visible on it draws the
+   ring on the tile via :has(). */
+.payInput {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.pay:has(.payInput:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+}
+
+.payIcon {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    color: var(--ink);
+    border: 1px solid var(--ink-hairline);
+}
+
+.pay[data-on='true'] .payIcon {
+    color: var(--paper-bright);
+    background-color: var(--ink);
+    border-color: var(--ink);
+}
+
+.payText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    min-width: 0;
+}
+
+.payTitle {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+.payNote {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-muted);
+}
+
+.payDisclosure {
+    max-width: 56ch;
+    margin: var(--space-sm) 0 0;
+    padding-left: var(--space-2xs);
+    border-left: 2px solid var(--riso-pink);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- DOCKET ------------------------------------------------------------ */
+.docket {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border: 2px solid var(--ink);
+    background-color: var(--paper);
+}
+
+.docketHead {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    max-height: 15rem;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0 0 var(--space-sm);
+    border-bottom: 1px solid var(--ink-hairline);
+    list-style: none;
+}
+
+.item {
+    display: grid;
+    grid-template-columns: 2rem 1fr auto;
+    gap: var(--space-2xs);
+    align-items: baseline;
+}
+
+.itemQty {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.itemBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
+    min-width: 0;
+}
+
+.itemName {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+.itemMeta {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.itemPrice {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---- TOTALS ------------------------------------------------------------ */
+.rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    margin: 0;
+}
+
+.row,
+.rowTotal {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+.row {
+    font-size: var(--text-xs);
+    color: var(--ink-soft);
+}
+
+.row dt,
+.rowTotal dt {
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+
+.row dd,
+.rowTotal dd {
+    margin: 0;
+}
+
+.rowTotal {
+    margin-top: var(--space-2xs);
+    padding-top: var(--space-2xs);
+    border-top: 2px solid var(--ink);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+.free {
+    color: var(--pink-text);
+    font-weight: var(--weight-bold);
+}
+
+.failure {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+    color: var(--danger);
+}
+
+.docketNote {
+    margin: 0;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--ink-hairline);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    line-height: var(--leading-body);
+    color: var(--ink-muted);
+}
+
+.docketLink {
+    color: var(--pink-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+/* ---- GATE (not signed in) ---------------------------------------------- */
+.gate {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    max-width: 50ch;
+}
+
+.gateTitle {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.gateBody {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.gateActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+}
+
+/* ---- LOADING ----------------------------------------------------------- */
+.loading {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 640px) {
+    .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Name and street run the full measure; the rest pair up. */
+    .wide {
+        grid-column: 1 / -1;
+    }
+
+    .payGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .pay {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2xs);
+    }
+}
+
+@media (min-width: 1024px) {
+    .layout {
+        grid-template-columns: minmax(0, 1fr) 22rem;
+        gap: var(--space-2xl);
+    }
+
+    .docket {
+        position: sticky;
+        top: calc(var(--header-h-lg) + var(--space-sm));
+    }
+
+    .title {
+        font-size: var(--text-4xl);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .pay:hover {
+        border-color: var(--ink);
+    }
+
+    .docketLink:hover {
+        color: var(--ink);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pay {
+        transition: none;
+    }
+}
