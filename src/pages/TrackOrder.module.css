@@ -1,0 +1,172 @@
+/* ===========================================================================
+   Track order.
+
+   A single-purpose sheet: a masthead, one input, and a result area that holds
+   either a docket or an explanation of why it doesn't. Narrow measure — nothing
+   here benefits from being wide.
+   =========================================================================== */
+
+.page {
+    max-width: var(--page-narrow);
+}
+
+/* ---- HEAD -------------------------------------------------------------- */
+.head {
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--ink);
+}
+
+.eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.title {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.lede {
+    max-width: 56ch;
+    margin: var(--space-sm) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-md);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.lede strong {
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+.link {
+    color: var(--pink-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+/* ---- FORM -------------------------------------------------------------- */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+/* Field spreads `className` onto its wrapper div, not onto the control — so the
+   mono treatment has to reach the input as a descendant. Checked rather than
+   assumed; styling the wrapper would have silently done nothing. */
+.refInput input {
+    font-family: var(--font-mono);
+    font-size: var(--text-md);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+}
+
+/* ---- RESULT ------------------------------------------------------------ */
+.result {
+    margin-top: var(--space-xl);
+}
+
+.idle {
+    margin: 0;
+    padding: var(--space-xl) var(--space-md);
+    border: 1px dashed var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-faint);
+}
+
+.miss {
+    padding: var(--space-md);
+    border: 2px solid var(--ink);
+    border-left-width: 6px;
+    background-color: var(--newsprint);
+}
+
+.missTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+}
+
+/* The reference echoed back, so it's obvious what was actually searched for —
+   including the stray character that caused the miss. */
+.missRef {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-label);
+    color: var(--pink-text);
+    overflow-wrap: anywhere;
+}
+
+.missText {
+    max-width: 58ch;
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- FOOT -------------------------------------------------------------- */
+.foot {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-md);
+    border-top: 2px solid var(--ink);
+}
+
+.footText {
+    max-width: 60ch;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 600px) {
+    /* Input and button on one line once there's room for both. `align-items:
+       flex-end` so the button's baseline sits with the input's, not with the
+       label above it. */
+    .form {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+
+    .refInput {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+@media (min-width: 768px) {
+    .title {
+        font-size: var(--text-4xl);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .link:hover {
+        color: var(--ink);
+    }
+}

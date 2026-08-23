@@ -1,0 +1,180 @@
+/* ===========================================================================
+   Your orders.
+
+   A stack of dockets. The page itself is deliberately plain — the cards carry
+   the design, and a list of orders is a place people arrive worried, so the
+   layout's job is to be legible rather than clever.
+
+   Shared with the gate and empty states, which use the same centred block: all
+   three are "there is nothing to show you yet, here's why".
+   =========================================================================== */
+
+.page {
+    max-width: var(--page-max);
+}
+
+/* ---- HEAD -------------------------------------------------------------- */
+.head {
+    padding-bottom: var(--space-md);
+    border-bottom: 2px solid var(--ink);
+}
+
+.eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.title {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.count {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+/* ---- LIST -------------------------------------------------------------- */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    margin: var(--space-lg) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.listItem {
+    min-width: 0;
+}
+
+/* ---- CANCEL CONFIRMATION ----------------------------------------------
+   Attached directly beneath its card, sharing the same left edge, so it reads
+   as part of that order rather than as a floating dialogue about nothing in
+   particular.                                                             */
+.confirm {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: -2px; /* collapse against the card's border */
+    padding: var(--space-md);
+    border: 2px solid var(--danger);
+    background-color: var(--newsprint);
+}
+
+.confirmTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-normal);
+    text-transform: uppercase;
+    color: var(--danger);
+}
+
+.confirmText {
+    max-width: 58ch;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.confirmActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+}
+
+/* ---- STATES ------------------------------------------------------------
+   The signed-out, loading, failed and empty screens live in Notice.module.css.
+   They used to be five classes here and five near-identical ones in
+   TrackOrder.module.css; now they're one component both pages call.        */
+.failure {
+    margin: var(--space-md) 0;
+    padding: var(--space-2xs) var(--space-sm);
+    border: 1px solid var(--danger);
+    border-left-width: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+    text-align: left;
+    color: var(--danger);
+}
+
+/* ---- FOOT -------------------------------------------------------------- */
+.foot {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-md);
+    border-top: 2px solid var(--ink);
+}
+
+.footText {
+    max-width: 60ch;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.footLink {
+    color: var(--pink-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+.back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 768px) {
+    .title {
+        font-size: var(--text-4xl);
+    }
+
+    .foot {
+        flex-direction: row;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .footLink:hover {
+        color: var(--ink);
+    }
+
+    .back:hover {
+        color: var(--pink-text);
+    }
+}
