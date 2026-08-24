@@ -1,0 +1,18 @@
+/* ===========================================================================
+   Admin access guard — the waiting state only.
+
+   One class. It exists because the previous version was an inline style object,
+   which meant the padding and font size couldn't respond to the viewport and
+   couldn't use a token.
+   =========================================================================== */
+
+.waiting {
+    margin: 0;
+    padding: var(--space-3xl) var(--space-md);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-faint);
+}

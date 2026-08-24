@@ -1,0 +1,238 @@
+/* ===========================================================================
+   ADMIN LAYOUT — the press room.
+
+   The storefront is the printed thing; this is the shop that prints it. Same
+   inks, same mono stamps, same hard rules — but denser, flatter and quieter,
+   because this is a tool being used rather than a page being read. No reveals,
+   no misregistration drift, no halftone. Someone updating forty order statuses
+   does not want the furniture moving.
+
+   WHY IT'S NO LONGER DARK. The old panel was #1A1A1A with coral accents, which
+   made it a second design system living in the same app. The cost showed up next
+   door rather than here: AdminProductForm.css needed eight `!important`
+   declarations to keep its inputs dark inside that panel. Working in the light
+   palette means inputs, selects and buttons inherit the same treatment as the
+   storefront and there is nothing to override.
+   =========================================================================== */
+
+.shell {
+    min-height: 100vh;
+    background-color: var(--newsprint);
+}
+
+/* ---- SIDEBAR ----------------------------------------------------------------
+   Mobile first: a band across the top. It becomes a column at 900px, where
+   there's finally width to spare. */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--page-gutter);
+    background-color: var(--newsprint-deep);
+    border-bottom: 2px solid var(--ink);
+}
+
+.brand {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+}
+
+.wordmark {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-shout);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink);
+}
+
+/* Rubber-stamped, like the plate labels on the storefront. */
+.badge {
+    padding: 2px var(--space-2xs);
+    border: 1px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+/* ---- NAV ------------------------------------------------------------------ */
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs);
+}
+
+.navItem {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-2xs) var(--space-xs);
+    border: 1px solid transparent;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--ink-soft);
+    transition: color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out);
+}
+
+/* The active state keys off aria-current, which NavLink sets itself. Styling
+   the attribute rather than a parallel `.active` class means the visual state
+   and the announced state are the same fact — they cannot drift apart, and
+   there's no className callback to forget. */
+.navItem[aria-current='page'] {
+    border-color: var(--ink);
+    background-color: var(--paper);
+    color: var(--ink);
+    font-weight: var(--weight-bold);
+}
+
+.navItem svg {
+    flex: none;
+}
+
+/* ---- SIDEBAR FOOT --------------------------------------------------------- */
+.sideFoot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+}
+
+.viewShop,
+.logout {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    text-decoration: none;
+    color: var(--ink-soft);
+    transition: color var(--dur-fast) var(--ease-out);
+}
+
+/* A real <button>, reset rather than restyled — it performs an action, it isn't
+   a destination, and it must stay keyboard-operable. */
+.logout {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.logout:hover,
+.viewShop:hover {
+    color: var(--pink-text);
+}
+
+/* ---- CONTENT -------------------------------------------------------------- */
+.content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.bar {
+    padding: var(--space-md) var(--page-gutter) var(--space-sm);
+    border-bottom: 2px solid var(--ink);
+    background-color: var(--paper);
+}
+
+/* Numbered like the storefront's plates, so the two halves of the site read as
+   one press run rather than two products. */
+.eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.title {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.body {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: var(--space-lg) var(--page-gutter) var(--space-4xl);
+}
+
+/* ---- BREAKPOINTS (min-width only) ---------------------------------------- */
+@media (min-width: 900px) {
+    /* Sidebar becomes a column. `100dvh` so a mobile browser's collapsing
+       toolbar doesn't leave a gap, with vh underneath it for older engines. */
+    .shell {
+        display: grid;
+        grid-template-columns: 15rem 1fr;
+        align-items: start;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        height: 100dvh;
+        gap: var(--space-lg);
+        padding: var(--space-lg) var(--space-md);
+        border-bottom: 0;
+        border-right: 2px solid var(--ink);
+    }
+
+    .nav {
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: var(--space-3xs);
+    }
+
+    .navItem {
+        padding: var(--space-xs) var(--space-sm);
+    }
+
+    /* Pushed to the bottom of the column. */
+    .sideFoot {
+        margin-top: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2xs);
+    }
+
+    .bar {
+        padding: var(--space-lg) var(--space-lg) var(--space-md);
+    }
+
+    .body {
+        padding: var(--space-xl) var(--space-lg) var(--space-4xl);
+    }
+
+    .title {
+        font-size: var(--text-3xl);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navItem,
+    .viewShop,
+    .logout {
+        transition: none;
+    }
+}
