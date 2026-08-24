@@ -1,0 +1,445 @@
+/* ===========================================================================
+   ADMIN TABLES — the docket ledger.
+
+   Shared by Products, Orders and the dashboard's recent-orders panel. One
+   module, and the reason is worth recording precisely.
+
+   In the old build all three pages rendered `<table className="admin-table">`.
+   That class was defined in exactly one place — AdminDashboard.css — and neither
+   AdminOrders.jsx nor AdminProducts.jsx imported it. Both imported AdminTable.css
+   instead, which defined only the cell treatments (`.stock-badge`,
+   `.status-select`, `.color-dots`) and no table at all. So two of the three
+   tables were styled entirely by a stylesheet neither page declared, and the only
+   reason they didn't render unstyled is that the bundler concatenates every
+   imported stylesheet into one file regardless of who imported it. Delete the
+   dashboard and the other two tables lose their borders.
+
+   That's the failure mode global stylesheets have and modules don't: the
+   dependency was real, load-bearing, and invisible.
+
+   Rules are hard and hairline; type is mono in the header and body; numbers are
+   tabular so columns of money line up digit for digit. This is a ledger, not a
+   dashboard — density is a feature.
+
+   Element selectors (th, td, tr) are scoped inside `.table`, which is a hashed
+   module class, so they cannot escape this file. That's the distinction the old
+   build got wrong by shipping these as global stylesheets.
+   =========================================================================== */
+
+/* ---- TOOLBAR -------------------------------------------------------------- */
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+.count {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+/* ---- SCROLLER ---------------------------------------------------------------
+   A table with seven columns will not fit a phone, and the honest answer is a
+   scroll container rather than a layout that reflows into ambiguity. It carries
+   tabindex="0" and a role/aria-label in the JSX so it's reachable and
+   announced — an overflow region that only responds to a trackpad is invisible
+   to a keyboard. */
+.scroller {
+    overflow-x: auto;
+    border: 2px solid var(--ink);
+    background-color: var(--paper);
+    overscroll-behavior-x: contain;
+}
+
+.scroller:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 2px;
+}
+
+/* ---- TABLE ---------------------------------------------------------------- */
+.table {
+    width: 100%;
+    min-width: 44rem;
+    border-collapse: collapse;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--ink);
+}
+
+/* Visually hidden but read out — it tells a screen reader user what this table
+   holds before they start moving through cells. */
+.table caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-raised);
+    padding: var(--space-xs) var(--space-sm);
+    background-color: var(--newsprint-deep);
+    border-bottom: 2px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+    color: var(--ink);
+}
+
+.table tbody td {
+    padding: var(--space-xs) var(--space-sm);
+    border-bottom: 1px solid var(--ink-hairline);
+    vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Zebra striping, but with the faintest wash the newsprint allows — enough to
+   track a row across seven columns, not enough to read as a highlight. */
+.table tbody tr:nth-child(even) td {
+    background-color: var(--newsprint);
+}
+
+/* A row mid-request. Pointer-events off so a second click can't race the
+   first — the same treatment OrderCard uses. */
+.table tbody tr[data-busy='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ---- CELL TREATMENTS ------------------------------------------------------ */
+
+/* Money and counts: tabular figures so digits align down the column. Without
+   this, proportional numerals make ₹1,111 narrower than ₹9,999 and a column of
+   totals looks ragged. */
+.num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* An order reference, meant to be read aloud down a phone or pasted into a
+   search. `user-select: all` makes one click select the whole thing. */
+.ref {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-label);
+    white-space: nowrap;
+    user-select: all;
+}
+
+.name {
+    font-weight: var(--weight-medium);
+}
+
+.meta {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--ink-faint);
+    overflow-wrap: anywhere;
+}
+
+.category {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+/* ---- THUMBNAIL ------------------------------------------------------------ */
+.thumb {
+    display: block;
+    width: 3rem;
+    height: 3.75rem;
+    object-fit: cover;
+    border: 1px solid var(--ink);
+    background-color: var(--newsprint-deep);
+}
+
+/* For a product with no image at all. An <img> with no src fires no error
+   event, so there is nothing to react to — the absence has to be handled in
+   the markup, not caught. */
+.noThumb {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3.75rem;
+    border: 1px dashed var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--ink-faint);
+}
+
+/* ---- STATUS BADGE ----------------------------------------------------------
+   Tones come from lib/orders' statusMeta, the same source the customer-facing
+   OrderCard uses. The old build had a separate getStatusColor() returning
+   'green' | 'blue' | 'orange' | 'red' | 'gray' in two files, so admin and
+   customer could describe one order in two different vocabularies. */
+.badge {
+    display: inline-block;
+    padding: 2px var(--space-2xs);
+    border: 1px solid currentColor;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.badge[data-tone='muted'] {
+    color: var(--ink-soft);
+}
+
+.badge[data-tone='blue'] {
+    color: var(--blue-text);
+}
+
+.badge[data-tone='pink'] {
+    color: var(--pink-text);
+}
+
+.badge[data-tone='ok'] {
+    color: var(--ok);
+}
+
+.badge[data-tone='danger'] {
+    color: var(--danger);
+}
+
+/* ---- STOCK ---------------------------------------------------------------- */
+.stock {
+    display: inline-block;
+    padding: 2px var(--space-2xs);
+    border: 1px solid currentColor;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.stock[data-level='out'] {
+    color: var(--danger);
+}
+
+.stock[data-level='low'] {
+    color: var(--warn);
+}
+
+.stock[data-level='ok'] {
+    color: var(--ink-soft);
+}
+
+/* ---- COLOUR DOTS --------------------------------------------------------- */
+.dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* The swatch is decorative; the colour's name is the accessible label, supplied
+   as text in the JSX. A ring of colour with no name is unusable to anyone who
+   can't distinguish the two shades — or who is using a screen reader. */
+.dot {
+    display: block;
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-pill);
+    flex: none;
+}
+
+.more {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    color: var(--ink-faint);
+}
+
+/* ---- ROW ACTIONS -------------------------------------------------------- */
+.actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+}
+
+.iconBtn {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--ink-hairline);
+    background-color: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out),
+        border-color var(--dur-fast) var(--ease-out);
+}
+
+.iconBtn:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 2px;
+}
+
+.iconBtn[data-kind='danger']:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.iconBtn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+}
+
+/* ---- STATUS SELECT ------------------------------------------------------- */
+.statusSelect {
+    max-width: 100%;
+    padding: var(--space-3xs) var(--space-2xs);
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-none);
+    background-color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.statusSelect:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 1px;
+}
+
+/* Colour-coded from the same statusMeta tone the customer's order card uses, so
+   one glance down the column reads as a lifecycle. The border carries it as well
+   as the text — colour alone shouldn't be the only signal, and here it isn't:
+   the option's own words say the same thing. */
+.statusSelect[data-tone='muted'] {
+    color: var(--ink-soft);
+}
+
+.statusSelect[data-tone='blue'] {
+    border-color: var(--blue-text);
+    color: var(--blue-text);
+}
+
+.statusSelect[data-tone='pink'] {
+    border-color: var(--pink-text);
+    color: var(--pink-text);
+}
+
+.statusSelect[data-tone='ok'] {
+    border-color: var(--ok);
+    color: var(--ok);
+}
+
+.statusSelect[data-tone='danger'] {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+/* ---- SCREEN-READER-ONLY TEXT ----------------------------------------------
+   For labels that would be noise on screen but are the only way a control gets
+   announced — the per-row status selects, which otherwise read as bare
+   "combobox" with no hint of which order they belong to. */
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* ---- EMPTY / ERROR ------------------------------------------------------- */
+.empty {
+    padding: var(--space-2xl) var(--space-md);
+    border: 1px dashed var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-faint);
+}
+
+.emptyTitle {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.emptyText {
+    max-width: 46ch;
+    margin: 0 auto;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-normal);
+    line-height: var(--leading-body);
+    text-transform: none;
+    color: var(--ink-soft);
+}
+
+.emptyActions {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-md);
+}
+
+/* A failed write, shown in place rather than in an alert() the admin has to
+   dismiss before they can see which row it referred to. */
+.failure {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
+    border: 2px solid var(--danger);
+    border-left-width: 6px;
+    background-color: var(--paper);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+}
+
+/* ---- BREAKPOINTS (min-width only) --------------------------------------- */
+@media (min-width: 900px) {
+    .table {
+        font-size: var(--text-base);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .iconBtn {
+        transition: none;
+    }
+}

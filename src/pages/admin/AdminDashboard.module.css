@@ -1,0 +1,195 @@
+/* ===========================================================================
+   ADMIN DASHBOARD — the run sheet.
+
+   Three figures and the last five dockets. The table itself comes from
+   AdminTable.module.css, imported alongside this file. In the old build the
+   dependency ran the other way and wasn't declared at all: AdminDashboard.css
+   was the only file defining `.admin-table`, and the products and orders pages
+   used that class without importing it. See the note at the top of
+   AdminTable.module.css.
+   =========================================================================== */
+
+/* ---- STAT CARDS ------------------------------------------------------------ */
+.stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-2xl);
+    padding: 0;
+    list-style: none;
+}
+
+/* Each figure is a plate: hard border, stamped label, oversized number. The
+   number is the content, so it gets the display face at a size nothing else on
+   the page competes with. */
+.stat {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border: 2px solid var(--ink);
+    background-color: var(--paper);
+}
+
+.statIcon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+}
+
+/* Each card's ink, so the three read as three plates of one run rather than a
+   row of identical boxes. */
+.stat:nth-child(1) .statIcon {
+    background-color: var(--pink-20);
+    color: var(--pink-text);
+}
+
+.stat:nth-child(2) .statIcon {
+    background-color: var(--blue-20);
+    color: var(--blue-text);
+}
+
+.stat:nth-child(3) .statIcon {
+    background-color: var(--orange-20);
+    color: var(--ink);
+}
+
+.statBody {
+    min-width: 0;
+}
+
+.statLabel {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+/* Tabular figures, because this number changes while you're looking at it and
+   proportional numerals make it jump sideways as digits swap. */
+.statValue {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+.statNote {
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    color: var(--ink-faint);
+}
+
+/* ---- SECTION -------------------------------------------------------------- */
+.section {
+    margin-top: var(--space-2xl);
+}
+
+.sectionHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 2px solid var(--ink);
+}
+
+.sectionTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.sectionLink {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--pink-text);
+    border-bottom: 1px solid currentColor;
+}
+
+/* ---- STATE --------------------------------------------------------------- */
+.waiting {
+    margin: 0;
+    padding: var(--space-3xl) var(--space-md);
+    border: 1px dashed var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--ink-faint);
+}
+
+/* The failure state is a bordered panel, not a console.error. A dashboard that
+   silently renders ₹0 when the request failed is worse than one that says it
+   couldn't load: the zero looks like a quiet trading day. */
+.failure {
+    padding: var(--space-md);
+    border: 2px solid var(--danger);
+    border-left-width: 6px;
+    background-color: var(--paper);
+}
+
+.failureTitle {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.failureText {
+    max-width: 60ch;
+    margin: var(--space-2xs) 0 var(--space-md);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+/* ---- BREAKPOINTS (min-width only) --------------------------------------- */
+@media (min-width: 640px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1100px) {
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .statValue {
+        font-size: var(--text-3xl);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .sectionLink:hover {
+        color: var(--ink);
+    }
+}

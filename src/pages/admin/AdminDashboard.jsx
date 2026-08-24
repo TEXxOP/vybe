@@ -1,132 +1,245 @@
-import { useState, useEffect } from 'react';
-import { adminAPI } from '../../services/api';
+import { Link } from 'react-router-dom';
+
+import Button from '../../components/primitives/Button';
 import { Icons } from '../../components/Icons';
-import './AdminDashboard.css';
+import { useResource } from '../../lib/useResource';
+import { statusMeta } from '../../lib/orders';
+import { money } from '../../lib/format';
+import { ROUTES } from '../../lib/routes';
+import { adminAPI } from '../../services/api';
 
-const AdminDashboard = () => {
-    const [stats, setStats] = useState({
-        totalRevenue: 0,
-        totalOrders: 0,
-        totalProducts: 0,
-        recentOrders: []
-    });
-    const [loading, setLoading] = useState(true);
+import styles from './AdminDashboard.module.css';
+import table from './AdminTable.module.css';
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const data = await adminAPI.getStats();
-                setStats({
-                    totalRevenue: data.totalRevenue,
-                    totalOrders: data.totalOrders,
-                    totalProducts: data.totalProducts,
-                    recentOrders: data.orders.slice(0, 5) // Last 5 orders
-                });
-            } catch (error) {
-                console.error('Failed to fetch admin stats:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+/**
+ * ADMIN — DASHBOARD.
+ *
+ * THE WORST BUG ON THIS PAGE WAS INVISIBLE. The fetch was wrapped in
+ * try/catch/finally where the catch did nothing but console.error, and the
+ * initial state was a set of zeroes. So when the backend was unreachable the
+ * page rendered:
+ *
+ *     Total Revenue    ₹0
+ *     Total Orders     0
+ *     Active Products  0
+ *
+ * — three confident figures, no error, no retry. On a reporting screen that is
+ * the most dangerous possible failure, because zero is a plausible answer. An
+ * owner could look at that and conclude they'd had no sales. The page now has an
+ * explicit error state with a retry, and it never shows a number it didn't
+ * receive.
+ *
+ * ALSO FIXED:
+ *
+ *  1. `data.orders.slice(0, 5)` — unguarded. A response without an `orders`
+ *     array threw a TypeError inside the try, which the catch then swallowed
+ *     into console.error, so a malformed response looked identical to a
+ *     successful one with no sales.
+ *
+ *  2. No AbortController. Clicking straight through to Products left the
+ *     request in flight to resolve into an unmounted component.
+ *
+ *  3. `getStatusColor()` mapped status → 'green' | 'blue' | 'orange' | 'red' |
+ *     'gray', a fourth vocabulary for order status alongside the two in the
+ *     orders page and the one the customer sees. It's statusMeta from
+ *     lib/orders now — one source, so a status can't be pink here and orange
+ *     there.
+ *
+ *  4. A local `formatCurrency` with maximumFractionDigits: 0, which was the
+ *     third copy of that Intl formatter in the admin folder and disagreed with
+ *     the storefront's. It's `money()` from lib/format.
+ *
+ *  5. Order references were `_id.slice(-6)` while the customer sees
+ *     `orderNumber`. The two halves of the shop couldn't name the same order.
+ *
+ *  6. The stat cards were <div>s. Three labelled figures are a list, and they're
+ *     a <ul> now, so the count is announced.
+ */
 
-        fetchStats();
-    }, []);
+export default function AdminDashboard() {
+    /* Passed by reference. An inline arrow would be a new identity on every
+       render and useResource holds the fetcher in its dependency array. */
+    const { data, status, error, retry } = useResource(adminAPI.getStats);
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            maximumFractionDigits: 0
-        }).format(amount);
-    };
+    if (status === 'loading') {
+        return (
+            <p className={styles.waiting} aria-live="polite">
+                Counting the run…
+            </p>
+        );
+    }
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'delivered': return 'green';
-            case 'shipped': return 'blue';
-            case 'processing': return 'orange';
-            case 'cancelled': return 'red';
-            default: return 'gray';
-        }
-    };
+    if (status === 'error') {
+        return (
+            <div className={styles.failure}>
+                <p className={styles.failureTitle}>Couldn’t load the figures</p>
+                <p className={styles.failureText} role="alert">
+                    {error} Nothing is shown rather than zeroes — a zero here
+                    would look like a quiet day instead of a failed request.
+                </p>
+                <Button variant="riso" size="md" onClick={retry}>
+                    <Icons.RefreshCw size={14} /> Try again
+                </Button>
+            </div>
+        );
+    }
 
-    if (loading) return <div className="admin-loading">Loading stats...</div>;
+    /* Guarded, unlike the original's `data.orders.slice(0, 5)`. */
+    const allOrders = Array.isArray(data?.orders) ? data.orders : [];
+    const recent = allOrders.slice(0, 5);
+
+    const pending = allOrders.filter((o) => o.status === 'pending').length;
 
     return (
-        <div className="admin-dashboard">
-            {/* Stats Grid */}
-            <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="stat-icon revenue">
-                        <Icons.TrendingUp size={24} />
+        <>
+            <ul className={styles.stats}>
+                <li className={styles.stat}>
+                    <span className={styles.statIcon}>
+                        <Icons.TrendingUp size={20} />
+                    </span>
+                    <div className={styles.statBody}>
+                        <span className={styles.statLabel}>Revenue booked</span>
+                        <p className={styles.statValue}>
+                            {money(data?.totalRevenue)}
+                        </p>
+                        <p className={styles.statNote}>
+                            Every order placed, including any later cancelled —
+                            it isn’t money collected. All orders are cash on
+                            delivery.
+                        </p>
                     </div>
-                    <div className="stat-info">
-                        <span className="stat-label">Total Revenue</span>
-                        <h3 className="stat-value">{formatCurrency(stats.totalRevenue)}</h3>
+                </li>
+
+                <li className={styles.stat}>
+                    <span className={styles.statIcon}>
+                        <Icons.Package size={20} />
+                    </span>
+                    <div className={styles.statBody}>
+                        <span className={styles.statLabel}>Orders</span>
+                        <p className={styles.statValue}>
+                            {data?.totalOrders ?? 0}
+                        </p>
+                        <p className={styles.statNote}>
+                            {pending > 0
+                                ? `${pending} still pending — they need confirming before they can be printed.`
+                                : 'Nothing pending. Every order has been moved on.'}
+                        </p>
                     </div>
+                </li>
+
+                <li className={styles.stat}>
+                    <span className={styles.statIcon}>
+                        <Icons.ShoppingBag size={20} />
+                    </span>
+                    <div className={styles.statBody}>
+                        <span className={styles.statLabel}>Products</span>
+                        <p className={styles.statValue}>
+                            {data?.totalProducts ?? 0}
+                        </p>
+                        <p className={styles.statNote}>
+                            Records in the catalogue, whether or not they’re
+                            currently in stock.
+                        </p>
+                    </div>
+                </li>
+            </ul>
+
+            <section className={styles.section}>
+                <div className={styles.sectionHead}>
+                    <h2 className={styles.sectionTitle}>Latest dockets</h2>
+                    <Link className={styles.sectionLink} to={ROUTES.adminOrders}>
+                        All orders →
+                    </Link>
                 </div>
 
-                <div className="stat-card">
-                    <div className="stat-icon orders">
-                        <Icons.Package size={24} />
+                {recent.length === 0 ? (
+                    <div className={table.empty}>
+                        <p className={table.emptyTitle}>No orders yet</p>
+                        <p className={table.emptyText}>
+                            This is an empty ledger, not a failed request — a
+                            failure would have shown an error above instead of
+                            these figures.
+                        </p>
                     </div>
-                    <div className="stat-info">
-                        <span className="stat-label">Total Orders</span>
-                        <h3 className="stat-value">{stats.totalOrders}</h3>
-                    </div>
-                </div>
+                ) : (
+                    <div
+                        className={table.scroller}
+                        tabIndex={0}
+                        role="region"
+                        aria-label="Five most recent orders, scrollable"
+                    >
+                        <table className={table.table}>
+                            <caption>
+                                The five most recent orders. The orders page has
+                                the full list and the controls to change a status.
+                            </caption>
 
-                <div className="stat-card">
-                    <div className="stat-icon products">
-                        <Icons.ShoppingBag size={24} />
-                    </div>
-                    <div className="stat-info">
-                        <span className="stat-label">Active Products</span>
-                        <h3 className="stat-value">{stats.totalProducts}</h3>
-                    </div>
-                </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="recent-orders-section">
-                <h3>Recent Orders</h3>
-                <div className="admin-table-container">
-                    <table className="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {stats.recentOrders.length > 0 ? (
-                                stats.recentOrders.map(order => (
-                                    <tr key={order._id}>
-                                        <td className="order-id">#{order._id.slice(-6).toUpperCase()}</td>
-                                        <td>{order.user?.name || 'Guest'}</td>
-                                        <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                                        <td>
-                                            <span className={`status-badge ${getStatusColor(order.status)}`}>
-                                                {order.status}
-                                            </span>
-                                        </td>
-                                        <td className="order-total">{formatCurrency(order.totalPrice)}</td>
-                                    </tr>
-                                ))
-                            ) : (
+                            <thead>
                                 <tr>
-                                    <td colSpan="5" className="empty-table">No orders yet</td>
+                                    <th scope="col">Reference</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Placed</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Total</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    );
-};
+                            </thead>
 
-export default AdminDashboard;
+                            <tbody>
+                                {recent.map((order) => {
+                                    const meta = statusMeta(order.status);
+
+                                    return (
+                                        <tr key={order._id}>
+                                            <td className={table.ref}>
+                                                {order.orderNumber || '—'}
+                                            </td>
+                                            <td>
+                                                <span className={table.name}>
+                                                    {order.user?.name ||
+                                                        order.shippingAddress
+                                                            ?.fullName ||
+                                                        'Unknown'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {order.createdAt ? (
+                                                    <time
+                                                        dateTime={order.createdAt}
+                                                    >
+                                                        {new Date(
+                                                            order.createdAt
+                                                        ).toLocaleDateString(
+                                                            'en-IN',
+                                                            {
+                                                                day: '2-digit',
+                                                                month: 'short',
+                                                                year: 'numeric',
+                                                            }
+                                                        )}
+                                                    </time>
+                                                ) : (
+                                                    '—'
+                                                )}
+                                            </td>
+                                            <td>
+                                                <span
+                                                    className={table.badge}
+                                                    data-tone={meta.tone}
+                                                >
+                                                    {meta.label}
+                                                </span>
+                                            </td>
+                                            <td className={table.num}>
+                                                {money(order.totalPrice)}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </section>
+        </>
+    );
+}
