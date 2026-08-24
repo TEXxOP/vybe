@@ -1,0 +1,261 @@
+/* ===========================================================================
+   Auth — shared by Login and Register.
+
+   Two leaves of one sheet: an ink-flooded panel carrying the wordmark and a
+   stencilled statement, and the form on bare newsprint. The split only exists
+   from 900px; below that the ink panel becomes a masthead band so the form is
+   the first thing under the thumb.
+
+   Every control here is styled through the Field primitive rather than by this
+   file. The old build had four global admin stylesheets whose class names were
+   `.form-group`, `.form-grid`, `.checkbox-group` and `.modal-overlay` — generic
+   enough that any second form in the app would have picked the same ones and
+   silently inherited a dark theme. Nothing had collided yet; nothing prevented
+   it either — and the eight `!important` declarations in AdminProductForm.css
+   show what it costs to referee a global namespace after the fact.
+   =========================================================================== */
+
+.page {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Fill the viewport under the fixed header, without assuming a height for
+       the header on every breakpoint. */
+    min-height: calc(100dvh - var(--header-h));
+}
+
+/* ---- INK PANEL --------------------------------------------------------- */
+.panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    padding: var(--space-lg) var(--page-gutter);
+    overflow: hidden;
+    background-color: var(--bg-inverted);
+    color: var(--fg-on-inverted);
+}
+
+/* Halftone over the flood, so the ink reads as printed rather than filled. */
+.panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(
+        currentColor var(--halftone-size),
+        transparent var(--halftone-size)
+    );
+    background-size: 6px 6px;
+    opacity: var(--halftone-alpha);
+}
+
+.wordmark {
+    position: relative;
+    z-index: var(--z-raised);
+    align-self: flex-start;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-shout);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--fg-on-inverted);
+    text-decoration: none;
+}
+
+.statement {
+    position: relative;
+    z-index: var(--z-raised);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+}
+
+/* Each line steps in slightly, the way a stencil gets laid down by hand. */
+.statementLine {
+    margin-left: 0.16em;
+    color: var(--riso-pink);
+}
+
+.panelFoot {
+    position: relative;
+    z-index: var(--z-raised);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+/* ---- FORM SIDE --------------------------------------------------------- */
+.formSide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--page-gutter);
+    background-color: var(--newsprint);
+}
+
+.form {
+    width: 100%;
+    max-width: 27rem;
+}
+
+.head {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--ink);
+}
+
+.eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.title {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.sub {
+    max-width: 42ch;
+    margin: var(--space-2xs) 0 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-body);
+    color: var(--ink-soft);
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+
+/* ---- SHOW PASSWORD ----------------------------------------------------- */
+.reveal {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Square, inked, no rounded corners — a form checkbox on a printed sheet. */
+.reveal input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--ink);
+    cursor: pointer;
+}
+
+/* ---- MESSAGES ---------------------------------------------------------- */
+.failure {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-2xs) var(--space-sm);
+    border: 1px solid var(--danger);
+    border-left-width: 3px;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-label);
+    color: var(--danger);
+}
+
+/* ---- FOOT -------------------------------------------------------------- */
+.alt {
+    margin: var(--space-md) 0 0;
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--ink-hairline);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    color: var(--ink-soft);
+}
+
+.altLink {
+    font-weight: var(--weight-bold);
+    color: var(--pink-text);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+.browse {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    margin-top: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+}
+
+.booting {
+    margin: auto;
+    padding: var(--space-3xl) var(--page-gutter);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 900px) {
+    .page {
+        /* The ink panel is the narrower leaf; the form is the point of the page. */
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+        min-height: calc(100dvh - var(--header-h-lg));
+    }
+
+    .panel {
+        padding: var(--space-2xl);
+    }
+
+    .statement {
+        font-size: var(--text-3xl);
+    }
+
+    .title {
+        font-size: var(--text-3xl);
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .wordmark:hover {
+        color: var(--riso-pink);
+    }
+
+    .altLink:hover {
+        color: var(--ink);
+    }
+
+    .browse:hover {
+        color: var(--pink-text);
+    }
+}
