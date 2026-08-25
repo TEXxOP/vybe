@@ -12,6 +12,7 @@ import { ordersAPI } from '../services/api';
 import { money } from '../lib/format';
 import { computeTotals } from '../lib/cart';
 import { ROUTES } from '../lib/routes';
+import { cartEnquiryHref, COMMERCE_ENABLED } from '../lib/enquiry';
 import styles from './Checkout.module.css';
 
 /**
@@ -500,7 +501,48 @@ function CheckoutForm({ user }) {
 }
 
 export default function Checkout() {
-    const { user, authReady } = useCart();
+    const { user, authReady, cart } = useCart();
+
+    /* ---- ENQUIRY MODE ----
+       The route stays registered and every link to it still works — nothing is
+       hidden. What changed is that there is no payment behind it, so instead of
+       collecting an address for an order it cannot complete, the page says so
+       and hands the same bag to WhatsApp. Flip COMMERCE_ENABLED in lib/enquiry
+       and the original form below returns untouched. */
+    if (!COMMERCE_ENABLED) {
+        const items = Array.isArray(cart?.items) ? cart.items : [];
+
+        return (
+            <Plate tone="paper" label="Order form · enquiries">
+                <div className={styles.gate}>
+                    <Stamp tone="ink" solid angle={-2}>
+                        Enquiries only
+                    </Stamp>
+                    <h1 className={styles.gateTitle}>We take orders on WhatsApp</h1>
+                    <p className={styles.gateBody}>
+                        Rather than collect a card we have nowhere to send, we confirm
+                        stock, sizing, delivery and the final figure with you directly
+                        — then arrange payment. Your bag comes along with the message.
+                    </p>
+                    <div className={styles.gateActions}>
+                        <Button
+                            href={cartEnquiryHref(items)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            variant="riso"
+                            size="lg"
+                        >
+                            <Icons.BrandWhatsApp size={17} />{' '}
+                            {items.length > 0 ? 'Send my bag' : 'Start an enquiry'}
+                        </Button>
+                        <Button to={ROUTES.cart} variant="outline" size="lg">
+                            Back to the bag
+                        </Button>
+                    </div>
+                </div>
+            </Plate>
+        );
+    }
 
     /* Wait for the auth check before deciding anything. Redirecting on a null
        user that simply hasn't loaded yet is how the previous build flashed

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import Doc from '../../components/Doc';
 import { ROUTES } from '../../lib/routes';
+import { COMPANY, emailHref } from '../../lib/company';
 
 /**
  * Returns and refunds.
@@ -68,7 +69,7 @@ export default function Returns() {
 
             <ol>
                 <li>
-                    Mail <a href="mailto:support@vybe.com">support@vybe.com</a> from
+                    Mail <a href={emailHref}>{COMPANY.email}</a> from
                     the address on the account.
                 </li>
                 <li>

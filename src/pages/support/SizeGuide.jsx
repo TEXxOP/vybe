@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import Doc from '../../components/Doc';
 import { ROUTES } from '../../lib/routes';
+import { COMPANY, emailHref } from '../../lib/company';
 
 /**
  * Size guide.
@@ -216,7 +217,7 @@ export default function SizeGuide() {
 
             <small>
                 Still unsure? Mail{' '}
-                <a href="mailto:support@vybe.com">support@vybe.com</a> with your usual
+                <a href={emailHref}>{COMPANY.email}</a> with your usual
                 size in a brand you wear and we’ll tell you what we’d send.
             </small>
         </Doc>

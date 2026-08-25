@@ -13,6 +13,7 @@ import { useCart } from '../context/CartContext';
 import { useMyOrders } from '../lib/useMyOrders';
 import { ROUTES } from '../lib/routes';
 import styles from './TrackOrder.module.css';
+import { COMPANY, emailHref } from '../lib/company';
 
 /**
  * TRACK ORDER.
@@ -243,8 +244,8 @@ function Tracker() {
                 <footer className={styles.foot}>
                     <p className={styles.footText}>
                         Tracking hasn’t moved for more than five working days? Mail{' '}
-                        <a className={styles.link} href="mailto:support@vybe.com">
-                            support@vybe.com
+                        <a className={styles.link} href={emailHref}>
+                            {COMPANY.email}
                         </a>{' '}
                         with the reference and we’ll chase the courier. Delivery
                         windows are on the{' '}

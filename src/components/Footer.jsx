@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
 import { ROUTES, ANCHORS } from '../lib/routes';
 import styles from './Footer.module.css';
+import { COMPANY, emailHref, telHref, addressLines } from '../lib/company';
+import { generalEnquiryHref } from '../lib/enquiry';
 
 /* All copy below is carried over verbatim from the previous build. The change
    is that every link now resolves through the route manifest — seven of the
@@ -104,21 +106,47 @@ export default function Footer() {
                         <h2 className={styles.columnHead}>Contact us</h2>
                         <ul className={styles.list}>
                             <li>
-                                <a href="mailto:support@vybe.com" className={styles.contact}>
-                                    <Icons.Mail size={16} />
-                                    <span>support@vybe.com</span>
+                                <a
+                                    href={generalEnquiryHref()}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.contact}
+                                >
+                                    <Icons.BrandWhatsApp size={16} />
+                                    <span>Enquire on WhatsApp</span>
                                 </a>
                             </li>
                             <li>
-                                <a href="tel:+13235550199" className={styles.contact}>
-                                    <Icons.Phone size={16} />
-                                    <span>+1 (323) 555-0199</span>
+                                <a href={emailHref} className={styles.contact}>
+                                    <Icons.Mail size={16} />
+                                    <span>{COMPANY.email}</span>
                                 </a>
+                            </li>
+                            <li>
+                                <a href={telHref} className={styles.contact}>
+                                    <Icons.Phone size={16} />
+                                    <span>{COMPANY.phoneDisplay}</span>
+                                </a>
+                            </li>
+                            <li>
+                                {/* A real postal address, which the previous build
+                                    did not have at all. <address> is the correct
+                                    element and carries the semantics for free. */}
+                                <address className={styles.contactStatic}>
+                                    <Icons.MapPin size={16} />
+                                    <span>
+                                        {addressLines().map((line) => (
+                                            <span key={line} className={styles.addressLine}>
+                                                {line}
+                                            </span>
+                                        ))}
+                                    </span>
+                                </address>
                             </li>
                             <li>
                                 <p className={styles.contactStatic}>
                                     <Icons.Clock size={16} />
-                                    <span>Mon-Fri, 9AM-6PM (PST)</span>
+                                    <span>Mon–Sat, 10am–7pm IST</span>
                                 </p>
                             </li>
                         </ul>
@@ -126,7 +154,12 @@ export default function Footer() {
                 </div>
 
                 <div className={styles.bottom}>
-                    <p className={styles.copyright}>© 2025 VYBE. All rights reserved.</p>
+                    {/* The registered entity, not the trading name — this is the
+                        line that has to name whoever a customer is dealing with. */}
+                    <p className={styles.copyright}>
+                        © {new Date().getFullYear()} {COMPANY.legalName}. All rights
+                        reserved.
+                    </p>
                     {/* A colophon, the way a printed object signs off. */}
                     <p className={styles.colophon}>
                         Set in Big Shoulders, Archivo &amp; Courier Prime

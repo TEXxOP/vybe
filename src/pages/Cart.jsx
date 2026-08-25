@@ -10,6 +10,7 @@ import { useCart } from '../context/CartContext';
 import { money } from '../lib/format';
 import { computeTotals, FREE_SHIPPING_THRESHOLD, MAX_PER_LINE } from '../lib/cart';
 import { ROUTES } from '../lib/routes';
+import { cartEnquiryHref, COMMERCE_ENABLED } from '../lib/enquiry';
 import styles from './Cart.module.css';
 
 /**
@@ -279,22 +280,41 @@ export default function Cart() {
                             <dd>{money(totals.subtotal)}</dd>
                         </div>
 
-                        <div className={styles.row}>
-                            <dt>Delivery</dt>
-                            <dd className={totals.freeShipping ? styles.free : undefined}>
-                                {totals.freeShipping ? 'Free' : money(totals.shipping)}
-                            </dd>
-                        </div>
+                        {/* Delivery, GST and the grand total are only shown when
+                            the site can actually take the money. With enquiries
+                            they'd be a quote nobody has agreed to yet, and the
+                            figure confirmed on WhatsApp is the one that counts. */}
+                        {COMMERCE_ENABLED ? (
+                            <>
+                                <div className={styles.row}>
+                                    <dt>Delivery</dt>
+                                    <dd
+                                        className={
+                                            totals.freeShipping ? styles.free : undefined
+                                        }
+                                    >
+                                        {totals.freeShipping
+                                            ? 'Free'
+                                            : money(totals.shipping)}
+                                    </dd>
+                                </div>
 
-                        <div className={styles.row}>
-                            <dt>GST (18%)</dt>
-                            <dd>{money(totals.tax)}</dd>
-                        </div>
+                                <div className={styles.row}>
+                                    <dt>GST (18%)</dt>
+                                    <dd>{money(totals.tax)}</dd>
+                                </div>
 
-                        <div className={styles.rowTotal}>
-                            <dt>Total</dt>
-                            <dd>{money(totals.total)}</dd>
-                        </div>
+                                <div className={styles.rowTotal}>
+                                    <dt>Total</dt>
+                                    <dd>{money(totals.total)}</dd>
+                                </div>
+                            </>
+                        ) : (
+                            <div className={styles.row}>
+                                <dt>Delivery &amp; GST</dt>
+                                <dd>Confirmed on WhatsApp</dd>
+                            </div>
+                        )}
                     </dl>
 
                     {/* A progress bar that measures something real, against the
@@ -324,22 +344,54 @@ export default function Cart() {
                         </div>
                     )}
 
-                    {/* A real link: middle-clickable, and announced as a link. */}
-                    <Button to={ROUTES.checkout} variant="riso" size="lg" full>
-                        <Icons.Lock size={16} /> Checkout · {money(totals.total)}
-                    </Button>
+                    {/* The bag is now an enquiry list: the same items, sent to
+                        WhatsApp as a message instead of to a checkout that has no
+                        live gateway behind it. Flip COMMERCE_ENABLED and the
+                        original checkout link and payment row come back
+                        untouched. A real link either way: middle-clickable, and
+                        announced as a link. */}
+                    {COMMERCE_ENABLED ? (
+                        <>
+                            <Button to={ROUTES.checkout} variant="riso" size="lg" full>
+                                <Icons.Lock size={16} /> Checkout ·{' '}
+                                {money(totals.total)}
+                            </Button>
 
-                    <ul className={styles.pay}>
-                        <li>
-                            <Icons.CreditCard size={15} /> Card
-                        </li>
-                        <li>
-                            <Icons.Smartphone size={15} /> UPI
-                        </li>
-                        <li>
-                            <Icons.Cash size={15} /> Cash on delivery
-                        </li>
-                    </ul>
+                            <ul className={styles.pay}>
+                                <li>
+                                    <Icons.CreditCard size={15} /> Card
+                                </li>
+                                <li>
+                                    <Icons.Smartphone size={15} /> UPI
+                                </li>
+                                <li>
+                                    <Icons.Cash size={15} /> Cash on delivery
+                                </li>
+                            </ul>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                href={cartEnquiryHref(items)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="riso"
+                                size="lg"
+                                full
+                            >
+                                <Icons.BrandWhatsApp size={16} /> Enquire about these
+                            </Button>
+
+                            <ul className={styles.pay}>
+                                <li>
+                                    <Icons.BrandWhatsApp size={15} /> Opens WhatsApp
+                                </li>
+                                <li>
+                                    <Icons.Check size={15} /> Your list comes with you
+                                </li>
+                            </ul>
+                        </>
+                    )}
                 </aside>
             </div>
         </Plate>

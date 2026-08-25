@@ -244,3 +244,15 @@
         translate: none;
     }
 }
+
+/* Postal address lines stack rather than running together. The <address>
+   element is a flex row (icon + block of lines), so the lines themselves are
+   blocks inside the second column. */
+.addressLine {
+    display: block;
+}
+
+.contactStatic {
+    align-items: flex-start;
+    font-style: normal;   /* <address> italicises by default */
+}

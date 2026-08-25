@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 
 import Doc from '../../components/Doc';
 import { ROUTES } from '../../lib/routes';
+import { COMPANY, emailHref, addressOneLine } from '../../lib/company';
 
 /**
  * Privacy.
@@ -27,6 +28,18 @@ export default function Privacy() {
             lede="What we hold, why we hold it, and how to get rid of it. Short, because we collect very little."
             updated="2026-08-25"
         >
+            <h2>Who holds it</h2>
+
+            <p>
+                VYBE is a brand of <strong>{COMPANY.legalName}</strong>, and that
+                company is the data controller for everything below. We’re at{' '}
+                {addressOneLine()}, reachable at{' '}
+                <a href={emailHref}>{COMPANY.email}</a> or on WhatsApp at{' '}
+                {COMPANY.phoneDisplay}. Enquiries sent over WhatsApp are also held by
+                WhatsApp under its own privacy terms — that conversation isn’t
+                something we can delete from their end.
+            </p>
+
             <h2>What we collect</h2>
 
             <dl>
@@ -41,9 +54,9 @@ export default function Privacy() {
                 <dt>Your orders</dt>
                 <dd>
                     What you bought, in which size and colour, what it cost, and the
-                    delivery details you typed at checkout: name, phone, street,
-                    city, state and pin code. Also which payment method you chose and
-                    the order’s current status.
+                    delivery details you gave us: name, phone, street, city, state
+                    and pin code. Also how you chose to pay and the order’s current
+                    status.
                 </dd>
 
                 <dt>Your bag</dt>
@@ -129,7 +142,7 @@ export default function Privacy() {
             <h2>Your say over it</h2>
 
             <p>
-                Mail <a href="mailto:support@vybe.com">support@vybe.com</a> from the
+                Mail <a href={emailHref}>{COMPANY.email}</a> from the
                 address on your account and you can ask us to:
             </p>
 
@@ -178,7 +191,7 @@ export default function Privacy() {
 
             <p>
                 Questions about any of this:{' '}
-                <a href="mailto:support@vybe.com">support@vybe.com</a>. See also our{' '}
+                <a href={emailHref}>{COMPANY.email}</a>. See also our{' '}
                 <Link to={ROUTES.terms}>terms of service</Link>.
             </p>
         </Doc>

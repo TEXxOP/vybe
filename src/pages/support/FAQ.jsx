@@ -4,6 +4,8 @@ import Doc from '../../components/Doc';
 import { ROUTES } from '../../lib/routes';
 import { money } from '../../lib/format';
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FLAT } from '../../lib/cart';
+import { COMPANY, emailHref } from '../../lib/company';
+import { generalEnquiryHref } from '../../lib/enquiry';
 
 /**
  * FAQ.
@@ -27,18 +29,29 @@ export default function FAQ() {
         <Doc
             eyebrow="Questions"
             title="Frequently asked"
-            lede="Sizing, delivery, payment and returns. If the answer you need isn’t here, mail us and a person will reply."
+            lede="Enquiring, sizing, delivery and returns. If the answer you need isn’t here, message us and a person will reply."
             updated="2026-08-25"
         >
             <h2>Ordering</h2>
 
             <details>
-                <summary>Do I need an account to order?</summary>
+                <summary>How do I order?</summary>
                 <p>
-                    Yes. Orders are tied to an account so that you can see them
-                    again — status, contents, address, and a cancel button while
-                    cancelling is still possible. Creating one takes an email and a
-                    password.{' '}
+                    You enquire, and we take it from there. Every product page has an{' '}
+                    <strong>Enquire on WhatsApp</strong> button that opens a chat with
+                    the item, size, colour and quantity already written out — or add
+                    several things to your bag and send the whole list at once. We
+                    confirm what’s in stock, the final figure including delivery, and
+                    how you’d like to pay.
+                </p>
+            </details>
+
+            <details>
+                <summary>Do I need an account?</summary>
+                <p>
+                    Not to enquire — the WhatsApp chat needs nothing from you but a
+                    message. An account is still useful if you want to keep a bag
+                    between visits and see past orders in one place.{' '}
                     <Link to={ROUTES.register}>Create an account</Link> or{' '}
                     <Link to={ROUTES.login}>sign in</Link>.
                 </p>
@@ -50,19 +63,20 @@ export default function FAQ() {
                     Stock is checked when the order is placed, not when the item is
                     added, so a size can go while you’re deciding. We print in small
                     runs and we don’t restock a design once its run is finished, so
-                    this happens more here than it would elsewhere. If it happens at
-                    checkout, the item will tell you before you pay.
+                    this happens more here than it would elsewhere. Stock is confirmed
+                    when we reply to your enquiry, so you’ll hear it from us before
+                    anything is agreed.
                 </p>
             </details>
 
             <details>
                 <summary>Can I change or cancel an order?</summary>
                 <p>
-                    You can cancel from{' '}
+                    Say so in the same WhatsApp chat, or cancel from{' '}
                     <Link to={ROUTES.orders}>your orders</Link> while the order is
                     still pending or confirmed. Once it’s been packed for dispatch,
                     cancelling is no longer possible from the site — mail{' '}
-                    <a href="mailto:support@vybe.com">support@vybe.com</a> and we’ll
+                    <a href={emailHref}>{COMPANY.email}</a> and we’ll
                     do what we can. We can’t edit the contents of an order; cancel
                     and reorder instead.
                 </p>
@@ -92,20 +106,20 @@ export default function FAQ() {
             <details>
                 <summary>How do I pay?</summary>
                 <p>
-                    Cash on delivery, today. Card, UPI and net banking appear at
-                    checkout so we can see what people would rather use, but no
-                    payment gateway is live yet and nothing is charged when you place
-                    the order — whichever you pick, you pay the courier at the door.
-                    We’d rather say that plainly than take a card number we have
-                    nowhere to send.
+                    We arrange it on WhatsApp once the order is confirmed — UPI or cash
+                    on delivery, whichever suits you. Nothing is charged on this site
+                    and there is no card form anywhere on it, which is deliberate: we’d
+                    rather say that plainly than take a card number we have nowhere to
+                    send.
                 </p>
             </details>
 
             <details>
                 <summary>Do you deliver outside India?</summary>
                 <p>
-                    Not yet. Checkout accepts Indian states and union territories
-                    only, and cash on delivery doesn’t travel.
+                    Not yet — Indian states and union territories only. Ask on
+                    WhatsApp if you’re somewhere else and we’ll tell you honestly
+                    whether we can.
                 </p>
             </details>
 
@@ -186,9 +200,16 @@ export default function FAQ() {
             <hr />
 
             <p>
-                Still stuck? Mail{' '}
-                <a href="mailto:support@vybe.com">support@vybe.com</a> — include your
-                order number if you have one and you’ll skip a round trip.
+                Still stuck?{' '}
+                <a
+                    href={generalEnquiryHref()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Message us on WhatsApp
+                </a>{' '}
+                or mail <a href={emailHref}>{COMPANY.email}</a> — include your order
+                number if you have one and you’ll skip a round trip.
             </p>
         </Doc>
     );

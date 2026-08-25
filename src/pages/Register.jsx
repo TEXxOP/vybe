@@ -7,6 +7,7 @@ import { Icons } from '../components/Icons';
 
 import { useCart } from '../context/CartContext';
 import { ROUTES } from '../lib/routes';
+import { COMPANY } from '../lib/company';
 import styles from './Auth.module.css';
 
 /**
@@ -137,7 +138,7 @@ export default function Register() {
                 </p>
 
                 <p className={styles.panelFoot}>
-                    © {new Date().getFullYear()} VYBE — printed in small batches
+                    © {new Date().getFullYear()} {COMPANY.legalName}
                 </p>
             </aside>
 

@@ -9,6 +9,7 @@ import {
     GST_RATE,
     MAX_PER_LINE,
 } from '../../lib/cart';
+import { COMPANY, emailHref, addressOneLine } from '../../lib/company';
 
 /**
  * Terms of service.
@@ -29,24 +30,28 @@ export default function Terms() {
         <Doc
             eyebrow="Terms"
             title="Terms of service"
-            lede="The agreement between you and VYBE when you buy something here. Plain language, and short enough to read."
+            lede="The agreement between you and us when you buy something here. Plain language, and short enough to read."
             updated="2026-08-25"
         >
             <h2>Who we are</h2>
 
             <p>
-                VYBE is a small-batch streetwear label printing and selling in India.
-                In this document “we” and “us” mean VYBE, and “you” means whoever is
-                using the site. Reach us at{' '}
-                <a href="mailto:support@vybe.com">support@vybe.com</a>.
+                VYBE is a small-batch streetwear label printing and selling in
+                India. It is a brand of <strong>{COMPANY.legalName}</strong>, the
+                company you are contracting with, registered at {addressOneLine()}. In
+                this document “we” and “us” mean that company, and “you” means whoever
+                is using the site. Reach us at{' '}
+                <a href={emailHref}>{COMPANY.email}</a> or on WhatsApp at{' '}
+                {COMPANY.phoneDisplay}.
             </p>
 
             <h2>Your account</h2>
 
             <p>
-                You need an account to place an order, and the details on it need to
-                be accurate — a wrong phone number is the single most common reason a
-                parcel comes back to us. Keep your password to yourself; anything
+                You don’t need an account to enquire, but if you keep one the
+                details on it need to be accurate — a wrong phone number is the single
+                most common reason a parcel comes back to us. Keep your password to
+                yourself; anything
                 done from a signed-in session is treated as done by you. Tell us
                 straight away if you think somebody else has got in.
             </p>
@@ -60,12 +65,13 @@ export default function Terms() {
             <h2>Orders</h2>
 
             <p>
-                Adding something to your bag isn’t a purchase, and placing an order
-                isn’t yet a contract — it’s an offer to buy. The contract forms when
-                we confirm the order for dispatch. That gap matters here more than at
-                most shops, because we print in fixed runs: if the last one in your
-                size goes while your order is being packed, we’ll cancel that line
-                and tell you rather than substitute something.
+                Adding something to your bag isn’t a purchase, and sending us an
+                enquiry isn’t yet a contract — it’s the start of a conversation. The
+                contract forms when we confirm your order, and its price and contents,
+                in writing. That gap matters here more than at most shops, because we
+                print in fixed runs: if the last one in your size goes while your
+                order is being packed, we’ll cancel that line and tell you rather than
+                substitute something.
             </p>
 
             <p>
@@ -82,8 +88,8 @@ export default function Terms() {
 
                 <dt>GST</dt>
                 <dd>
-                    {Math.round(GST_RATE * 100)}%, added at checkout and shown on its
-                    own line.
+                    {Math.round(GST_RATE * 100)}%, included in the figure we confirm
+                    and shown on its own line.
                 </dd>
 
                 <dt>Delivery</dt>
@@ -95,17 +101,18 @@ export default function Terms() {
 
                 <dt>Payment</dt>
                 <dd>
-                    Cash on delivery. Card, UPI and net banking are listed at checkout
-                    as preferences only — no gateway is live, nothing is charged when
-                    you order, and you pay the courier on arrival.
+                    Arranged directly with you once the order is confirmed — UPI, or
+                    cash to the courier on arrival. This site takes no payments and
+                    stores no card details, because no gateway is connected to it.
                 </dd>
             </dl>
 
             <p>
-                The price you’re shown at checkout is the price we’ll honour. If a
+                The price we confirm to you in writing is the price we’ll honour —
+                listed prices are an invitation to enquire, not a binding offer. If a
                 product is listed at an obviously wrong price — a decimal in the wrong
-                place — we’ll cancel the order and refund anything collected rather
-                than hold you to it or quietly charge you the difference.
+                place — we’ll say so and cancel rather than hold either of us to it or
+                quietly charge you the difference.
             </p>
 
             <h2>Delivery</h2>
@@ -121,8 +128,9 @@ export default function Terms() {
             <h2>Cancelling and returning</h2>
 
             <p>
-                You can cancel from <Link to={ROUTES.orders}>your orders</Link> while
-                the order is pending or confirmed. After that, and after delivery, the{' '}
+                You can cancel by telling us, or from{' '}
+                <Link to={ROUTES.orders}>your orders</Link>, while the order is pending
+                or confirmed. After that, and after delivery, the{' '}
                 <Link to={ROUTES.returns}>returns policy</Link> applies: seven days
                 from delivery, unworn, tags on. Nothing in these terms reduces your
                 rights under the Consumer Protection Act, 2019.

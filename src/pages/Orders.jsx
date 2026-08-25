@@ -14,6 +14,7 @@ import { ordersAPI } from '../services/api';
 import { useMyOrders } from '../lib/useMyOrders';
 import { ROUTES } from '../lib/routes';
 import styles from './Orders.module.css';
+import { COMPANY, emailHref } from '../lib/company';
 
 /**
  * YOUR ORDERS.
@@ -281,8 +282,8 @@ function OrderList() {
                 <footer className={styles.foot}>
                     <p className={styles.footText}>
                         Something not right with one of these? Mail{' '}
-                        <a className={styles.footLink} href="mailto:support@vybe.com">
-                            support@vybe.com
+                        <a className={styles.footLink} href={emailHref}>
+                            {COMPANY.email}
                         </a>{' '}
                         with the order number, or read the{' '}
                         <Link className={styles.footLink} to={ROUTES.returns}>

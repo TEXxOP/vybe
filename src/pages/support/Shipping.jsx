@@ -8,6 +8,7 @@ import {
     SHIPPING_FLAT,
     GST_RATE,
 } from '../../lib/cart';
+import { COMPANY, emailHref } from '../../lib/company';
 
 /**
  * Shipping and delivery.
@@ -48,20 +49,20 @@ export default function Shipping() {
 
                 <dt>GST</dt>
                 <dd>
-                    {Math.round(GST_RATE * 100)}%, added at checkout and listed as
-                    its own line so you can see it rather than infer it.
+                    {Math.round(GST_RATE * 100)}%, included in the figure we confirm
+                    with you and itemised so you can see it rather than infer it.
                 </dd>
 
-                <dt>Cash-on-delivery fee</dt>
-                <dd>None. Paying at the door costs the same as paying up front.</dd>
+                <dt>Paying on delivery</dt>
+                <dd>No extra charge. Paying at the door costs the same as paying up front.</dd>
             </dl>
 
             <aside>
                 <p>
                     The cart shows how much more you’d need to add to cross the
                     free-delivery threshold, and the bar next to it measures your
-                    actual subtotal against it. If it says free, the total you’re
-                    shown is the total you pay.
+                    actual subtotal against it. If it says free, delivery is free on
+                    the figure we confirm with you.
                 </p>
             </aside>
 
@@ -97,18 +98,17 @@ export default function Shipping() {
             <h2>Where we deliver</h2>
 
             <p>
-                All Indian states and union territories. Checkout lists them, and it
-                won’t accept an address outside that list, because cash on delivery
-                doesn’t work internationally and no other payment method is live
-                yet. We aren’t shipping outside India at present and we’d rather say
-                so here than let you fill in a form that can’t be submitted.
+                All Indian states and union territories. We aren’t shipping outside
+                India at present, and we’d rather say so here than let you get as far
+                as asking. If you’re elsewhere, ask on WhatsApp and we’ll tell you
+                honestly whether it’s possible.
             </p>
 
             <h2>Tracking</h2>
 
             <p>
-                Every order has a number beginning <strong>VYBE</strong>, shown on
-                your confirmation page and on{' '}
+                Every confirmed order has a number beginning <strong>VYBE</strong>,
+                which we send you on WhatsApp and which appears on{' '}
                 <Link to={ROUTES.orders}>your orders</Link>. Put it into{' '}
                 <Link to={ROUTES.trackOrder}>track order</Link> to see the current
                 stage. Both need you signed in to the account that placed the order
@@ -121,7 +121,7 @@ export default function Shipping() {
             <p>
                 If the tracking hasn’t moved for more than five working days, or a
                 parcel arrives damaged, mail{' '}
-                <a href="mailto:support@vybe.com">support@vybe.com</a> with your
+                <a href={emailHref}>{COMPANY.email}</a> with your
                 order number. Photographs help for damage — of the parcel as well as
                 the garment, because that tells us whether to argue with the courier
                 or with ourselves. Damage in transit is on us, and it isn’t counted
@@ -130,8 +130,8 @@ export default function Shipping() {
             </p>
 
             <small>
-                Working days exclude Sundays and public holidays. Orders placed after
-                4pm are counted from the next working day.
+                Working days exclude Sundays and public holidays. Orders confirmed
+                after 4pm are counted from the next working day.
             </small>
         </Doc>
     );

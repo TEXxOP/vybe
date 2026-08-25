@@ -161,6 +161,17 @@
 
 /* ---- LOADING ------------------------------------------------------------ */
 
+/* Icons sit BESIDE the label, not above it. global.css sets `svg { display:
+   block }`, and .label is a flex item (blockified), so a block svg followed by
+   a text node generated anonymous block boxes and stacked the glyph over the
+   words in every icon-bearing button. Making .label its own flex row fixes all
+   of them at once. */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
 .loading .label { opacity: 0.55; }
 
 .spinner {

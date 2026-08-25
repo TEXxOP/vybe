@@ -12,6 +12,7 @@ import { productsAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { money, discountPercent } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD, MAX_PER_LINE } from '../lib/cart';
+import { productEnquiryHref, COMMERCE_ENABLED } from '../lib/enquiry';
 import { ROUTES, shopCategory } from '../lib/routes';
 import styles from './ProductDetail.module.css';
 
@@ -542,27 +543,54 @@ function ProductView({ id }) {
                             </div>
                         ) : null}
 
-                        {/* ---- ACTION ---- */}
+                        {/* ---- ACTION ----
+                            Enquiry is the primary action now. When
+                            COMMERCE_ENABLED is false the WhatsApp button is the
+                            only one shown, because offering "Add to bag" beside
+                            it would promise a checkout that cannot complete.
+                            Flip the flag and the original add-to-bag returns
+                            with the enquiry demoted to a secondary option. */}
                         <div className={styles.actions}>
                             {anyStock ? (
-                                <Button
-                                    variant="riso"
-                                    size="lg"
-                                    full
-                                    loading={busy}
-                                    onClick={onAdd}
-                                >
-                                    {added ? (
-                                        <>
-                                            <Icons.Check size={17} /> In your bag
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Icons.ShoppingBag size={17} /> Add to bag ·{' '}
-                                            {money(product.price * qty)}
-                                        </>
-                                    )}
-                                </Button>
+                                <>
+                                    <Button
+                                        href={productEnquiryHref(product, {
+                                            size,
+                                            color,
+                                            qty,
+                                        })}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        variant="riso"
+                                        size="lg"
+                                        full
+                                    >
+                                        <Icons.BrandWhatsApp size={17} /> Enquire ·{' '}
+                                        {money(product.price * qty)}
+                                    </Button>
+
+                                    {COMMERCE_ENABLED ? (
+                                        <Button
+                                            variant="outline"
+                                            size="lg"
+                                            full
+                                            loading={busy}
+                                            onClick={onAdd}
+                                        >
+                                            {added ? (
+                                                <>
+                                                    <Icons.Check size={17} /> In your
+                                                    bag
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Icons.ShoppingBag size={17} /> Add
+                                                    to bag
+                                                </>
+                                            )}
+                                        </Button>
+                                    ) : null}
+                                </>
                             ) : (
                                 <div className={styles.soldOutBox}>
                                     <Stamp tone="muted" solid angle={-1}>
