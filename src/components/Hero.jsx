@@ -5,6 +5,7 @@ import Stamp from './primitives/Stamp';
 import Marquee from './primitives/Marquee';
 import { productsAPI } from '../services/api';
 import { ROUTES, ANCHORS } from '../lib/routes';
+import { COMPANY } from '../lib/company';
 import { money } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD } from '../lib/cart';
 import modelImage from '../assets/model.webp';
@@ -103,6 +104,15 @@ export default function Hero() {
             The two shouted words print a second pass off register — the same
             --mis-x/--mis-y the logo and every image use.                  */}
         <h1 className={styles.title} id="hero-title">
+          {/* The brand and the company behind it, stated once — inside the h1
+              rather than beside it, so the site's one main heading names who
+              a customer is actually dealing with. Set small and tracked out
+              like a masthead's publisher line: it belongs to the heading
+              semantically without competing with the two shouted words. */}
+          <span className={styles.byline}>
+            {COMPANY.brand} <span className={styles.bylineBy}>by</span>{' '}
+            {COMPANY.legalName}
+          </span>
           <span className={styles.line}>Own the</span>
           <span className={`${styles.line} ${styles.shout}`}>
             <span className={styles.shoutGhost} aria-hidden="true">

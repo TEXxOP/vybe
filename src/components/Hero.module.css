@@ -68,6 +68,28 @@
     isolation: isolate;
 }
 
+/* Publisher line. Every property here is an override: .title sets the display
+   face, the shout weight and display tracking, and inheriting any of those
+   would turn a 30-character company name into a second headline. */
+.byline {
+    display: block;
+    margin-bottom: var(--space-xs);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-body);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-stamp);
+    color: var(--ink-soft);
+}
+
+.bylineBy {
+    /* Lowercase and lighter, so the eye reads two names either side of it
+       rather than one long string of capitals. */
+    text-transform: lowercase;
+    font-style: italic;
+    color: var(--ink-muted);
+}
+
 .line {
     display: block;
 }
