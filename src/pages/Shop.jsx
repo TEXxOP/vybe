@@ -63,7 +63,6 @@ const CATEGORIES = [
     'shirts',
     'hoodies',
     'pants',
-    'shoes',
     'caps',
     'accessories',
 ];

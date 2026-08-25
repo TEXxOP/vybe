@@ -201,31 +201,6 @@ const products = [
     },
     // ENERGY Collection
     {
-        name: 'Neon Pulse Sneakers',
-        description: 'High-energy sneakers with reflective neon accents. Lightweight, comfortable, designed for the streets.',
-        price: 6499,
-        category: 'shoes',
-        collection: 'energy',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=600&fit=crop', alt: 'Neon Pulse Sneakers' }
-        ],
-        sizes: [
-            { size: 'S', stock: 10 },
-            { size: 'M', stock: 15 },
-            { size: 'L', stock: 12 },
-            { size: 'XL', stock: 8 }
-        ],
-        colors: [
-            { name: 'Red', hexCode: '#FF4444' },
-            { name: 'Blue', hexCode: '#4444FF' }
-        ],
-        tags: ['energy', 'sneakers', 'neon', 'shoes'],
-        badge: 'bestseller',
-        rating: { average: 4.6, count: 567 },
-        isLimited: false,
-        isFeatured: true
-    },
-    {
         name: 'Volt Track Pants',
         description: 'Electric track pants with side stripe design. Perfect for athleisure and street style.',
         price: 2799,

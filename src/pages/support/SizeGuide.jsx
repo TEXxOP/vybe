@@ -12,10 +12,10 @@ import { COMPANY, emailHref } from '../../lib/company';
  *
  * The size columns are XS–XXL, which is exactly the enum in
  * backend/src/models/Product.model.js — so every size a product can actually be
- * sold in appears here, and no size appears here that can't be ordered. Worth
- * noting the schema applies that same letter enum to the `shoes` category, so
- * shoe listings show S/M/L rather than UK numbers; the footwear table below maps
- * the letters onto UK sizes rather than pretending the problem isn't there.
+ * sold in appears here, and no size appears here that can't be ordered. A
+ * footwear table used to sit below the pants one; it went when the shoes
+ * category did, because a size chart for something the shop doesn't sell is
+ * just a promise waiting to be broken.
  *
  * Every cell carries both units. Splitting them into an inches table and a
  * centimetres table means maintaining the same numbers twice, which is how one
@@ -39,15 +39,6 @@ const PANTS = [
     { size: 'L', waist: '34 / 86', hip: '44 / 112', inseam: '31 / 79' },
     { size: 'XL', waist: '36 / 91', hip: '46 / 117', inseam: '31.5 / 80' },
     { size: 'XXL', waist: '38 / 97', hip: '48 / 122', inseam: '32 / 81' },
-];
-
-const SHOES = [
-    { size: 'XS', uk: '6', eu: '40', foot: '25.0' },
-    { size: 'S', uk: '7', eu: '41', foot: '25.7' },
-    { size: 'M', uk: '8', eu: '42', foot: '26.5' },
-    { size: 'L', uk: '9', eu: '43', foot: '27.3' },
-    { size: 'XL', uk: '10', eu: '44', foot: '28.0' },
-    { size: 'XXL', uk: '11', eu: '45', foot: '28.8' },
 ];
 
 export default function SizeGuide() {
@@ -123,46 +114,6 @@ export default function SizeGuide() {
                 is a 32 on a tape around your waist.
             </p>
 
-            <h2>Footwear</h2>
-
-            <aside>
-                <p>
-                    Shoes are listed with letter sizes on this site. Use this table to
-                    work out which letter is your UK size, and go by the foot-length
-                    column if you’re between two.
-                </p>
-            </aside>
-
-            <figure>
-                <table>
-                    <caption>Footwear — letter size to UK, EU and foot length</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Listed as</th>
-                            <th scope="col">UK</th>
-                            <th scope="col">EU</th>
-                            <th scope="col">Foot length (cm)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {SHOES.map((row) => (
-                            <tr key={row.size}>
-                                <th scope="row">{row.size}</th>
-                                <td>{row.uk}</td>
-                                <td>{row.eu}</td>
-                                <td>{row.foot}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </figure>
-
-            <p>
-                Measure foot length by standing on a sheet of paper with your heel
-                against a wall and marking the end of your longest toe. Do it in the
-                evening, when your feet are at their largest, and use the bigger of
-                the two.
-            </p>
 
             <h2>Caps and accessories</h2>
 

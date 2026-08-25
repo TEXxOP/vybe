@@ -54,7 +54,20 @@ exports.getProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
 
-        if (!product) {
+        /* An inactive product is gone as far as the public is concerned.
+           Without this check, `deleteProduct` — which is a soft delete, setting
+           isActive: false — removed a listing from every grid on the site while
+           leaving its detail page fully live at its own URL: purchasable,
+           linkable and indexable. buildFilters() forces isActive: true for the
+           listings, so this was the one endpoint that never asked.
+
+           Admins are exempt, because this route also backs the admin edit form
+           and an admin needs to be able to reach a product precisely when it
+           has been withdrawn. */
+        const withdrawn = product && product.isActive === false;
+        const isAdmin = req.user && req.user.role === 'admin';
+
+        if (!product || (withdrawn && !isAdmin)) {
             return res.status(404).json({
                 success: false,
                 message: 'Product not found'

@@ -74,7 +74,6 @@ const CATEGORIES = [
     'pants',
     'caps',
     'accessories',
-    'shoes',
     'hoodies',
 ];
 const COLLECTIONS = ['edge', 'canvas', 'energy', 'limited', 'classics'];
