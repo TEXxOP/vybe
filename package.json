@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "check:css": "node scripts/check-css-modules.mjs",
+    "check:routes": "node scripts/check-routes.mjs",
+    "check": "npm run lint && npm run check:css && npm run check:routes",
     "preview": "vite preview"
   },
   "dependencies": {
