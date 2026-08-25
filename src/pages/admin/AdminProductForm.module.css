@@ -1,0 +1,422 @@
+/* ===========================================================================
+   ADMIN PRODUCT FORM — the job sheet.
+
+   A modal, which means it has obligations the old one didn't meet: it traps
+   focus, it restores focus on close, it stops the page behind it scrolling, and
+   it doesn't throw away a half-filled form because someone's cursor slipped onto
+   the backdrop.
+
+   No `!important` anywhere. The old file carried eight of them — `background:
+   #1a1a1a !important`, `color: #fff !important`, a forced border — all hardcoding
+   a dark panel with dark inputs. Escalating to `!important` eight times in one
+   file is the tell that nobody owned the cascade. Working in the shared light
+   palette, through the Field primitive, there is nothing to fight.
+   =========================================================================== */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: var(--space-sm);
+    background-color: var(--scrim);
+    overflow-y: auto;
+}
+
+.dialog {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 46rem;
+    max-height: 94vh;
+    max-height: 94dvh;
+    border: 2px solid var(--ink);
+    background-color: var(--paper);
+    box-shadow: var(--print-offset-pink);
+}
+
+/* ---- HEAD ---------------------------------------------------------------- */
+.head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    flex: none;
+    padding: var(--space-md);
+    border-bottom: 2px solid var(--ink);
+    background-color: var(--newsprint-deep);
+}
+
+.eyebrow {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--pink-text);
+}
+
+.title {
+    margin: var(--space-3xs) 0 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-shout);
+    line-height: var(--leading-flush);
+    letter-spacing: var(--tracking-display);
+    text-transform: uppercase;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+
+.close {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--ink);
+    background-color: transparent;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.close:hover {
+    background-color: var(--ink);
+    color: var(--paper);
+}
+
+.close:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 2px;
+}
+
+/* ---- FORM BODY ----------------------------------------------------------- */
+.form {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-md);
+}
+
+/* ---- ERROR SUMMARY --------------------------------------------------------
+   Listed at the top and linked to each field. On a form this long the field at
+   fault can easily be off-screen, and a bare "please fill in all fields" (which
+   is what the old build's sibling forms did) makes the user hunt. */
+.summary {
+    margin: 0 0 var(--space-md);
+    padding: var(--space-sm);
+    border: 2px solid var(--danger);
+    border-left-width: 6px;
+    background-color: var(--newsprint);
+}
+
+.summaryTitle {
+    margin: 0 0 var(--space-2xs);
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    color: var(--ink);
+}
+
+.summaryList {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--ink-soft);
+}
+
+.summaryList li + li {
+    margin-top: 2px;
+}
+
+/* ---- SECTIONS ------------------------------------------------------------ */
+.section + .section {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--ink-hairline);
+}
+
+.sectionHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+}
+
+/* Numbered by a counter, so inserting a section renumbers the rest instead of
+   leaving "4." above "6." the way hand-typed numbers eventually do. */
+.form {
+    counter-reset: part;
+}
+
+.sectionTitle {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink);
+}
+
+.sectionTitle::before {
+    counter-increment: part;
+    content: counter(part, decimal-leading-zero) ' · ';
+    color: var(--pink-text);
+}
+
+.sectionNote {
+    max-width: 60ch;
+    margin: calc(var(--space-2xs) * -1) 0 var(--space-sm);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    line-height: var(--leading-snug);
+    color: var(--ink-faint);
+}
+
+/* ---- GRID --------------------------------------------------------------- */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sm);
+}
+
+.wide {
+    grid-column: 1 / -1;
+}
+
+/* ---- REPEATABLE ROWS --------------------------------------------------- */
+.rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    border: 1px solid var(--ink-hairline);
+    background-color: var(--newsprint);
+}
+
+.rowFields {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xs);
+    min-width: 0;
+}
+
+/* The column beside a row's fields: image preview above, remove button below. */
+.rowAside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2xs);
+}
+
+/* A section-level problem — "at least one image URL is needed" — which belongs
+   to the list rather than to any one row, so it can't hang off a Field. */
+.notice {
+    margin: 0 0 var(--space-sm);
+    padding: var(--space-2xs) var(--space-xs);
+    border-left: 4px solid var(--danger);
+    background-color: var(--newsprint);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+}
+
+/* The native colour picker, sized to sit level with the text input beside it.
+   It is paired with a text field for the hex value — a colour well alone can't
+   be typed into, so a brand hex has to be found by eye. */
+.swatch {
+    width: 100%;
+    height: 2.5rem;
+    padding: 2px;
+    border: 1px solid var(--ink);
+    background-color: var(--paper);
+    cursor: pointer;
+}
+
+.swatch:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 2px;
+}
+
+.addBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-2xs);
+    border: 1px solid var(--ink);
+    background-color: transparent;
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: var(--tracking-stamp);
+    text-transform: uppercase;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.addBtn:hover:not(:disabled) {
+    background-color: var(--ink);
+    color: var(--paper);
+}
+
+.addBtn:disabled {
+    border-color: var(--ink-hairline);
+    color: var(--ink-faint);
+    cursor: not-allowed;
+}
+
+.addBtn:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 2px;
+}
+
+.removeBtn {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.5rem;
+    padding: 0;
+    border: 1px solid var(--ink-hairline);
+    background-color: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+}
+
+.removeBtn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.removeBtn:focus-visible {
+    outline: 2px solid var(--pink-text);
+    outline-offset: 2px;
+}
+
+/* ---- IMAGE PREVIEW ----------------------------------------------------- */
+.preview {
+    display: block;
+    width: 4rem;
+    height: 5rem;
+    object-fit: cover;
+    border: 1px solid var(--ink);
+    background-color: var(--newsprint-deep);
+}
+
+.previewMissing {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 5rem;
+    border: 1px dashed var(--ink-hairline);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    text-align: center;
+    color: var(--ink-faint);
+}
+
+/* ---- CHECKBOXES -------------------------------------------------------- */
+.checks {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.check {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.check input {
+    margin: 0;
+    flex: none;
+    accent-color: var(--riso-pink);
+}
+
+.checkNote {
+    display: block;
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    color: var(--ink-faint);
+}
+
+/* ---- FOOT --------------------------------------------------------------- */
+.foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-xs);
+    flex: none;
+    padding: var(--space-md);
+    border-top: 2px solid var(--ink);
+    background-color: var(--newsprint-deep);
+}
+
+/* Shown when a close is attempted with unsaved edits, in place of silently
+   discarding them — which is what clicking the old overlay did. */
+.discard {
+    flex: 1 1 100%;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--ink);
+}
+
+.failure {
+    flex: 1 1 100%;
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--danger);
+}
+
+/* ---- BREAKPOINTS (min-width only) ------------------------------------- */
+@media (min-width: 640px) {
+    .overlay {
+        align-items: center;
+        padding: var(--space-lg);
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Colour rows: swatch, name, hex. Sizes: size, stock. */
+    .rowFields {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .rowFields[data-cols='3'] {
+        grid-template-columns: 5rem 1fr 1fr;
+    }
+
+    .foot {
+        justify-content: flex-end;
+    }
+}
