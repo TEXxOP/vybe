@@ -8,8 +8,8 @@ const products = [
     {
         name: 'Chroma Surge Jacket',
         description: 'Bold, statement-making jacket with vibrant color blocking. Limited edition streetwear piece designed for those who dare to stand out.',
-        price: 4999,
-        comparePrice: 6499,
+        price: 2499,
+        comparePrice: 2500,
         category: 'jackets',
         collection: 'limited',
         images: [
@@ -32,8 +32,8 @@ const products = [
     {
         name: 'Vivid Blueprint Shirt',
         description: 'Architectural-inspired graphic shirt with unique blueprint patterns. A fusion of urban art and fashion.',
-        price: 1999,
-        comparePrice: 2499,
+        price: 999,
+        comparePrice: 1299,
         category: 'shirts',
         collection: 'limited',
         images: [
@@ -54,35 +54,10 @@ const products = [
         isFeatured: false
     },
     {
-        name: 'Heritage Wave Cap',
-        description: 'Vintage-inspired cap with modern wave embroidery. Classic streetwear essential with premium materials.',
-        price: 1499,
-        comparePrice: 1999,
-        category: 'caps',
-        collection: 'limited',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&h=600&fit=crop', alt: 'Heritage Wave Cap' }
-        ],
-        sizes: [
-            { size: 'M', stock: 30 },
-            { size: 'L', stock: 25 }
-        ],
-        colors: [
-            { name: 'Black', hexCode: '#1A1A1A' },
-            { name: 'Cream', hexCode: '#F5F5DC' }
-        ],
-        tags: ['limited', 'cap', 'heritage', 'accessories'],
-        badge: 'limited',
-        rating: { average: 4.8, count: 203 },
-        isLimited: true,
-        limitedStock: 75,
-        isFeatured: true
-    },
-    {
         name: 'Graffiti Canvas Cargo',
         description: 'Street art-inspired cargo pants with graffiti accents. Multiple pockets, relaxed fit, premium cotton blend.',
-        price: 3499,
-        comparePrice: 4299,
+        price: 1799,
+        comparePrice: 2199,
         category: 'pants',
         collection: 'limited',
         images: [
@@ -106,7 +81,7 @@ const products = [
     {
         name: 'Shadow Edge Hoodie',
         description: 'Dark aesthetic hoodie with minimal branding. Heavyweight cotton, oversized fit for maximum comfort.',
-        price: 3299,
+        price: 1699,
         category: 'hoodies',
         collection: 'edge',
         images: [
@@ -132,7 +107,7 @@ const products = [
     {
         name: 'Razor Cut Tee',
         description: 'Sharp, angular graphic tee with distressed details. Premium organic cotton, relaxed streetwear fit.',
-        price: 1799,
+        price: 899,
         category: 'shirts',
         collection: 'edge',
         images: [
@@ -158,7 +133,7 @@ const products = [
     {
         name: 'Abstract Canvas Jacket',
         description: 'Artistic denim jacket with hand-painted abstract patterns. Each piece is unique and one-of-a-kind.',
-        price: 5999,
+        price: 2399,
         category: 'jackets',
         collection: 'canvas',
         images: [
@@ -180,7 +155,7 @@ const products = [
     {
         name: 'Palette Blend Shirt',
         description: 'Color-splashed button-up shirt inspired by artist palettes. Relaxed fit, premium cotton.',
-        price: 2499,
+        price: 1299,
         category: 'shirts',
         collection: 'canvas',
         images: [
@@ -203,7 +178,7 @@ const products = [
     {
         name: 'Volt Track Pants',
         description: 'Electric track pants with side stripe design. Perfect for athleisure and street style.',
-        price: 2799,
+        price: 1499,
         category: 'pants',
         collection: 'energy',
         images: [
@@ -229,8 +204,8 @@ const products = [
     {
         name: 'Urban Vanguard Tee',
         description: 'The ultimate streetwear essential. Premium organic cotton, perfect fit, unmatched comfort. A must-have in every collection.',
-        price: 2672,
-        comparePrice: 3499,
+        price: 1399,
+        comparePrice: 1799,
         category: 'shirts',
         collection: 'classics',
         images: [
@@ -259,7 +234,7 @@ const products = [
     {
         name: 'Street Cipher Hoodie',
         description: 'Encoded streetwear hoodie with hidden message graphics. Heavyweight fleece, oversized silhouette.',
-        price: 3799,
+        price: 1999,
         category: 'hoodies',
         collection: 'edge',
         images: [

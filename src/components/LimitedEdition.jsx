@@ -106,7 +106,7 @@ const FALLBACK = [
     _id: 'demo-1',
     demo: true,
     name: 'Chroma Surge Jacket',
-    price: 4999,
+    price: 2499,
     category: 'Outerwear',
     limitedStock: 50,
     images: [
@@ -119,7 +119,7 @@ const FALLBACK = [
     _id: 'demo-2',
     demo: true,
     name: 'Vivid Blueprint Shirt',
-    price: 1999,
+    price: 999,
     category: 'Tops',
     limitedStock: 8,
     images: [
@@ -131,13 +131,13 @@ const FALLBACK = [
   {
     _id: 'demo-3',
     demo: true,
-    name: 'Heritage Wave Cap',
-    price: 1499,
-    category: 'Accessories',
+    name: 'Shadow Edge Hoodie',
+    price: 1699,
+    category: 'Hoodies',
     limitedStock: 5,
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&h=800&fit=crop',
+        url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop',
       },
     ],
   },
@@ -145,7 +145,7 @@ const FALLBACK = [
     _id: 'demo-4',
     demo: true,
     name: 'Graffiti Canvas Cargo',
-    price: 3499,
+    price: 1799,
     category: 'Bottoms',
     limitedStock: 12,
     images: [

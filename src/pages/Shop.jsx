@@ -63,8 +63,6 @@ const CATEGORIES = [
     'shirts',
     'hoodies',
     'pants',
-    'caps',
-    'accessories',
 ];
 
 /* `param` is what the backend sort expects; `value` is what lives in the URL,
