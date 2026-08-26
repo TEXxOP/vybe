@@ -44,8 +44,8 @@ const COLLECTIONS = [
     slug: 'shirts',
     plate: 'orange',
     image:
-      'https://images.unsplash.com/photo-1544441893-675973e31985?w=800&h=1000&fit=crop',
-    alt: 'A folded stack of printed cotton tees',
+      'https://images.unsplash.com/photo-1562157873-818bc0726f68?w=800&h=1000&fit=crop',
+    alt: 'Colorful graphic t-shirts hanging on a rack',
   },
   {
     name: 'ENERGY',
