@@ -8,8 +8,8 @@ const products = [
     {
         name: 'Chroma Surge Jacket',
         description: 'Bold, statement-making jacket with vibrant color blocking. Limited edition streetwear piece designed for those who dare to stand out.',
-        price: 2499,
-        comparePrice: 2500,
+        price: 2500,
+        comparePrice: 3200,
         category: 'jackets',
         collection: 'limited',
         images: [
@@ -32,8 +32,8 @@ const products = [
     {
         name: 'Vivid Blueprint Shirt',
         description: 'Architectural-inspired graphic shirt with unique blueprint patterns. A fusion of urban art and fashion.',
-        price: 999,
-        comparePrice: 1299,
+        price: 1000,
+        comparePrice: 1300,
         category: 'shirts',
         collection: 'limited',
         images: [
@@ -56,8 +56,8 @@ const products = [
     {
         name: 'Graffiti Canvas Cargo',
         description: 'Street art-inspired cargo pants with graffiti accents. Multiple pockets, relaxed fit, premium cotton blend.',
-        price: 1799,
-        comparePrice: 2199,
+        price: 1800,
+        comparePrice: 2200,
         category: 'pants',
         collection: 'limited',
         images: [
@@ -81,7 +81,7 @@ const products = [
     {
         name: 'Shadow Edge Hoodie',
         description: 'Dark aesthetic hoodie with minimal branding. Heavyweight cotton, oversized fit for maximum comfort.',
-        price: 1699,
+        price: 1700,
         category: 'hoodies',
         collection: 'edge',
         images: [
@@ -107,7 +107,7 @@ const products = [
     {
         name: 'Razor Cut Tee',
         description: 'Sharp, angular graphic tee with distressed details. Premium organic cotton, relaxed streetwear fit.',
-        price: 899,
+        price: 900,
         category: 'shirts',
         collection: 'edge',
         images: [
@@ -133,7 +133,7 @@ const products = [
     {
         name: 'Abstract Canvas Jacket',
         description: 'Artistic denim jacket with hand-painted abstract patterns. Each piece is unique and one-of-a-kind.',
-        price: 2399,
+        price: 2400,
         category: 'jackets',
         collection: 'canvas',
         images: [
@@ -155,7 +155,7 @@ const products = [
     {
         name: 'Palette Blend Shirt',
         description: 'Color-splashed button-up shirt inspired by artist palettes. Relaxed fit, premium cotton.',
-        price: 1299,
+        price: 1300,
         category: 'shirts',
         collection: 'canvas',
         images: [
@@ -178,7 +178,7 @@ const products = [
     {
         name: 'Volt Track Pants',
         description: 'Electric track pants with side stripe design. Perfect for athleisure and street style.',
-        price: 1499,
+        price: 1500,
         category: 'pants',
         collection: 'energy',
         images: [
@@ -204,8 +204,8 @@ const products = [
     {
         name: 'Urban Vanguard Tee',
         description: 'The ultimate streetwear essential. Premium organic cotton, perfect fit, unmatched comfort. A must-have in every collection.',
-        price: 1399,
-        comparePrice: 1799,
+        price: 1400,
+        comparePrice: 1800,
         category: 'shirts',
         collection: 'classics',
         images: [
@@ -234,7 +234,7 @@ const products = [
     {
         name: 'Street Cipher Hoodie',
         description: 'Encoded streetwear hoodie with hidden message graphics. Heavyweight fleece, oversized silhouette.',
-        price: 1999,
+        price: 2000,
         category: 'hoodies',
         collection: 'edge',
         images: [

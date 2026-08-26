@@ -106,7 +106,7 @@ const FALLBACK = [
     _id: 'demo-1',
     demo: true,
     name: 'Chroma Surge Jacket',
-    price: 2499,
+    price: 2500,
     category: 'Outerwear',
     limitedStock: 50,
     images: [
@@ -119,7 +119,7 @@ const FALLBACK = [
     _id: 'demo-2',
     demo: true,
     name: 'Vivid Blueprint Shirt',
-    price: 999,
+    price: 1000,
     category: 'Tops',
     limitedStock: 8,
     images: [
@@ -132,7 +132,7 @@ const FALLBACK = [
     _id: 'demo-3',
     demo: true,
     name: 'Shadow Edge Hoodie',
-    price: 1699,
+    price: 1700,
     category: 'Hoodies',
     limitedStock: 5,
     images: [
@@ -145,7 +145,7 @@ const FALLBACK = [
     _id: 'demo-4',
     demo: true,
     name: 'Graffiti Canvas Cargo',
-    price: 1799,
+    price: 1800,
     category: 'Bottoms',
     limitedStock: 12,
     images: [
