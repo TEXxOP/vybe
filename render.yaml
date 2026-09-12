@@ -1,0 +1,72 @@
+# Render Blueprint for the VYBE backend API.
+#
+# The Vite frontend is deployed separately (see vercel.json). This blueprint
+# deploys only the Express API, because PhonePe's webhook needs a long-running
+# public HTTPS listener that a static frontend deployment cannot provide.
+#
+# Apply with: Render Dashboard -> New -> Blueprint -> pick this repository.
+# Values marked `sync: false` are never committed; Render prompts for them at
+# deploy time and stores them as secrets.
+services:
+  - type: web
+    name: vybe-api
+    runtime: node
+    # Singapore is Render's closest region to India, where PhonePe settles.
+    region: singapore
+    # `free` spins down after ~15 minutes idle. A cold start can outlast
+    # PhonePe's webhook timeout; the return page's status check still resolves
+    # the receipt, so sandbox UAT works. Move to `starter` before live traffic
+    # so webhooks are not missed.
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22.13.1"
+      - key: NODE_ENV
+        value: production
+
+      # Render injects PORT itself; server.js already reads it.
+
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+
+      # MongoDB Atlas connection string. Must be a replica set: paid-order
+      # fulfilment runs inside a transaction and fails on a standalone server.
+      - key: MONGODB_URI
+        sync: false
+
+      # Exact public frontend origin, e.g. https://vybe.vercel.app
+      # Used for browser CORS and to build the PhonePe return URL.
+      - key: FRONTEND_URL
+        sync: false
+
+      # --- PhonePe Standard Checkout -------------------------------------
+      # Keep false until every value below is filled in, so checkout fails
+      # closed instead of starting a payment with partial credentials.
+      - key: PHONEPE_ENABLED
+        value: "false"
+      - key: PHONEPE_ENV
+        value: sandbox
+      - key: PHONEPE_CLIENT_ID
+        sync: false
+      - key: PHONEPE_CLIENT_SECRET
+        sync: false
+      - key: PHONEPE_CLIENT_VERSION
+        sync: false
+      # Must match the SHA credentials configured on the PhonePe webhook.
+      - key: PHONEPE_WEBHOOK_USERNAME
+        sync: false
+      - key: PHONEPE_WEBHOOK_PASSWORD
+        sync: false
+      - key: PHONEPE_PAYMENT_EXPIRY_SECONDS
+        value: "1200"
+
+      - key: RATE_LIMIT_WINDOW_MS
+        value: "900000"
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: "100"
