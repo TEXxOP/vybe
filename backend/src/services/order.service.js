@@ -155,6 +155,61 @@ async function removePurchasedItemsFromCart(userId, orderItems, session) {
 }
 
 /**
+ * Commit the inventory side of a sale: take the stock off the shelf and count
+ * the sale, once per line.
+ *
+ * Stock was previously never decremented at all — only `soldCount` moved — so
+ * the availability check in buildOrderFromCart only ever compared against the
+ * seeded number and the same units could be sold indefinitely.
+ *
+ * The update is a single conditional document write per line: it matches the
+ * size element *and* requires it to still hold enough stock, so two orders
+ * racing for the last unit cannot both succeed. That matters because the
+ * availability check happens when the order is built, which for PhonePe can be
+ * twenty minutes before payment confirms (PHONEPE_PAYMENT_EXPIRY_SECONDS).
+ *
+ * A line that can no longer be satisfied is *recorded, not thrown*. By the time
+ * this runs for an online order the customer's money has already been captured
+ * and paymentStatus is 'paid'; throwing would roll the transaction back, leave
+ * fulfillmentCommittedAt unset, and make the webhook fail and retry forever on
+ * an order that is genuinely paid. Overselling one unit is recoverable by a
+ * human; a paid order stuck unconfirmed is not. `stock` is declared `min: 0`,
+ * and the conditional filter means it can never be driven negative either way.
+ */
+async function commitStockAndSales(orderItems, session) {
+    const shortfalls = [];
+
+    for (const item of orderItems) {
+        const updated = await Product.findOneAndUpdate(
+            {
+                _id: item.product,
+                sizes: { $elemMatch: { size: item.size, stock: { $gte: item.quantity } } },
+            },
+            {
+                // The positional operator targets the element $elemMatch matched.
+                $inc: { 'sizes.$.stock': -item.quantity, soldCount: item.quantity },
+            },
+            { new: true, ...(session ? { session } : {}) }
+        );
+
+        if (!updated) {
+            // soldCount is deliberately not incremented here: nothing left the
+            // shelf, so counting it as sold would put the two figures out of
+            // step and hide the problem from whoever reconciles it.
+            shortfalls.push({
+                product: item.product,
+                name: item.name,
+                size: item.size,
+                quantity: item.quantity,
+                reason: 'insufficient_stock_at_fulfilment',
+            });
+        }
+    }
+
+    return shortfalls;
+}
+
+/**
  * Marks the commercial side of an order complete exactly once. The payment
  * provider status is updated separately so a webhook can be acknowledged
  * quickly and retried safely.
@@ -169,11 +224,9 @@ async function fulfilOrder(order, { transactional = true } = {}) {
         if (!currentOrder || currentOrder.fulfillmentCommittedAt) return;
 
         await removePurchasedItemsFromCart(currentOrder.user, currentOrder.items);
-        for (const item of currentOrder.items) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { soldCount: item.quantity },
-            });
-        }
+        const shortfalls = await commitStockAndSales(currentOrder.items);
+
+        if (shortfalls.length > 0) currentOrder.fulfillmentIssues = shortfalls;
         currentOrder.fulfillmentCommittedAt = new Date();
         await currentOrder.save();
         return;
@@ -187,13 +240,9 @@ async function fulfilOrder(order, { transactional = true } = {}) {
             if (!currentOrder || currentOrder.fulfillmentCommittedAt) return;
 
             await removePurchasedItemsFromCart(currentOrder.user, currentOrder.items, session);
+            const shortfalls = await commitStockAndSales(currentOrder.items, session);
 
-            for (const item of currentOrder.items) {
-                await Product.findByIdAndUpdate(item.product, {
-                    $inc: { soldCount: item.quantity },
-                }, { session });
-            }
-
+            if (shortfalls.length > 0) currentOrder.fulfillmentIssues = shortfalls;
             currentOrder.fulfillmentCommittedAt = new Date();
             await currentOrder.save({ session });
         });

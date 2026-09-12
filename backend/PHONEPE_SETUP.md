@@ -37,9 +37,10 @@ The blueprint deploys `backend/` as a Node web service, runs `npm ci`, starts
 5. Set `VITE_API_URL=https://<service>.onrender.com/api` on the frontend and
    redeploy it, so the browser calls the deployed API rather than localhost.
 
-`FRONTEND_URL` must be the exact public frontend origin, with no trailing
-slash and no path — it is matched against the browser's `Origin` header for
-CORS and used to build the PhonePe return URL.
+`FRONTEND_URL` must be the exact public frontend origin, with no path — it is
+matched against the browser's `Origin` header for CORS and used to build the
+PhonePe return URL. A trailing slash is stripped automatically; an origin that
+is not on the list simply receives no CORS headers, so the browser blocks it.
 
 ### Free plan and webhook delivery
 
@@ -87,9 +88,23 @@ incomplete credentials.
    `confirmed`.
 3. Confirm the browser return page also resolves the receipt through the status
    API, even if the webhook is delayed.
-4. Deliver the same webhook twice and verify the cart and `soldCount` are
-   changed only once.
+4. Deliver the same webhook twice and verify the cart, `soldCount` and
+   `sizes.stock` are changed only once.
 5. Test failed and abandoned checkout: the cart must remain intact and the
    order must not be confirmed.
+6. Confirm the charged amount equals the total shown on the Place-order button.
+   The order is refused with **409** if they disagree — the browser sends the
+   figure the customer agreed to and the server compares it against its own, so
+   a bag that drifted out of sync cannot be charged silently. To exercise it:
+   open checkout, add another item in a second tab, then submit the first tab.
+   It must refuse and re-read the bag rather than charge the higher total.
+7. Confirm `sizes.stock` for the purchased size drops by the ordered quantity.
+   Stock is committed at fulfilment, not at checkout, so an abandoned PhonePe
+   payment never holds inventory.
+8. If two orders race for the last unit, the loser's order records
+   `fulfillmentIssues` instead of failing: its payment already succeeded, so it
+   needs a human decision (restock, refund, or part-ship) rather than a webhook
+   that retries forever. Check this field before treating an order as cleanly
+   fulfilled.
 
 References: [PhonePe Standard Checkout integration steps](https://developer.phonepe.com/payment-gateway/website-integration/standard-checkout/api-integration/integration-steps), [Node.js SDK](https://developer.phonepe.com/payment-gateway/backend-sdk/nodejs-be-sdk/integration-steps), and [webhook handling](https://developer.phonepe.com/payment-gateway/website-integration/standard-checkout/api-integration/api-reference/webhook).

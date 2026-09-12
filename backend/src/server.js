@@ -57,13 +57,23 @@ const webhookLimiter = rateLimit({
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
     .split(',')
     .map((origin) => origin.trim())
+    // A trailing slash here would silently reject the real frontend: browsers
+    // send `Origin` with no path and no trailing slash, and the comparison
+    // below is exact. Normalising is cheaper than debugging it again.
+    .map((origin) => origin.replace(/\/+$/, ''))
     .filter(Boolean);
 
 app.use(cors({
     origin(origin, callback) {
         // Server-to-server calls and local tools do not send an Origin header.
         if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error('Origin is not allowed by CORS'));
+
+        // Previously this passed an Error to the callback, which fell through to
+        // the global handler as a 500 — so a misconfigured FRONTEND_URL looked
+        // identical to a crashed server and cost real debugging time. Refuse the
+        // CORS headers without erroring: the browser still blocks the response,
+        // which is the actual enforcement, and the status now says why.
+        return callback(null, false);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']

@@ -94,7 +94,19 @@ const orderSchema = new mongoose.Schema({
     cancelReason: String,
     // The cart and sales counters are only updated after a verified payment.
     // Keeping this separately makes duplicate PhonePe callbacks harmless.
-    fulfillmentCommittedAt: Date
+    fulfillmentCommittedAt: Date,
+    // Lines that could not be taken from stock at fulfilment — almost always
+    // two orders racing for the last unit between checkout and payment
+    // confirmation. Recorded rather than thrown: the money is already captured
+    // by then, so this needs a human (restock, refund, or part-ship), not a
+    // failed webhook that retries forever. Empty on a clean order.
+    fulfillmentIssues: [{
+        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        name: String,
+        size: String,
+        quantity: Number,
+        reason: String
+    }]
 }, {
     timestamps: true
 });

@@ -168,3 +168,167 @@ test('adds flat shipping below the free-shipping threshold', async () => {
     assert.equal(order.shippingPrice, 99);
     assert.equal(order.totalPrice, 689);
 });
+
+/* ===================================================================
+ * Fulfilment: taking stock off the shelf.
+ *
+ * Stock was never decremented before — only soldCount moved — so the same
+ * units could be sold indefinitely. These cover the decrement, its idempotency
+ * under duplicate PhonePe webhooks, and the race that cannot be thrown on.
+ * =================================================================== */
+
+/**
+ * A fake Product collection that honours the same conditional-update contract
+ * as MongoDB: the write applies only if the matched size still holds enough
+ * stock, and returns null otherwise.
+ */
+function fakeProducts(docs) {
+    const byId = new Map(docs.map((d) => [String(d._id), d]));
+
+    return {
+        find: async () => docs,
+        findOneAndUpdate: async (filter, update) => {
+            const doc = byId.get(String(filter._id));
+            if (!doc) return null;
+
+            const match = filter.sizes.$elemMatch;
+            const size = doc.sizes.find((s) => s.size === match.size);
+            if (!size || size.stock < match.stock.$gte) return null;
+
+            size.stock += update.$inc['sizes.$.stock'];
+            doc.soldCount = (doc.soldCount || 0) + update.$inc.soldCount;
+            return doc;
+        },
+        _byId: byId,
+    };
+}
+
+/** A minimal saved-order stand-in matching what fulfilOrder reads and writes. */
+function fakeOrder(items, { committed = null } = {}) {
+    const order = {
+        _id: 'order-1',
+        user: 'user-1',
+        items,
+        fulfillmentCommittedAt: committed,
+        fulfillmentIssues: undefined,
+        saved: 0,
+        async save() { this.saved += 1; },
+    };
+    order.constructor = { findById: async () => order };
+    return order;
+}
+
+function loadServiceForFulfilment(productStub, cartDoc) {
+    stubModel(CART_PATH, {
+        findOne: () => ({ then: (res) => res(cartDoc), session: () => Promise.resolve(cartDoc) }),
+    });
+    stubModel(PRODUCT_PATH, productStub);
+    delete require.cache[require.resolve('../src/services/order.service')];
+    return require('../src/services/order.service');
+}
+
+test('fulfilment takes the purchased quantity out of stock', async () => {
+    const products = fakeProducts([
+        { _id: 'p1', name: 'Jacket', soldCount: 0, sizes: [{ size: 'S', stock: 10 }, { size: 'M', stock: 4 }] },
+    ]);
+    const cart = { items: [], save: async () => {} };
+    const service = loadServiceForFulfilment(products, cart);
+
+    const order = fakeOrder([
+        { product: 'p1', name: 'Jacket', size: 'S', quantity: 3 },
+        { product: 'p1', name: 'Jacket', size: 'M', quantity: 1 },
+    ]);
+
+    await service.fulfilOrder(order, { transactional: false });
+
+    const doc = products._byId.get('p1');
+    assert.equal(doc.sizes.find((s) => s.size === 'S').stock, 7, 'S: 10 - 3');
+    assert.equal(doc.sizes.find((s) => s.size === 'M').stock, 3, 'M: 4 - 1');
+    assert.equal(doc.soldCount, 4, 'both lines counted as sold');
+    assert.ok(order.fulfillmentCommittedAt instanceof Date);
+    assert.equal(order.fulfillmentIssues, undefined, 'a clean order records no issues');
+});
+
+test('a duplicate webhook does not decrement stock twice', async () => {
+    const products = fakeProducts([
+        { _id: 'p1', name: 'Jacket', soldCount: 0, sizes: [{ size: 'S', stock: 10 }] },
+    ]);
+    const cart = { items: [], save: async () => {} };
+    const service = loadServiceForFulfilment(products, cart);
+
+    const order = fakeOrder([{ product: 'p1', name: 'Jacket', size: 'S', quantity: 2 }]);
+
+    await service.fulfilOrder(order, { transactional: false });
+    await service.fulfilOrder(order, { transactional: false }); // PhonePe retries
+    await service.fulfilOrder(order, { transactional: false });
+
+    const doc = products._byId.get('p1');
+    assert.equal(doc.sizes[0].stock, 8, 'decremented once despite three deliveries');
+    assert.equal(doc.soldCount, 2);
+});
+
+test('records a shortfall instead of throwing when stock ran out', async () => {
+    // Only 1 left, but the order was built for 3 — the race between checkout
+    // and payment confirmation. The money is already captured at this point.
+    const products = fakeProducts([
+        { _id: 'p1', name: 'Jacket', soldCount: 0, sizes: [{ size: 'S', stock: 1 }] },
+    ]);
+    const cart = { items: [], save: async () => {} };
+    const service = loadServiceForFulfilment(products, cart);
+
+    const order = fakeOrder([{ product: 'p1', name: 'Jacket', size: 'S', quantity: 3 }]);
+
+    // Must not throw: a paid order that cannot commit would leave the webhook
+    // failing forever on a payment that genuinely succeeded.
+    await service.fulfilOrder(order, { transactional: false });
+
+    const doc = products._byId.get('p1');
+    assert.equal(doc.sizes[0].stock, 1, 'stock untouched rather than driven negative');
+    assert.equal(doc.soldCount, 0, 'nothing left the shelf, so nothing is counted sold');
+    assert.ok(order.fulfillmentCommittedAt instanceof Date, 'order still commits');
+    assert.equal(order.fulfillmentIssues.length, 1);
+    assert.equal(order.fulfillmentIssues[0].reason, 'insufficient_stock_at_fulfilment');
+    assert.equal(order.fulfillmentIssues[0].quantity, 3);
+    assert.equal(order.fulfillmentIssues[0].size, 'S');
+});
+
+test('one unavailable line does not block the others', async () => {
+    const products = fakeProducts([
+        { _id: 'p1', name: 'Jacket', soldCount: 0, sizes: [{ size: 'S', stock: 5 }] },
+        { _id: 'p2', name: 'Tee', soldCount: 0, sizes: [{ size: 'M', stock: 0 }] },
+    ]);
+    const cart = { items: [], save: async () => {} };
+    const service = loadServiceForFulfilment(products, cart);
+
+    const order = fakeOrder([
+        { product: 'p1', name: 'Jacket', size: 'S', quantity: 2 },
+        { product: 'p2', name: 'Tee', size: 'M', quantity: 1 },
+    ]);
+
+    await service.fulfilOrder(order, { transactional: false });
+
+    assert.equal(products._byId.get('p1').sizes[0].stock, 3, 'available line still ships');
+    assert.equal(products._byId.get('p1').soldCount, 2);
+    assert.equal(order.fulfillmentIssues.length, 1);
+    assert.equal(order.fulfillmentIssues[0].name, 'Tee');
+});
+
+test('stock is never driven below zero', async () => {
+    const products = fakeProducts([
+        { _id: 'p1', name: 'Jacket', soldCount: 0, sizes: [{ size: 'S', stock: 2 }] },
+    ]);
+    const cart = { items: [], save: async () => {} };
+    const service = loadServiceForFulfilment(products, cart);
+
+    // Three separate orders for the last 2 units.
+    for (const qty of [2, 1, 1]) {
+        await service.fulfilOrder(fakeOrder([{ product: 'p1', name: 'Jacket', size: 'S', quantity: qty }]), {
+            transactional: false,
+        });
+    }
+
+    const doc = products._byId.get('p1');
+    assert.equal(doc.sizes[0].stock, 0, 'first order took both; the rest found none');
+    assert.ok(doc.sizes[0].stock >= 0);
+    assert.equal(doc.soldCount, 2, 'only the units that actually existed are counted sold');
+});
