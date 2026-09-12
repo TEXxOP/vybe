@@ -42,16 +42,29 @@ const orderSchema = new mongoose.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['cod', 'card', 'upi', 'netbanking'],
+        // Legacy values remain readable for historical orders. New online
+        // payments are always processed through the PhonePe hosted checkout.
+        enum: ['cod', 'phonepe', 'card', 'upi', 'netbanking'],
         default: 'cod'
     },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'paid', 'failed', 'refunded'],
+        enum: ['pending', 'initiated', 'paid', 'failed', 'expired', 'refunded'],
         default: 'pending'
     },
     paymentDetails: {
+        provider: { type: String, enum: ['phonepe', null] },
+        merchantOrderId: String,
+        phonepeOrderId: String,
         transactionId: String,
+        paymentMode: String,
+        amountPaisa: Number,
+        providerState: String,
+        failureCode: String,
+        failureDetail: String,
+        expiresAt: Date,
+        providerUpdatedAt: Date,
+        lastSource: String,
         paidAt: Date
     },
     itemsPrice: {
@@ -78,7 +91,10 @@ const orderSchema = new mongoose.Schema({
     trackingNumber: String,
     deliveredAt: Date,
     cancelledAt: Date,
-    cancelReason: String
+    cancelReason: String,
+    // The cart and sales counters are only updated after a verified payment.
+    // Keeping this separately makes duplicate PhonePe callbacks harmless.
+    fulfillmentCommittedAt: Date
 }, {
     timestamps: true
 });
@@ -91,5 +107,9 @@ orderSchema.pre('save', async function (next) {
     }
     next();
 });
+
+// PhonePe's merchant order ID is our immutable correlation key for status
+// requests and callbacks. Sparse keeps existing cash-on-delivery orders valid.
+orderSchema.index({ 'paymentDetails.merchantOrderId': 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('Order', orderSchema);

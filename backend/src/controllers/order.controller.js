@@ -1,7 +1,10 @@
 const Order = require('../models/Order.model');
-const Cart = require('../models/Cart.model');
-const Product = require('../models/Product.model');
 const { paginate } = require('../utils/helpers');
+const {
+    buildOrderFromCart,
+    fulfilOrder,
+    OrderValidationError,
+} = require('../services/order.service');
 
 // @desc    Create order
 // @route   POST /api/orders
@@ -10,71 +13,26 @@ exports.createOrder = async (req, res) => {
     try {
         const { shippingAddress, paymentMethod } = req.body;
 
-        // Get user's cart
-        const cart = await Cart.findOne({ user: req.user.id })
-            .populate('items.product');
-
-        if (!cart || cart.items.length === 0) {
+        // Card/UPI strings from old clients must not create a fake online order.
+        // PhonePe checkout has its own endpoint and only confirms after a
+        // provider-verified response.
+        if (paymentMethod && paymentMethod !== 'cod') {
             return res.status(400).json({
                 success: false,
-                message: 'Cart is empty'
+                message: 'Use the PhonePe checkout endpoint for online payments'
             });
         }
 
-        // Validate shipping address
-        if (!shippingAddress || !shippingAddress.name || !shippingAddress.street ||
-            !shippingAddress.city || !shippingAddress.state || !shippingAddress.pincode ||
-            !shippingAddress.phone) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide complete shipping address'
-            });
-        }
-
-        // Prepare order items
-        const orderItems = cart.items.map(item => ({
-            product: item.product._id,
-            name: item.product.name,
-            quantity: item.quantity,
-            size: item.size,
-            color: item.color,
-            price: item.price,
-            image: item.product.images[0]?.url
-        }));
-
-        // Calculate prices
-        const itemsPrice = cart.totalPrice;
-        // FIXED: this was `itemsPrice > 999`, while the cart and checkout both
-        // used `>= 999`. At a subtotal of exactly ₹999 the storefront promised
-        // free delivery and then the server charged ₹99 — the customer was
-        // billed a total they had never been shown. The threshold now matches
-        // FREE_SHIPPING_THRESHOLD in src/lib/cart.js, inclusive on both sides.
-        const shippingPrice = itemsPrice >= 999 ? 0 : 99; // Free shipping from ₹999
-        const taxPrice = Math.round(itemsPrice * 0.18); // 18% GST
-        const totalPrice = itemsPrice + shippingPrice + taxPrice;
+        const orderData = await buildOrderFromCart(req.user.id, shippingAddress);
 
         // Create order
         const order = await Order.create({
             user: req.user.id,
-            items: orderItems,
-            shippingAddress,
-            paymentMethod: paymentMethod || 'cod',
-            itemsPrice,
-            shippingPrice,
-            taxPrice,
-            totalPrice
+            ...orderData,
+            paymentMethod: 'cod',
         });
 
-        // Clear cart after order
-        cart.items = [];
-        await cart.save();
-
-        // Update product sold counts
-        for (const item of orderItems) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { soldCount: item.quantity }
-            });
-        }
+        await fulfilOrder(order, { transactional: false });
 
         res.status(201).json({
             success: true,
@@ -84,9 +42,9 @@ exports.createOrder = async (req, res) => {
 
     } catch (error) {
         console.error('Create order error:', error);
-        res.status(500).json({
+        res.status(error instanceof OrderValidationError ? error.statusCode : 500).json({
             success: false,
-            message: 'Failed to create order'
+            message: error instanceof OrderValidationError ? error.message : 'Failed to create order'
         });
     }
 };
@@ -190,6 +148,16 @@ exports.cancelOrder = async (req, res) => {
             });
         }
 
+        // A paid gateway order cannot be silently turned into "cancelled": it
+        // first needs a real, auditable refund through PhonePe. Keep this as a
+        // support workflow until the dedicated refund endpoint is implemented.
+        if (order.paymentMethod === 'phonepe' && order.paymentStatus === 'paid') {
+            return res.status(400).json({
+                success: false,
+                message: 'Please contact support to cancel a paid PhonePe order and arrange its refund'
+            });
+        }
+
         order.status = 'cancelled';
         order.cancelledAt = new Date();
         order.cancelReason = req.body.reason || 'Cancelled by customer';
@@ -253,12 +221,26 @@ exports.updateOrderStatus = async (req, res) => {
     try {
         const { status, trackingNumber } = req.body;
 
+        if (!['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid order status'
+            });
+        }
+
         const order = await Order.findById(req.params.id);
 
         if (!order) {
             return res.status(404).json({
                 success: false,
                 message: 'Order not found'
+            });
+        }
+
+        if (status === 'cancelled' && order.paymentMethod === 'phonepe' && order.paymentStatus === 'paid') {
+            return res.status(400).json({
+                success: false,
+                message: 'Refund the paid PhonePe order before marking it cancelled'
             });
         }
 
