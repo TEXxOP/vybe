@@ -77,9 +77,24 @@ const productSchema = new mongoose.Schema({
     toObject: { virtuals: true }
 });
 
-// Virtual for total stock
+// Virtual for total stock.
+//
+// `sizes` is undefined whenever the document was loaded with a projection that
+// did not select it — every cart route populates `items.product` with just
+// 'name images price'. This getter runs on serialisation (`toJSON: virtuals`),
+// so `this.sizes.reduce` threw a TypeError inside res.json() and turned every
+// populated cart response into a 500, *after* the write had already committed.
+// That is what made a signed-in customer unable to add anything to their bag,
+// and it is very likely the failed GET /api/cart behind the stale bag that led
+// to the ₹14,396-on-a-₹2,950-screen charge.
+//
+// Returning undefined rather than 0 is deliberate: a missing key means "not
+// loaded", while 0 means "sold out" and is rendered as such by the storefront
+// (see stockLeft/badgeText in LimitedEdition.jsx). Never report absent data as
+// zero stock.
 productSchema.virtual('totalStock').get(function () {
-    return this.sizes.reduce((total, size) => total + size.stock, 0);
+    if (!Array.isArray(this.sizes)) return undefined;
+    return this.sizes.reduce((total, size) => total + (Number(size?.stock) || 0), 0);
 });
 
 // Virtual for discount percentage
