@@ -14,6 +14,22 @@ class OrderValidationError extends Error {
     }
 }
 
+/**
+ * The server's total and the total the customer was shown disagree.
+ *
+ * Subclasses OrderValidationError so both controllers' existing
+ * `instanceof OrderValidationError` branches surface the message rather than a
+ * generic 500; 409 Conflict is the accurate status, since nothing about the
+ * request is malformed — the bag simply changed underneath it.
+ */
+class CartChangedError extends OrderValidationError {
+    constructor(message) {
+        super(message);
+        this.name = 'CartChangedError';
+        this.statusCode = 409;
+    }
+}
+
 function validateShippingAddress(address) {
     const required = ['name', 'street', 'city', 'state', 'pincode', 'phone'];
 
@@ -26,8 +42,20 @@ function validateShippingAddress(address) {
  * Build an order from the current catalogue, not from the price stored when an
  * item was added to the cart. A payment request must always use a server-side,
  * current price; the browser is never an authority for money.
+ *
+ * `expectedTotal` is the figure the customer actually saw on the Place-order
+ * button. The browser is still not trusted to *set* the price — the server
+ * computes it either way — but a customer must never be charged a number they
+ * were never shown. If the two disagree the order is refused, and the customer
+ * is sent back to a re-fetched bag to agree to the new figure.
+ *
+ * This is not hypothetical: an order was charged ₹14,396 against a screen
+ * reading ₹2,950, because a failed cart re-fetch after login left the browser
+ * rendering a stale one-item bag while the server cart held five units. The
+ * provider-amount check in payment.controller could not catch it — it compares
+ * PhonePe against the order record, and the order record was already wrong.
  */
-async function buildOrderFromCart(userId, shippingAddress) {
+async function buildOrderFromCart(userId, shippingAddress, { expectedTotal } = {}) {
     validateShippingAddress(shippingAddress);
 
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
@@ -69,6 +97,25 @@ async function buildOrderFromCart(userId, shippingAddress) {
     const itemsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingPrice = itemsPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_PRICE;
     const taxPrice = Math.round(itemsPrice * TAX_RATE);
+    const totalPrice = itemsPrice + shippingPrice + taxPrice;
+
+    // Compared as integers: every component above is already whole rupees, and
+    // an exact === on floats would be a latent rounding bug waiting for the day
+    // a price stops being round.
+    if (expectedTotal !== undefined && expectedTotal !== null) {
+        const shown = Math.round(Number(expectedTotal));
+
+        if (!Number.isSafeInteger(shown)) {
+            throw new OrderValidationError('Could not confirm the order total. Please reload your bag and try again.');
+        }
+
+        if (shown !== Math.round(totalPrice)) {
+            throw new CartChangedError(
+                'Your bag changed since this page was loaded, so the total is no longer ' +
+                    `₹${shown}. Please review your updated bag and confirm the new total.`
+            );
+        }
+    }
 
     return {
         items,
@@ -76,7 +123,7 @@ async function buildOrderFromCart(userId, shippingAddress) {
         itemsPrice,
         shippingPrice,
         taxPrice,
-        totalPrice: itemsPrice + shippingPrice + taxPrice,
+        totalPrice,
     };
 }
 
@@ -157,6 +204,7 @@ async function fulfilOrder(order, { transactional = true } = {}) {
 
 module.exports = {
     OrderValidationError,
+    CartChangedError,
     buildOrderFromCart,
     fulfilOrder,
     validateShippingAddress,

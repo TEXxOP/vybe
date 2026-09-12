@@ -147,7 +147,7 @@ function validate(form) {
 }
 
 function CheckoutForm({ user }) {
-    const { cart, clearCart, cartLoading } = useCart();
+    const { cart, clearCart, cartLoading, cartStale, fetchCart } = useCart();
     const navigate = useNavigate();
 
     /* Mounted only once auth is known, so reading user here is safe. */
@@ -174,6 +174,18 @@ function CheckoutForm({ user }) {
     const submit = async (e) => {
         e.preventDefault();
 
+        /* The bag on screen could not be confirmed against the server, so the
+           total on the button is not necessarily the total that would be
+           charged. Re-read it rather than take the order. */
+        if (cartStale) {
+            setFailure(
+                'We could not confirm your bag with the server, so nothing has been ' +
+                    'ordered. Reloading it now — please check the total and try again.'
+            );
+            fetchCart();
+            return;
+        }
+
         const found = validate(form);
         setErrors(found);
         if (Object.keys(found).length > 0) {
@@ -195,7 +207,15 @@ function CheckoutForm({ user }) {
             };
 
             if (payment === 'phonepe') {
-                const data = await paymentsAPI.createPhonePeCheckout({ shippingAddress });
+                /* `expectedTotal` is the figure on the button the customer just
+                   pressed. The server recomputes the price from its own cart
+                   and refuses the order if the two disagree, so a bag that
+                   drifted out of sync with this screen can no longer be
+                   charged silently. See order.service.buildOrderFromCart. */
+                const data = await paymentsAPI.createPhonePeCheckout({
+                    shippingAddress,
+                    expectedTotal: totals.total,
+                });
 
                 // Leave the cart alone. The backend removes only the paid line
                 // items after a server-verified PhonePe success, so an aborted
@@ -204,7 +224,11 @@ function CheckoutForm({ user }) {
                 return;
             }
 
-            const data = await ordersAPI.create({ shippingAddress, paymentMethod: 'cod' });
+            const data = await ordersAPI.create({
+                shippingAddress,
+                paymentMethod: 'cod',
+                expectedTotal: totals.total,
+            });
 
             /* Set before navigating. The server empties the cart as part of
                creating the order, so this component is about to re-render with
@@ -228,6 +252,12 @@ function CheckoutForm({ user }) {
 
             clearCart();
         } catch (err) {
+            /* 409 is the server refusing because its total disagreed with the
+               one on this screen. The bag shown here is wrong by definition, so
+               re-read it — the customer then sees the real figure and can
+               agree to it deliberately, rather than being charged it silently. */
+            if (err?.status === 409) fetchCart();
+
             /* The reason, not a shrug. The server says "Cart is empty" or
                "Please provide complete shipping address"; both are actionable
                and both used to be replaced by the same alert(). */
@@ -468,9 +498,24 @@ function CheckoutForm({ user }) {
                         </div>
                     </dl>
 
-                    <Button type="submit" variant="riso" size="lg" full loading={busy}>
+                    <Button
+                        type="submit"
+                        variant="riso"
+                        size="lg"
+                        full
+                        loading={busy}
+                        disabled={cartStale}
+                    >
                         <Icons.Lock size={16} /> Place order · {money(totals.total)}
                     </Button>
+
+                    {cartStale ? (
+                        <p className={styles.failure} role="alert">
+                            This total could not be confirmed with the server. Reload
+                            your bag before ordering so you are not charged a different
+                            figure.
+                        </p>
+                    ) : null}
 
                     {failure ? (
                         <p className={styles.failure} role="alert">

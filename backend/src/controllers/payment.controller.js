@@ -126,7 +126,9 @@ exports.createPhonePeCheckout = async (req, res) => {
             throw new PhonePeConfigurationError('PhonePe payments are not configured yet');
         }
 
-        const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress);
+        const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
+            expectedTotal: req.body.expectedTotal,
+        });
         const order = new Order({
             user: req.user.id,
             ...orderData,

@@ -27,6 +27,14 @@ export const CartProvider = ({ children }) => {
     const [cartLoading, setCartLoading] = useState(false);
     const [authReady, setAuthReady] = useState(false);
 
+    /**
+     * True when the server cart could not be read, so `cart` may not reflect
+     * what the server would actually charge for. Checkout blocks on this: the
+     * customer must be shown a bag the server agrees with before they can
+     * commit to a total.
+     */
+    const [cartStale, setCartStale] = useState(false);
+
     const userRef = useRef(null);
     userRef.current = user;
 
@@ -36,8 +44,17 @@ export const CartProvider = ({ children }) => {
             setCartLoading(true);
             const data = await cartAPI.get();
             setCart(data.cart ? withTotals(data.cart.items || []) : EMPTY_CART);
+            setCartStale(false);
         } catch (error) {
+            // FIXED: this used to log and return, leaving `cart` holding
+            // whatever it held before — so a failed re-fetch after login left
+            // the browser rendering a stale guest bag while the server cart
+            // held something else entirely. Checkout then charged the server's
+            // figure against a screen showing the stale one (₹14,396 billed on
+            // a ₹2,950 screen). The cart state is now explicitly marked
+            // untrustworthy, and Checkout refuses to take an order on it.
             console.error('Failed to fetch cart:', error);
+            setCartStale(true);
         } finally {
             setCartLoading(false);
         }
@@ -264,6 +281,8 @@ export const CartProvider = ({ children }) => {
         authAPI.logout();
         setUser(null);
         setCart(EMPTY_CART);
+        // A guest cart is authoritative locally, so nothing is stale any more.
+        setCartStale(false);
         try {
             localStorage.removeItem(GUEST_KEY);
         } catch {
@@ -280,6 +299,7 @@ export const CartProvider = ({ children }) => {
             loading: cartLoading,
             // New, more precise flags.
             cartLoading,
+            cartStale,
             authReady,
             isAdmin: user?.role === 'admin',
             addToCart,
@@ -295,6 +315,7 @@ export const CartProvider = ({ children }) => {
             cart,
             user,
             cartLoading,
+            cartStale,
             authReady,
             addToCart,
             updateQuantity,

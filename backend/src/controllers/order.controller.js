@@ -11,7 +11,7 @@ const {
 // @access  Private
 exports.createOrder = async (req, res) => {
     try {
-        const { shippingAddress, paymentMethod } = req.body;
+        const { shippingAddress, paymentMethod, expectedTotal } = req.body;
 
         // Card/UPI strings from old clients must not create a fake online order.
         // PhonePe checkout has its own endpoint and only confirms after a
@@ -23,7 +23,7 @@ exports.createOrder = async (req, res) => {
             });
         }
 
-        const orderData = await buildOrderFromCart(req.user.id, shippingAddress);
+        const orderData = await buildOrderFromCart(req.user.id, shippingAddress, { expectedTotal });
 
         // Create order
         const order = await Order.create({
