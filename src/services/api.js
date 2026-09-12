@@ -19,6 +19,37 @@ export class ApiError extends Error {
 }
 
 /**
+ * Fired when the server rejects our stored token. CartProvider listens for it
+ * and drops the in-memory session, so React state cannot go on believing the
+ * user is signed in after the credentials behind it have been thrown away.
+ */
+export const AUTH_EXPIRED_EVENT = 'vybe:auth-expired';
+
+/**
+ * A 401 on a protected route means the stored token is no longer accepted —
+ * expired, or signed with a JWT_SECRET the server has since rotated. Keeping it
+ * in localStorage is what made the app unusable without a fresh browser
+ * profile: `isLoggedIn()` only tests that a token *exists*, so the UI stayed in
+ * its signed-in state while every request behind it failed, and even logging
+ * out and back in did not help because the dead token was replayed on the next
+ * boot. Throw it away so the app falls back to a guest session it can recover
+ * from.
+ *
+ * Login and register are excluded: a 401 there is "wrong password", not a dead
+ * session, and there is no established session to tear down.
+ */
+function clearRejectedCredentials(endpoint) {
+    if (endpoint.startsWith('/auth/login') || endpoint.startsWith('/auth/register')) {
+        return;
+    }
+    if (!localStorage.getItem('vybe_token')) return;
+
+    localStorage.removeItem('vybe_token');
+    localStorage.removeItem('vybe_user');
+    window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
+}
+
+/**
  * Single fetch wrapper.
  *
  * FIXED: this used to call `await response.json()` unconditionally, which threw
@@ -72,6 +103,8 @@ const apiCall = async (endpoint, options = {}) => {
     }
 
     if (!response.ok) {
+        if (response.status === 401) clearRejectedCredentials(endpoint);
+
         throw new ApiError(
             data?.message || `Request failed (${response.status})`,
             response.status,

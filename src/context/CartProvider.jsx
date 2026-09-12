@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { cartAPI, authAPI } from '../services/api';
+import { cartAPI, authAPI, AUTH_EXPIRED_EVENT } from '../services/api';
 import {
     CartContext,
     EMPTY_CART,
@@ -75,6 +75,20 @@ export const CartProvider = ({ children }) => {
             setAuthReady(true);
         }
     }, [fetchCart]);
+
+    // The API layer clears a token the server has rejected. Follow it here, so
+    // the UI drops out of its signed-in state at the same moment rather than
+    // rendering a logged-in header over a session that no longer exists.
+    useEffect(() => {
+        const onAuthExpired = () => {
+            setUser(null);
+            setCart(readGuestCart());
+            setCartStale(false);
+        };
+
+        window.addEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+        return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onAuthExpired);
+    }, []);
 
     // Persist the guest cart. Skipped for signed-in users, whose cart is
     // authoritative on the server.
