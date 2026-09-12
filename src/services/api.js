@@ -214,6 +214,20 @@ export const ordersAPI = {
         }),
 };
 
+// ============ PAYMENTS ======================================================
+// The browser receives only PhonePe's hosted checkout URL. Merchant credentials
+// and payment verification stay on the server.
+export const paymentsAPI = {
+    createPhonePeCheckout: (paymentData) =>
+        apiCall('/payments/phonepe/checkout', {
+            method: 'POST',
+            body: JSON.stringify(paymentData),
+        }),
+
+    getPhonePeStatus: (orderId) =>
+        apiCall(`/payments/phonepe/orders/${encodeURIComponent(orderId)}/status`),
+};
+
 // ============ ADMIN =========================================================
 export const adminAPI = {
     /** No dedicated stats endpoint exists yet, so this aggregates client-side.
@@ -275,6 +289,7 @@ const api = {
     products: productsAPI,
     cart: cartAPI,
     orders: ordersAPI,
+    payments: paymentsAPI,
     admin: adminAPI,
 };
 

@@ -344,12 +344,9 @@ export default function Cart() {
                         </div>
                     )}
 
-                    {/* The bag is now an enquiry list: the same items, sent to
-                        WhatsApp as a message instead of to a checkout that has no
-                        live gateway behind it. Flip COMMERCE_ENABLED and the
-                        original checkout link and payment row come back
-                        untouched. A real link either way: middle-clickable, and
-                        announced as a link. */}
+                    {/* Ordering and enquiries are both real paths. The checkout
+                        links to PhonePe's hosted payment page; WhatsApp remains
+                        available only when commerce is deliberately paused. */}
                     {COMMERCE_ENABLED ? (
                         <>
                             <Button to={ROUTES.checkout} variant="riso" size="lg" full>
@@ -359,10 +356,10 @@ export default function Cart() {
 
                             <ul className={styles.pay}>
                                 <li>
-                                    <Icons.CreditCard size={15} /> Card
+                                    <Icons.CreditCard size={15} /> PhonePe cards
                                 </li>
                                 <li>
-                                    <Icons.Smartphone size={15} /> UPI
+                                    <Icons.Smartphone size={15} /> PhonePe UPI
                                 </li>
                                 <li>
                                     <Icons.Cash size={15} /> Cash on delivery

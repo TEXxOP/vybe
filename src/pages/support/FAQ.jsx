@@ -106,11 +106,9 @@ export default function FAQ() {
             <details>
                 <summary>How do I pay?</summary>
                 <p>
-                    We arrange it on WhatsApp once the order is confirmed — UPI or cash
-                    on delivery, whichever suits you. Nothing is charged on this site
-                    and there is no card form anywhere on it, which is deliberate: we’d
-                    rather say that plainly than take a card number we have nowhere to
-                    send.
+                    Choose cash on delivery or PhonePe at checkout. PhonePe hosts the
+                    secure payment page for UPI, cards and net banking, so we never
+                    ask for or store card details or a UPI PIN.
                 </p>
             </details>
 

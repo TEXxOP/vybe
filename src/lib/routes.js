@@ -20,6 +20,7 @@ export const ROUTES = {
   cart: '/cart',
   checkout: '/checkout',
   orderSuccess: '/order-success',
+  phonepeReturn: '/payment/phonepe/return',
 
   // Account
   login: '/login',

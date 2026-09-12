@@ -3,12 +3,11 @@ import { ROUTES } from './routes';
 import { money } from './format';
 
 /**
- * ENQUIRE, DON'T ORDER.
+ * ENQUIRIES AND ORDERS.
  *
- * The shop shows a catalogue and takes enquiries over WhatsApp. It does not take
- * payment. This module is the whole of that decision: the flag that switches
- * between the two models, and the builders that turn a product or a bag into a
- * prefilled WhatsApp message.
+ * The shop supports both online ordering and WhatsApp enquiries. This module
+ * owns the optional enquiry builders and the commerce switch used by the cart,
+ * product, and checkout pages.
  *
  * WHY A FLAG AND NOT DELETED CODE. The cart, the checkout form, the order
  * history and the whole backend order pipeline all still work. They are not
@@ -17,9 +16,8 @@ import { money } from './format';
  * worth less than no code at all. Instead every commerce affordance reads
  * COMMERCE_ENABLED, so:
  *
- *   - turning ordering back on is editing `false` to `true`, once;
- *   - until then, the paths that would have taken money say plainly that they
- *     don't, and offer WhatsApp instead;
+ *   - the flag makes it possible to pause ordering while retaining the product
+ *     catalogue and WhatsApp enquiry path;
  *   - the code stays under lint, so it cannot quietly stop compiling.
  *
  * WHAT THE MESSAGE DELIBERATELY OMITS. The cart enquiry quotes the subtotal of
@@ -30,8 +28,8 @@ import { money } from './format';
  * are settled in the conversation.
  */
 
-/** The one line to change to put real ordering back. */
-export const COMMERCE_ENABLED = false;
+/** Online ordering is enabled; PhonePe itself is enabled server-side by env config. */
+export const COMMERCE_ENABLED = true;
 
 /**
  * Budget for the *encoded* message, which is the only length that matters — the

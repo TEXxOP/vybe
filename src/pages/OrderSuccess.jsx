@@ -15,10 +15,9 @@ import styles from './OrderSuccess.module.css';
  *
  * What was wrong here was mostly a matter of honesty:
  *
- *  1. "AMOUNT PAID" — nothing had been paid. Every order on this site is
- *     collected on delivery; there is no payment gateway. The customer was told
- *     they had paid, which is the sort of thing that generates a furious email
- *     when the courier asks for cash.
+ *  1. "AMOUNT PAID" applies only to a verified PhonePe order. Cash-on-delivery
+ *     receipts say "Due on delivery" so the courier never arrives with a
+ *     surprise charge.
  *
  *  2. "YOU'LL RECEIVE AN EMAIL WITH ORDER DETAILS" — there is no email service
  *     in the backend. Not nodemailer, not SendGrid, not anything: I grepped the
@@ -58,6 +57,7 @@ function addDays(days) {
 export default function OrderSuccess() {
     const { state } = useLocation();
     const { orderNumber, total, itemCount, paymentMethod, email } = state || {};
+    const paidOnline = paymentMethod === 'phonepe';
 
     /* No state means a reload or a direct hit. Send them to the order list —
        the order is genuinely there, which is more use than the homepage. */
@@ -110,9 +110,8 @@ export default function OrderSuccess() {
                             </dd>
                         </div>
 
-                        {/* Not "amount paid". Nothing has been paid yet. */}
                         <div className={styles.rowTotal}>
-                            <dt>Due on delivery</dt>
+                            <dt>{paidOnline ? 'Amount paid' : 'Due on delivery'}</dt>
                             <dd>
                                 {Number.isFinite(total) ? money(total) : 'See your order'}
                             </dd>

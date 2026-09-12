@@ -101,18 +101,16 @@ export default function Terms() {
 
                 <dt>Payment</dt>
                 <dd>
-                    Arranged directly with you once the order is confirmed — UPI, or
-                    cash to the courier on arrival. This site takes no payments and
-                    stores no card details, because no gateway is connected to it.
+                    You can pay cash on delivery or use PhonePe&apos;s hosted checkout
+                    for UPI, card, and net-banking payments. We do not receive or
+                    store your card or bank details.
                 </dd>
             </dl>
 
             <p>
-                The price we confirm to you in writing is the price we’ll honour —
-                listed prices are an invitation to enquire, not a binding offer. If a
-                product is listed at an obviously wrong price — a decimal in the wrong
-                place — we’ll say so and cancel rather than hold either of us to it or
-                quietly charge you the difference.
+                The price shown at checkout is the price we’ll honour. If a product
+                is listed at an obvious error — a decimal in the wrong place — we’ll
+                tell you and refund rather than quietly charge a different amount.
             </p>
 
             <h2>Delivery</h2>

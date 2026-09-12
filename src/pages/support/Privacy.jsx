@@ -13,9 +13,9 @@ import { COMPANY, emailHref, addressOneLine } from '../../lib/company';
  * Order.model.js, and the two browser-storage keys are the two this client
  * actually writes (`vybe_token`, `vybe_user` — grep for them).
  *
- * It also states what we do NOT hold, which is the more useful half. No payment
- * gateway is wired up anywhere in this codebase, so we have never received a card
- * number and cannot claim to protect one. There is no analytics script, no
+ * It also states what we do NOT hold, which is the more useful half. PhonePe
+ * hosts card and bank entry, so our application never receives a card number.
+ * There is no analytics script, no
  * advertising pixel and no mail service in the project either. A privacy policy
  * that lists third parties we don't use in order to sound thorough is worse than
  * no policy, because it's the part a reader can't verify.
@@ -55,8 +55,8 @@ export default function Privacy() {
                 <dd>
                     What you bought, in which size and colour, what it cost, and the
                     delivery details you gave us: name, phone, street, city, state
-                    and pin code. Also how you chose to pay and the order’s current
-                    status.
+                    and pin code. Also how you chose to pay, a PhonePe transaction
+                    reference when applicable, and the order’s current status.
                 </dd>
 
                 <dt>Your bag</dt>
@@ -80,10 +80,9 @@ export default function Privacy() {
 
             <ul>
                 <li>
-                    <strong>Card and bank details.</strong> No payment gateway is
-                    connected to this site. Orders are collected in cash on delivery,
-                    so we have never held a card number and there is nothing of that
-                    kind for us to lose.
+                    <strong>Card and bank details.</strong> PhonePe hosts its own
+                    checkout page for online payments. We do not receive or store
+                    card numbers, bank-account details, or UPI PINs.
                 </li>
                 <li>
                     <strong>Analytics and advertising.</strong> There is no
@@ -110,8 +109,9 @@ export default function Privacy() {
             <p>
                 Only the people who have to. A delivery partner receives the name,
                 phone number and address on the parcel, because that is how a parcel
-                arrives. Our database is hosted with an infrastructure provider who
-                stores it but has no reason to read it. Beyond that, nobody — we
+                arrives. PhonePe processes online payment details under its own
+                privacy terms. Our database is hosted with an infrastructure provider
+                who stores it but has no reason to read it. Beyond that, nobody — we
                 don’t sell, rent or share customer data, and we won’t start without
                 telling you on this page first.
             </p>

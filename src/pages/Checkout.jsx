@@ -8,7 +8,7 @@ import Field from '../components/primitives/Field';
 import { Icons } from '../components/Icons';
 
 import { useCart } from '../context/CartContext';
-import { ordersAPI } from '../services/api';
+import { ordersAPI, paymentsAPI } from '../services/api';
 import { money } from '../lib/format';
 import { computeTotals } from '../lib/cart';
 import { ROUTES } from '../lib/routes';
@@ -96,10 +96,9 @@ const STATES = [
     'Ladakh', 'Lakshadweep', 'Puducherry',
 ];
 
-/* The backend enum is ['cod', 'card', 'upi', 'netbanking']. No payment gateway
-   is wired up, so nothing here charges a card — see the note rendered under
-   these options. Offering a card field that silently does nothing would be
-   worse than saying so plainly. */
+/* PhonePe Standard Checkout is hosted by PhonePe, so UPI, cards, and net
+   banking never touch this storefront. That keeps payment credentials and card
+   data out of the browser and our backend. */
 const PAYMENTS = [
     {
         value: 'cod',
@@ -108,16 +107,10 @@ const PAYMENTS = [
         note: 'Pay the courier when it arrives',
     },
     {
-        value: 'upi',
+        value: 'phonepe',
         icon: 'Smartphone',
-        title: 'UPI',
-        note: 'GPay, PhonePe, Paytm',
-    },
-    {
-        value: 'card',
-        icon: 'CreditCard',
-        title: 'Card',
-        note: 'Visa, Mastercard, RuPay',
+        title: 'PhonePe secure payment',
+        note: 'UPI, cards, and net banking',
     },
 ];
 
@@ -191,18 +184,27 @@ function CheckoutForm({ user }) {
         setBusy(true);
         setFailure('');
         try {
-            const data = await ordersAPI.create({
-                shippingAddress: {
-                    name: form.name.trim(),
-                    phone: form.phone.trim(),
-                    street: form.street.trim(),
-                    city: form.city.trim(),
-                    state: form.state,
-                    pincode: form.pincode.trim(),
-                    country: form.country,
-                },
-                paymentMethod: payment,
-            });
+            const shippingAddress = {
+                name: form.name.trim(),
+                phone: form.phone.trim(),
+                street: form.street.trim(),
+                city: form.city.trim(),
+                state: form.state,
+                pincode: form.pincode.trim(),
+                country: form.country,
+            };
+
+            if (payment === 'phonepe') {
+                const data = await paymentsAPI.createPhonePeCheckout({ shippingAddress });
+
+                // Leave the cart alone. The backend removes only the paid line
+                // items after a server-verified PhonePe success, so an aborted
+                // or failed checkout never loses a customer's bag.
+                window.location.assign(data.checkoutUrl);
+                return;
+            }
+
+            const data = await ordersAPI.create({ shippingAddress, paymentMethod: 'cod' });
 
             /* Set before navigating. The server empties the cart as part of
                creating the order, so this component is about to re-render with
@@ -407,13 +409,9 @@ function CheckoutForm({ user }) {
                             </div>
                         </fieldset>
 
-                        {/* Said out loud rather than implied. There is no payment
-                            gateway behind this form; pretending otherwise is the
-                            kind of lie that ends up in a support ticket. */}
                         <p className={styles.payDisclosure}>
-                            Card and UPI aren&apos;t live yet — choosing one tells us what
-                            you&apos;d prefer, and we&apos;ll collect payment on delivery
-                            either way. Nothing is charged now.
+                            PhonePe opens its secure checkout to complete online payments.
+                            We confirm your order only after PhonePe verifies the result.
                         </p>
                     </section>
                 </div>

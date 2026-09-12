@@ -77,13 +77,15 @@ export const STAGES = [
 const CANCELLABLE = new Set(['pending', 'confirmed']);
 
 export function canCancel(order) {
-    return CANCELLABLE.has(order?.status);
+    return !(
+        order?.paymentMethod === 'phonepe' && order?.paymentStatus === 'paid'
+    ) && CANCELLABLE.has(order?.status);
 }
 
-/** Payment methods, from the same enum. Every label says "on delivery" because
- *  no gateway is connected — see the disclosure on the checkout page. */
+/** Payment methods, from the same enum. PhonePe hosts the online checkout. */
 export const PAYMENT_LABELS = {
     cod: 'Cash on delivery',
+    phonepe: 'PhonePe',
     upi: 'UPI, on delivery',
     card: 'Card, on delivery',
     netbanking: 'Net banking, on delivery',
