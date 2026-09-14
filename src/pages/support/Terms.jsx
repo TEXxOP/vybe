@@ -88,8 +88,9 @@ export default function Terms() {
 
                 <dt>GST</dt>
                 <dd>
-                    {Math.round(GST_RATE * 100)}%, included in the figure we confirm
-                    and shown on its own line.
+                    {Math.round(GST_RATE * 100)}%, already included in every listed
+                    price and shown on its own line in your bag and on the invoice.
+                    Nothing is added at checkout.
                 </dd>
 
                 <dt>Delivery</dt>

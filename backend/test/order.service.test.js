@@ -70,11 +70,12 @@ test('builds the order total from the server cart, not the browser', async () =>
 
     const order = await service.buildOrderFromCart('user-1', ADDRESS);
 
-    // 2500 subtotal, free shipping (>= 999), 18% GST = 450.
+    // 2500 subtotal, free shipping (>= 999). GST is inclusive: ₹2500 * 18/118 =
+    // ₹381.36, recorded for the invoice and NOT added to the total.
     assert.equal(order.itemsPrice, 2500);
     assert.equal(order.shippingPrice, 0);
-    assert.equal(order.taxPrice, 450);
-    assert.equal(order.totalPrice, 2950);
+    assert.equal(order.taxPrice, 381);
+    assert.equal(order.totalPrice, 2500);
 });
 
 test('accepts an expected total that matches the server figure', async () => {
@@ -84,16 +85,16 @@ test('accepts an expected total that matches the server figure', async () => {
     );
 
     const order = await service.buildOrderFromCart('user-1', ADDRESS, {
-        expectedTotal: 2950,
+        expectedTotal: 2500,
     });
 
-    assert.equal(order.totalPrice, 2950);
+    assert.equal(order.totalPrice, 2500);
 });
 
 test('refuses to charge a total the customer was never shown', async () => {
     // The exact divergence from the live order: the browser rendered one
-    // jacket (2950) while the server cart held five units across three lines
-    // (12200 + 2196 GST = 14396).
+    // jacket (then 2950 with additive GST) while the server cart held five
+    // units across three lines (12200 + 2196 GST = 14396).
     const canvas = jacket('canvas', 2400);
     const chroma = jacket('chroma', 2500);
     const service = loadServiceWith(
@@ -105,19 +106,19 @@ test('refuses to charge a total the customer was never shown', async () => {
         [canvas, chroma]
     );
 
-    // Without agreement, the old behaviour: it happily builds 14396.
+    // Without agreement, the old behaviour: it happily builds 12200.
     const unchecked = await service.buildOrderFromCart('user-1', ADDRESS);
-    assert.equal(unchecked.totalPrice, 14396);
+    assert.equal(unchecked.totalPrice, 12200);
 
     // With it, the order is refused rather than silently repriced.
     await assert.rejects(
-        () => service.buildOrderFromCart('user-1', ADDRESS, { expectedTotal: 2950 }),
+        () => service.buildOrderFromCart('user-1', ADDRESS, { expectedTotal: 2500 }),
         (error) => {
             assert.equal(error.name, 'CartChangedError');
             assert.equal(error.statusCode, 409);
             assert.ok(error instanceof service.OrderValidationError,
                 'must subclass OrderValidationError so controllers surface the message');
-            assert.match(error.message, /2950/);
+            assert.match(error.message, /2500/);
             return true;
         }
     );
@@ -149,7 +150,7 @@ test('omitting the expected total leaves existing callers working', async () => 
 
     for (const options of [undefined, {}, { expectedTotal: undefined }, { expectedTotal: null }]) {
         const order = await service.buildOrderFromCart('user-1', ADDRESS, options);
-        assert.equal(order.totalPrice, 2950);
+        assert.equal(order.totalPrice, 2500);
     }
 });
 
@@ -160,13 +161,31 @@ test('adds flat shipping below the free-shipping threshold', async () => {
         [tee]
     );
 
-    // 500 + 99 shipping + 90 GST. GST is charged on the goods, not the postage.
+    // 500 + 99 shipping. GST is inclusive, so it adds nothing: the old
+    // additive maths would have made this 689.
     const order = await service.buildOrderFromCart('user-1', ADDRESS, {
-        expectedTotal: 689,
+        expectedTotal: 599,
     });
 
     assert.equal(order.shippingPrice, 99);
-    assert.equal(order.totalPrice, 689);
+    assert.equal(order.totalPrice, 599);
+});
+
+test('never adds GST to the total, only reports the inclusive component', async () => {
+    const service = loadServiceWith(
+        [{ product: jacket('a'), quantity: 1, size: 'S', color: 'Black' }],
+        [jacket('a')]
+    );
+
+    const order = await service.buildOrderFromCart('user-1', ADDRESS);
+
+    // The whole point: the customer pays the listed price plus delivery, and
+    // the recorded tax is the slice already inside it. If this ever regresses
+    // to itemsPrice + taxPrice, a ₹2,500 jacket is charged at ₹2,881.
+    assert.equal(order.totalPrice, order.itemsPrice + order.shippingPrice);
+    assert.ok(order.taxPrice > 0, 'the invoice still needs the tax component');
+    assert.ok(order.taxPrice < order.itemsPrice * 0.18,
+        'an inclusive ₹2500 holds ₹381, not ₹450');
 });
 
 /* ===================================================================

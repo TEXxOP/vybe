@@ -33,6 +33,22 @@ function productId(product) {
     return typeof product === 'string' ? product : product._id || null;
 }
 
+/**
+ * Whether this order's tax was added on top or was already inside the price.
+ *
+ * Orders placed before GST went inclusive have `totalPrice` that includes the
+ * tax; orders placed after have a total of items + delivery. Both are still in
+ * the database and both are still rendered by this one component, so labelling
+ * a historical order's ₹450 as "included" would state something untrue about
+ * money that was actually charged. The totals themselves say which era it is,
+ * so this reads the fact rather than guessing from a date.
+ */
+function taxWasAddedOnTop(order) {
+    const items = Number(order.itemsPrice) || 0;
+    const shipping = Number(order.shippingPrice) || 0;
+    return Math.round(Number(order.totalPrice) || 0) !== Math.round(items + shipping);
+}
+
 function Stepper({ status }) {
     const current = STAGES.findIndex((s) => s.key === status);
 
@@ -189,7 +205,7 @@ export default function OrderCard({ order, onCancel, busy = false }) {
                 </div>
 
                 <div className={styles.totalRow}>
-                    <dt>GST</dt>
+                    <dt>{taxWasAddedOnTop(order) ? 'GST' : 'GST (included)'}</dt>
                     <dd>{money(order.taxPrice)}</dd>
                 </div>
 

@@ -4,7 +4,30 @@ const mongoose = require('mongoose');
 
 const FREE_SHIPPING_THRESHOLD = 999;
 const SHIPPING_PRICE = 99;
+
+/**
+ * GST is INCLUSIVE of the listed price, not added at checkout.
+ *
+ * It used to be charged on top (`Math.round(itemsPrice * 0.18)` added into the
+ * total), which meant a ₹2,500 jacket became ₹2,950 at the payment step. The
+ * support pages had always described it the other way — "included in the figure
+ * we confirm with you and itemised so you can see it rather than infer it" — so
+ * the storefront was contradicting its own policy, and the customer only found
+ * out at the last screen.
+ *
+ * `TAX_RATE` is therefore no longer a multiplier on the total. It is only used
+ * to derive the tax *component* already sitting inside the price, because an
+ * Indian tax invoice has to state the GST separately. The component is
+ * `price * rate / (1 + rate)` — the standard way of backing tax out of an
+ * inclusive figure — and it is recorded on the order for the invoice without
+ * ever being added to what the customer pays.
+ */
 const TAX_RATE = 0.18;
+
+/** The GST already contained in an inclusive amount. Never additive. */
+function includedTax(inclusiveAmount, rate = TAX_RATE) {
+    return Math.round((inclusiveAmount * rate) / (1 + rate));
+}
 
 class OrderValidationError extends Error {
     constructor(message) {
@@ -96,8 +119,9 @@ async function buildOrderFromCart(userId, shippingAddress, { expectedTotal } = {
 
     const itemsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingPrice = itemsPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_PRICE;
-    const taxPrice = Math.round(itemsPrice * TAX_RATE);
-    const totalPrice = itemsPrice + shippingPrice + taxPrice;
+    // Already inside itemsPrice — recorded for the invoice, not charged on top.
+    const taxPrice = includedTax(itemsPrice);
+    const totalPrice = itemsPrice + shippingPrice;
 
     // Compared as integers: every component above is already whole rupees, and
     // an exact === on floats would be a latent rounding bug waiting for the day
@@ -256,5 +280,6 @@ module.exports = {
     CartChangedError,
     buildOrderFromCart,
     fulfilOrder,
+    includedTax,
     validateShippingAddress,
 };

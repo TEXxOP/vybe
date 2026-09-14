@@ -43,14 +43,16 @@ export default function Shipping() {
                     On orders from {money(FREE_SHIPPING_THRESHOLD)} upwards — a
                     subtotal of exactly {money(FREE_SHIPPING_THRESHOLD)} qualifies.
                     The threshold is measured on the value of the items in your bag,
-                    before GST and before delivery — so the figure you’re watching is
-                    the subtotal shown at the top of the cart summary.
+                    before delivery — so the figure you’re watching is the subtotal
+                    shown at the top of the cart summary.
                 </dd>
 
                 <dt>GST</dt>
                 <dd>
-                    {Math.round(GST_RATE * 100)}%, included in the figure we confirm
-                    with you and itemised so you can see it rather than infer it.
+                    {Math.round(GST_RATE * 100)}%, already included in every price on
+                    the site. It is itemised in your bag and on the invoice so you can
+                    see it rather than infer it, but it is never added at checkout —
+                    the price you see on a product is the price you pay.
                 </dd>
 
                 <dt>Paying on delivery</dt>

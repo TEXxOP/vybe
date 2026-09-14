@@ -75,6 +75,11 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    // The GST already contained in this order's prices, recorded for the tax
+    // invoice — NOT an amount that was added to what the customer paid. See
+    // includedTax() in order.service.js. Orders placed before GST went
+    // inclusive hold an additive figure here instead; OrderCard distinguishes
+    // the two from the totals rather than assuming.
     taxPrice: {
         type: Number,
         default: 0

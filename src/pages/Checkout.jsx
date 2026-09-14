@@ -489,7 +489,7 @@ function CheckoutForm({ user }) {
                             </dd>
                         </div>
                         <div className={styles.row}>
-                            <dt>GST (18%)</dt>
+                            <dt>GST (included)</dt>
                             <dd>{money(totals.tax)}</dd>
                         </div>
                         <div className={styles.rowTotal}>

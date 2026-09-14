@@ -89,7 +89,7 @@ export default function FAQ() {
                 <p>
                     {money(SHIPPING_FLAT)} flat, free on orders from{' '}
                     {money(FREE_SHIPPING_THRESHOLD)}. The threshold is measured on
-                    the value of the items, before GST. Full detail on the{' '}
+                    the value of the items, before delivery. Full detail on the{' '}
                     <Link to={ROUTES.shipping}>shipping page</Link>.
                 </p>
             </details>
