@@ -15,7 +15,7 @@ import styles from './OrderSuccess.module.css';
  *
  * What was wrong here was mostly a matter of honesty:
  *
- *  1. "AMOUNT PAID" applies only to a verified PhonePe order. Cash-on-delivery
+ *  1. "AMOUNT PAID" applies only to a verified online-payment order. Cash-on-delivery
  *     receipts say "Due on delivery" so the courier never arrives with a
  *     surprise charge.
  *
@@ -57,7 +57,7 @@ function addDays(days) {
 export default function OrderSuccess() {
     const { state } = useLocation();
     const { orderNumber, total, itemCount, paymentMethod, email } = state || {};
-    const paidOnline = paymentMethod === 'phonepe';
+    const paidOnline = ['phonepe', 'pinelabs'].includes(paymentMethod);
 
     /* No state means a reload or a direct hit. Send them to the order list —
        the order is genuinely there, which is more use than the homepage. */

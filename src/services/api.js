@@ -248,9 +248,11 @@ export const ordersAPI = {
 };
 
 // ============ PAYMENTS ======================================================
-// The browser receives only PhonePe's hosted checkout URL. Merchant credentials
-// and payment verification stay on the server.
+// The browser receives only a hosted checkout URL. Merchant credentials and
+// payment verification stay on the server for every provider.
 export const paymentsAPI = {
+    getProviders: () => apiCall('/payments/providers'),
+
     createPhonePeCheckout: (paymentData) =>
         apiCall('/payments/phonepe/checkout', {
             method: 'POST',
@@ -259,10 +261,24 @@ export const paymentsAPI = {
 
     getPhonePeStatus: (orderId) =>
         apiCall(`/payments/phonepe/orders/${encodeURIComponent(orderId)}/status`),
+
+    createPineLabsCheckout: (paymentData) =>
+        apiCall('/payments/pinelabs/checkout', {
+            method: 'POST',
+            body: JSON.stringify(paymentData),
+        }),
+
+    getPineLabsStatus: (orderId) =>
+        apiCall(`/payments/pinelabs/orders/${encodeURIComponent(orderId)}/status`),
 };
 
 // ============ ADMIN =========================================================
 export const adminAPI = {
+    getPineLabsTransactionSummary: ({ fromDate, toDate, page = 0, size = 100 }, options) => {
+        const query = new URLSearchParams({ fromDate, toDate, page: String(page), size: String(size) });
+        return apiCall(`/reports/pinelabs/transactions/summary?${query.toString()}`, options);
+    },
+
     /** No dedicated stats endpoint exists yet, so this aggregates client-side.
      *  Worth moving server-side once the order count gets large.
      *

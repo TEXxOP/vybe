@@ -43,8 +43,8 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         // Legacy values remain readable for historical orders. New online
-        // payments are always processed through the PhonePe hosted checkout.
-        enum: ['cod', 'phonepe', 'card', 'upi', 'netbanking'],
+        // payments use one of the hosted gateways below.
+        enum: ['cod', 'phonepe', 'pinelabs', 'card', 'upi', 'netbanking'],
         default: 'cod'
     },
     paymentStatus: {
@@ -53,9 +53,11 @@ const orderSchema = new mongoose.Schema({
         default: 'pending'
     },
     paymentDetails: {
-        provider: { type: String, enum: ['phonepe', null] },
+        provider: { type: String, enum: ['phonepe', 'pinelabs', null] },
         merchantOrderId: String,
         phonepeOrderId: String,
+        pineLabsOrderId: String,
+        checkoutToken: String,
         transactionId: String,
         paymentMode: String,
         amountPaisa: Number,
@@ -125,8 +127,9 @@ orderSchema.pre('save', async function (next) {
     next();
 });
 
-// PhonePe's merchant order ID is our immutable correlation key for status
+// A gateway merchant-order ID is the immutable correlation key for status
 // requests and callbacks. Sparse keeps existing cash-on-delivery orders valid.
 orderSchema.index({ 'paymentDetails.merchantOrderId': 1 }, { unique: true, sparse: true });
+orderSchema.index({ 'paymentDetails.pineLabsOrderId': 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('Order', orderSchema);

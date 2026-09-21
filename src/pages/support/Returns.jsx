@@ -106,7 +106,7 @@ export default function Returns() {
 
             <p>
                 We check the parcel within two working days of it reaching us and
-                send the refund the same day it passes. PhonePe payments are refunded
+                send the refund the same day it passes. Online payments are refunded
                 to the original payment method; cash-on-delivery refunds go by bank
                 transfer, for which we’ll ask for account details only after the
                 return is approved. How quickly it then shows up is your bank’s
@@ -136,7 +136,7 @@ export default function Returns() {
                 If it hasn’t shipped, cancelling is cleaner than returning. You can
                 do it yourself from <Link to={ROUTES.orders}>your orders</Link> while
                 the order is still pending or confirmed. For an order already paid
-                through PhonePe, contact us first so we can process the refund rather
+                through a payment gateway, contact us first so we can process the refund rather
                 than cancelling a paid order without one.
             </p>
 

@@ -28,7 +28,7 @@ import { money } from './format';
  * are settled in the conversation.
  */
 
-/** Online ordering is enabled; PhonePe itself is enabled server-side by env config. */
+/** Online ordering is enabled; each hosted gateway is enabled server-side by env config. */
 export const COMMERCE_ENABLED = true;
 
 /**

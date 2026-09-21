@@ -66,6 +66,38 @@ services:
       - key: PHONEPE_PAYMENT_EXPIRY_SECONDS
         value: "1200"
 
+      # --- Pine Labs Online Payments / Plural -----------------------------
+      # These are independent from the Pine Labs POS reporting credentials
+      # below. Keep checkout disabled until Pine Labs has registered the
+      # webhook and supplied every production secret.
+      - key: PINELABS_ENABLED
+        value: "false"
+      - key: PINELABS_ENV
+        value: production
+      - key: PINELABS_CLIENT_ID
+        sync: false
+      - key: PINELABS_CLIENT_SECRET
+        sync: false
+      - key: PINELABS_WEBHOOK_SECRET
+        sync: false
+      - key: PINELABS_WEBHOOK_TOLERANCE_SECONDS
+        value: "300"
+      - key: PINELABS_ALLOWED_PAYMENT_METHODS
+        value: UPI,CARD,NETBANKING
+
+      # --- Pine Labs POS transaction reporting ----------------------------
+      # Read-only admin reconciliation; never enables customer checkout.
+      - key: PINELABS_POS_REPORTING_ENABLED
+        value: "false"
+      - key: PINELABS_POS_API_BASE_URL
+        value: https://api-c.pinelabs.com
+      - key: PINELABS_POS_CLIENT_ID
+        sync: false
+      - key: PINELABS_POS_CLIENT_SECRET
+        sync: false
+      - key: PINELABS_POS_REQUEST_TIMEOUT_MS
+        value: "15000"
+
       - key: RATE_LIMIT_WINDOW_MS
         value: "900000"
       - key: RATE_LIMIT_MAX_REQUESTS

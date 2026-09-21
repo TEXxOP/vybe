@@ -102,7 +102,7 @@ export default function Terms() {
 
                 <dt>Payment</dt>
                 <dd>
-                    You can pay cash on delivery or use PhonePe&apos;s hosted checkout
+                    You can pay cash on delivery or use an available hosted checkout
                     for UPI, card, and net-banking payments. We do not receive or
                     store your card or bank details.
                 </dd>

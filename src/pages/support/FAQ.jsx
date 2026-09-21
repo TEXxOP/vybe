@@ -106,7 +106,7 @@ export default function FAQ() {
             <details>
                 <summary>How do I pay?</summary>
                 <p>
-                    Choose cash on delivery or PhonePe at checkout. PhonePe hosts the
+                    Choose cash on delivery or an available hosted gateway at checkout. The gateway hosts the
                     secure payment page for UPI, cards and net banking, so we never
                     ask for or store card details or a UPI PIN.
                 </p>
