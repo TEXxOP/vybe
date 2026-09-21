@@ -11,6 +11,7 @@ const productRoutes = require('./routes/product.routes');
 const cartRoutes = require('./routes/cart.routes');
 const orderRoutes = require('./routes/order.routes');
 const paymentRoutes = require('./routes/payment.routes');
+const reportRoutes = require('./routes/report.routes');
 const paymentController = require('./controllers/payment.controller');
 
 // Initialize express
@@ -39,9 +40,9 @@ const limiter = rateLimit({
     }
 });
 
-// PhonePe delivers callbacks from a small pool of IPs and retries on failure,
-// so its webhooks must not share the per-IP browser budget above — a burst of
-// retries would otherwise be rejected with 429 and the payment left unresolved.
+// Gateways retry callbacks on failure, so webhooks must not share the per-IP
+// browser budget above — a burst of retries would otherwise be rejected with
+// 429 and the payment left unresolved.
 // It still gets a limit of its own, since the route is publicly reachable.
 const webhookLimiter = rateLimit({
     windowMs: 60 * 1000,
@@ -89,6 +90,15 @@ app.post(
     paymentController.handlePhonePeWebhook
 );
 
+// Pine Labs signs the original request bytes with an HMAC. Keep this route
+// ahead of express.json() for the same reason as PhonePe's callback above.
+app.post(
+    '/api/payments/pinelabs/webhook',
+    webhookLimiter,
+    express.raw({ type: 'application/json', limit: '64kb' }),
+    paymentController.handlePineLabsWebhook
+);
+
 // Every remaining API route shares the per-IP browser budget.
 app.use('/api', limiter);
 
@@ -102,6 +112,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

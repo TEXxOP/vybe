@@ -1,0 +1,4 @@
+api.restoralai.com {
+    encode zstd gzip
+    reverse_proxy api:5000
+}

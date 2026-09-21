@@ -345,7 +345,7 @@ export default function Cart() {
                     )}
 
                     {/* Ordering and enquiries are both real paths. The checkout
-                        links to PhonePe's hosted payment page; WhatsApp remains
+                        links to a hosted payment page; WhatsApp remains
                         available only when commerce is deliberately paused. */}
                     {COMMERCE_ENABLED ? (
                         <>
@@ -356,10 +356,10 @@ export default function Cart() {
 
                             <ul className={styles.pay}>
                                 <li>
-                                    <Icons.CreditCard size={15} /> PhonePe cards
+                                    <Icons.CreditCard size={15} /> Online cards
                                 </li>
                                 <li>
-                                    <Icons.Smartphone size={15} /> PhonePe UPI
+                                    <Icons.Smartphone size={15} /> Online UPI
                                 </li>
                                 <li>
                                     <Icons.Cash size={15} /> Cash on delivery

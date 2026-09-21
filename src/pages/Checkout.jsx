@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 
 import Plate from '../components/primitives/Plate';
@@ -96,9 +96,9 @@ const STATES = [
     'Ladakh', 'Lakshadweep', 'Puducherry',
 ];
 
-/* PhonePe Standard Checkout is hosted by PhonePe, so UPI, cards, and net
-   banking never touch this storefront. That keeps payment credentials and card
-   data out of the browser and our backend. */
+/* Hosted checkout keeps UPI, cards, and net banking details out of this
+   storefront. A provider appears only after its backend credentials and
+   webhook verification are fully configured. */
 const PAYMENTS = [
     {
         value: 'cod',
@@ -110,6 +110,12 @@ const PAYMENTS = [
         value: 'phonepe',
         icon: 'Smartphone',
         title: 'PhonePe secure payment',
+        note: 'UPI, cards, and net banking',
+    },
+    {
+        value: 'pinelabs',
+        icon: 'CreditCard',
+        title: 'Pine Labs secure payment',
         note: 'UPI, cards, and net banking',
     },
 ];
@@ -157,9 +163,30 @@ function CheckoutForm({ user }) {
     const [failure, setFailure] = useState('');
     const [busy, setBusy] = useState(false);
     const [placed, setPlaced] = useState(false);
+    const [providers, setProviders] = useState(null);
 
     const items = Array.isArray(cart?.items) ? cart.items : [];
     const totals = computeTotals(cart?.totalPrice || 0);
+
+    useEffect(() => {
+        let active = true;
+        paymentsAPI.getProviders()
+            .then((data) => {
+                if (active) setProviders(data?.providers || {});
+            })
+            // Cash on delivery remains available if the optional provider check
+            // cannot be reached. Never guess that an online gateway is live.
+            .catch(() => {
+                if (active) setProviders({});
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
+
+    const availablePayments = PAYMENTS.filter(
+        (option) => option.value === 'cod' || providers?.[option.value] === true
+    );
 
     const change = (e) => {
         const { name, value } = e.target;
@@ -206,19 +233,23 @@ function CheckoutForm({ user }) {
                 country: form.country,
             };
 
-            if (payment === 'phonepe') {
+            if (payment === 'phonepe' || payment === 'pinelabs') {
                 /* `expectedTotal` is the figure on the button the customer just
                    pressed. The server recomputes the price from its own cart
                    and refuses the order if the two disagree, so a bag that
                    drifted out of sync with this screen can no longer be
                    charged silently. See order.service.buildOrderFromCart. */
-                const data = await paymentsAPI.createPhonePeCheckout({
+                const createCheckout =
+                    payment === 'phonepe'
+                        ? paymentsAPI.createPhonePeCheckout
+                        : paymentsAPI.createPineLabsCheckout;
+                const data = await createCheckout({
                     shippingAddress,
                     expectedTotal: totals.total,
                 });
 
                 // Leave the cart alone. The backend removes only the paid line
-                // items after a server-verified PhonePe success, so an aborted
+                // items after a server-verified payment success, so an aborted
                 // or failed checkout never loses a customer's bag.
                 window.location.assign(data.checkoutUrl);
                 return;
@@ -405,7 +436,7 @@ function CheckoutForm({ user }) {
                             <legend className="visuallyHidden">Payment method</legend>
 
                             <div className={styles.payGrid}>
-                                {PAYMENTS.map((option) => {
+                                {availablePayments.map((option) => {
                                     const Icon = Icons[option.icon];
                                     const on = payment === option.value;
                                     return (
@@ -440,8 +471,8 @@ function CheckoutForm({ user }) {
                         </fieldset>
 
                         <p className={styles.payDisclosure}>
-                            PhonePe opens its secure checkout to complete online payments.
-                            We confirm your order only after PhonePe verifies the result.
+                            Online payments open on the selected provider&apos;s secure checkout.
+                            We confirm your order only after the provider verifies the result.
                         </p>
                     </section>
                 </div>

@@ -78,14 +78,15 @@ const CANCELLABLE = new Set(['pending', 'confirmed']);
 
 export function canCancel(order) {
     return !(
-        order?.paymentMethod === 'phonepe' && order?.paymentStatus === 'paid'
+        ['phonepe', 'pinelabs'].includes(order?.paymentMethod) && order?.paymentStatus === 'paid'
     ) && CANCELLABLE.has(order?.status);
 }
 
-/** Payment methods, from the same enum. PhonePe hosts the online checkout. */
+/** Payment methods, from the same enum. Online gateways host their checkouts. */
 export const PAYMENT_LABELS = {
     cod: 'Cash on delivery',
     phonepe: 'PhonePe',
+    pinelabs: 'Pine Labs',
     upi: 'UPI, on delivery',
     card: 'Card, on delivery',
     netbanking: 'Net banking, on delivery',

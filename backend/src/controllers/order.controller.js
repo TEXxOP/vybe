@@ -14,12 +14,11 @@ exports.createOrder = async (req, res) => {
         const { shippingAddress, paymentMethod, expectedTotal } = req.body;
 
         // Card/UPI strings from old clients must not create a fake online order.
-        // PhonePe checkout has its own endpoint and only confirms after a
-        // provider-verified response.
+        // Hosted checkout endpoints only confirm after a provider-verified response.
         if (paymentMethod && paymentMethod !== 'cod') {
             return res.status(400).json({
                 success: false,
-                message: 'Use the PhonePe checkout endpoint for online payments'
+                message: 'Use a hosted checkout endpoint for online payments'
             });
         }
 
@@ -149,12 +148,12 @@ exports.cancelOrder = async (req, res) => {
         }
 
         // A paid gateway order cannot be silently turned into "cancelled": it
-        // first needs a real, auditable refund through PhonePe. Keep this as a
+        // first needs a real, auditable refund through its gateway. Keep this as a
         // support workflow until the dedicated refund endpoint is implemented.
-        if (order.paymentMethod === 'phonepe' && order.paymentStatus === 'paid') {
+        if (['phonepe', 'pinelabs'].includes(order.paymentMethod) && order.paymentStatus === 'paid') {
             return res.status(400).json({
                 success: false,
-                message: 'Please contact support to cancel a paid PhonePe order and arrange its refund'
+                message: 'Please contact support to cancel a paid online order and arrange its refund'
             });
         }
 
@@ -237,10 +236,14 @@ exports.updateOrderStatus = async (req, res) => {
             });
         }
 
-        if (status === 'cancelled' && order.paymentMethod === 'phonepe' && order.paymentStatus === 'paid') {
+        if (
+            status === 'cancelled' &&
+            ['phonepe', 'pinelabs'].includes(order.paymentMethod) &&
+            order.paymentStatus === 'paid'
+        ) {
             return res.status(400).json({
                 success: false,
-                message: 'Refund the paid PhonePe order before marking it cancelled'
+                message: 'Refund the paid online order before marking it cancelled'
             });
         }
 

@@ -13,7 +13,7 @@ import { COMPANY, emailHref, addressOneLine } from '../../lib/company';
  * Order.model.js, and the two browser-storage keys are the two this client
  * actually writes (`vybe_token`, `vybe_user` — grep for them).
  *
- * It also states what we do NOT hold, which is the more useful half. PhonePe
+ * It also states what we do NOT hold, which is the more useful half. Hosted gateways
  * hosts card and bank entry, so our application never receives a card number.
  * There is no analytics script, no
  * advertising pixel and no mail service in the project either. A privacy policy
@@ -55,7 +55,7 @@ export default function Privacy() {
                 <dd>
                     What you bought, in which size and colour, what it cost, and the
                     delivery details you gave us: name, phone, street, city, state
-                    and pin code. Also how you chose to pay, a PhonePe transaction
+                    and pin code. Also how you chose to pay and a gateway transaction
                     reference when applicable, and the order’s current status.
                 </dd>
 
@@ -80,7 +80,7 @@ export default function Privacy() {
 
             <ul>
                 <li>
-                    <strong>Card and bank details.</strong> PhonePe hosts its own
+                    <strong>Card and bank details.</strong> Our hosted payment gateways handle their own
                     checkout page for online payments. We do not receive or store
                     card numbers, bank-account details, or UPI PINs.
                 </li>
@@ -109,7 +109,7 @@ export default function Privacy() {
             <p>
                 Only the people who have to. A delivery partner receives the name,
                 phone number and address on the parcel, because that is how a parcel
-                arrives. PhonePe processes online payment details under its own
+                arrives. The selected payment gateway processes online payment details under its own
                 privacy terms. Our database is hosted with an infrastructure provider
                 who stores it but has no reason to read it. Beyond that, nobody — we
                 don’t sell, rent or share customer data, and we won’t start without
