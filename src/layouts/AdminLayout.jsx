@@ -61,6 +61,13 @@ const SECTIONS = [
         plate: 'Plate 03 · dockets',
         title: 'Orders',
     },
+    {
+        to: ROUTES.adminPineLabsReports,
+        icon: Icons.CreditCard,
+        label: 'Pine Labs',
+        plate: 'Plate 04 · terminal ledger',
+        title: 'Pine Labs reports',
+    },
 ];
 
 export default function AdminLayout() {

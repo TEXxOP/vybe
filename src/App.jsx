@@ -36,6 +36,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminPineLabsReports from './pages/admin/AdminPineLabsReports';
 
 import { CartProvider } from './context/CartProvider';
 import { startPress } from './lib/press';
@@ -124,6 +125,7 @@ function Shell() {
                             <Route index element={<AdminDashboard />} />
                             <Route path="products" element={<AdminProducts />} />
                             <Route path="orders" element={<AdminOrders />} />
+                            <Route path="pine-labs-reports" element={<AdminPineLabsReports />} />
                         </Route>
                     </Route>
 

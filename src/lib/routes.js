@@ -41,6 +41,7 @@ export const ROUTES = {
   admin: '/admin',
   adminProducts: '/admin/products',
   adminOrders: '/admin/orders',
+  adminPineLabsReports: '/admin/pine-labs-reports',
 };
 
 /** Homepage section anchors. Real scroll targets, not decoration.
