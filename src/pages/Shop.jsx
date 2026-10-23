@@ -12,6 +12,7 @@ import { Icons } from '../components/Icons';
 import { productsAPI } from '../services/api';
 import { money, discountPercent } from '../lib/format';
 import { ROUTES } from '../lib/routes';
+import { getProductImage } from '../lib/productImages';
 import styles from './Shop.module.css';
 
 /**
@@ -101,7 +102,7 @@ function isSoldOut(product) {
 }
 
 function ProductCard({ product, index }) {
-    const image = product.images?.[0];
+    const image = getProductImage(product);
     const badge = BADGES[product.badge];
     const off = discountPercent(product.price, product.comparePrice);
     const rated = Number(product.rating?.count) > 0;

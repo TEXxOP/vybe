@@ -5,6 +5,7 @@ import AdminProductForm from './AdminProductForm';
 import { Icons } from '../../components/Icons';
 import { useResource, selectProducts } from '../../lib/useResource';
 import { money } from '../../lib/format';
+import { getProductImage } from '../../lib/productImages';
 import { adminAPI, productsAPI } from '../../services/api';
 import styles from './AdminTable.module.css';
 
@@ -227,7 +228,7 @@ export default function AdminProducts() {
                         <tbody>
                             {products.map((product) => {
                                 const image =
-                                    product.images?.[0]?.url || product.image;
+                                    getProductImage(product)?.url || product.image;
 
                                 const sizes = Array.isArray(product.sizes)
                                     ? product.sizes

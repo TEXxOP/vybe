@@ -7,6 +7,7 @@ import {
     withTotals,
     readGuestCart,
 } from './CartContext';
+import { getProductImages } from '../lib/productImages';
 
 /**
  * CartProvider — the only export in this file, so edits to it hot-patch.
@@ -152,7 +153,7 @@ export const CartProvider = ({ children }) => {
                                 _id: product._id,
                                 name: product.name,
                                 price: product.price,
-                                images: product.images,
+                                images: getProductImages(product),
                             },
                             quantity,
                             size,

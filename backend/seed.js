@@ -2,6 +2,15 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const Product = require('./src/models/Product.model');
 const User = require('./src/models/User.model');
+const catalogImageMap = require('./catalog-image-map.json');
+
+const catalogImage = (productName) => {
+    const image = catalogImageMap[productName];
+    return {
+        url: `https://www.restoralai.com/product-images/${image.file}`,
+        alt: image.alt
+    };
+};
 
 const products = [
     // Limited Edition Products (matching current UI)
@@ -12,9 +21,7 @@ const products = [
         comparePrice: 3200,
         category: 'jackets',
         collection: 'limited',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&h=600&fit=crop', alt: 'Chroma Surge Jacket' }
-        ],
+        images: [catalogImage('Chroma Surge Jacket')],
         sizes: [
             { size: 'S', stock: 10 },
             { size: 'M', stock: 15 },
@@ -36,9 +43,7 @@ const products = [
         comparePrice: 1300,
         category: 'shirts',
         collection: 'limited',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&h=600&fit=crop', alt: 'Vivid Blueprint Shirt' }
-        ],
+        images: [catalogImage('Vivid Blueprint Shirt')],
         sizes: [
             { size: 'S', stock: 20 },
             { size: 'M', stock: 25 },
@@ -60,9 +65,7 @@ const products = [
         comparePrice: 2200,
         category: 'pants',
         collection: 'limited',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=500&h=600&fit=crop', alt: 'Graffiti Canvas Cargo' }
-        ],
+        images: [catalogImage('Graffiti Canvas Cargo')],
         sizes: [
             { size: 'S', stock: 8 },
             { size: 'M', stock: 12 },
@@ -84,9 +87,7 @@ const products = [
         price: 1700,
         category: 'hoodies',
         collection: 'edge',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=600&fit=crop', alt: 'Shadow Edge Hoodie' }
-        ],
+        images: [catalogImage('Shadow Edge Hoodie')],
         sizes: [
             { size: 'S', stock: 25 },
             { size: 'M', stock: 40 },
@@ -110,9 +111,7 @@ const products = [
         price: 900,
         category: 'shirts',
         collection: 'edge',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&h=600&fit=crop', alt: 'Razor Cut Tee' }
-        ],
+        images: [catalogImage('Razor Cut Tee')],
         sizes: [
             { size: 'S', stock: 50 },
             { size: 'M', stock: 60 },
@@ -136,9 +135,7 @@ const products = [
         price: 2400,
         category: 'jackets',
         collection: 'canvas',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=600&fit=crop', alt: 'Abstract Canvas Jacket' }
-        ],
+        images: [catalogImage('Abstract Canvas Jacket')],
         sizes: [
             { size: 'S', stock: 5 },
             { size: 'M', stock: 8 },
@@ -158,9 +155,7 @@ const products = [
         price: 1300,
         category: 'shirts',
         collection: 'canvas',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&h=600&fit=crop', alt: 'Palette Blend Shirt' }
-        ],
+        images: [catalogImage('Palette Blend Shirt')],
         sizes: [
             { size: 'S', stock: 15 },
             { size: 'M', stock: 20 },
@@ -181,9 +176,7 @@ const products = [
         price: 1500,
         category: 'pants',
         collection: 'energy',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500&h=600&fit=crop', alt: 'Volt Track Pants' }
-        ],
+        images: [catalogImage('Volt Track Pants')],
         sizes: [
             { size: 'S', stock: 30 },
             { size: 'M', stock: 40 },
@@ -208,9 +201,7 @@ const products = [
         comparePrice: 1800,
         category: 'shirts',
         collection: 'classics',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=500&h=600&fit=crop', alt: 'Urban Vanguard Tee' }
-        ],
+        images: [catalogImage('Urban Vanguard Tee')],
         sizes: [
             { size: 'XS', stock: 20 },
             { size: 'S', stock: 50 },
@@ -237,9 +228,7 @@ const products = [
         price: 2000,
         category: 'hoodies',
         collection: 'edge',
-        images: [
-            { url: 'https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?w=500&h=600&fit=crop', alt: 'Street Cipher Hoodie' }
-        ],
+        images: [catalogImage('Street Cipher Hoodie')],
         sizes: [
             { size: 'S', stock: 18 },
             { size: 'M', stock: 25 },

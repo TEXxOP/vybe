@@ -9,6 +9,7 @@ import { Icons } from './Icons';
 import { productsAPI } from '../services/api';
 import { ROUTES } from '../lib/routes';
 import { money } from '../lib/format';
+import { getProductImage } from '../lib/productImages';
 import { msToNextDrop, splitRemaining } from '../lib/drops';
 import styles from './LimitedEdition.module.css';
 
@@ -99,63 +100,6 @@ function DropCountdown() {
   );
 }
 
-/* Fallback content for when the API is unreachable. Flagged as demo so the
-   cards link to the shop rather than to /product/1, which never existed. */
-const FALLBACK = [
-  {
-    _id: 'demo-1',
-    demo: true,
-    name: 'Chroma Surge Jacket',
-    price: 2500,
-    category: 'Outerwear',
-    limitedStock: 50,
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=800&fit=crop',
-      },
-    ],
-  },
-  {
-    _id: 'demo-2',
-    demo: true,
-    name: 'Vivid Blueprint Shirt',
-    price: 1000,
-    category: 'Tops',
-    limitedStock: 8,
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&h=800&fit=crop',
-      },
-    ],
-  },
-  {
-    _id: 'demo-3',
-    demo: true,
-    name: 'Shadow Edge Hoodie',
-    price: 1700,
-    category: 'Hoodies',
-    limitedStock: 5,
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=800&fit=crop',
-      },
-    ],
-  },
-  {
-    _id: 'demo-4',
-    demo: true,
-    name: 'Graffiti Canvas Cargo',
-    price: 1800,
-    category: 'Bottoms',
-    limitedStock: 12,
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&h=800&fit=crop',
-      },
-    ],
-  },
-];
-
 const RUN_SIZE = 50; // Units per limited run — the denominator for the bar.
 
 /** Stock left, from whichever field the document actually carries. Returns
@@ -183,7 +127,7 @@ function LimitedCard({ product }) {
   const left = stockLeft(product);
   const sold = left == null ? null : Math.max(0, RUN_SIZE - left);
   const soldPct = sold == null ? null : Math.min(100, Math.round((sold / RUN_SIZE) * 100));
-  const image = product.images?.[0]?.url;
+  const image = getProductImage(product)?.url;
   const to = product.demo ? ROUTES.shop : ROUTES.product(product._id);
   const isOut = left === 0;
 
@@ -251,17 +195,28 @@ function LimitedCard({ product }) {
 
 export default function LimitedEdition() {
   const [products, setProducts] = useState(null); // null = still loading
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     let live = true;
     productsAPI
       .getLimited()
       .then((res) => {
-        const list = res?.products || res?.data || [];
-        if (live) setProducts(list.length ? list.slice(0, 4) : FALLBACK);
+        const list = Array.isArray(res?.products)
+          ? res.products
+          : Array.isArray(res?.data)
+            ? res.data
+            : [];
+        if (live) {
+          setProducts(list.slice(0, 4));
+          setLoadError(false);
+        }
       })
       .catch(() => {
-        if (live) setProducts(FALLBACK);
+        if (live) {
+          setProducts([]);
+          setLoadError(true);
+        }
       });
     return () => {
       live = false;
@@ -306,7 +261,13 @@ export default function LimitedEdition() {
                 <div className={styles.skeletonLineShort} />
               </div>
             ))
-          : products.map((product, i) => (
+          : products.length === 0 ? (
+            <p className={styles.emptyState} role={loadError ? 'alert' : undefined}>
+              {loadError
+                ? 'This drop could not load right now. Please try again shortly.'
+                : 'No limited pieces are available right now.'}
+            </p>
+          ) : products.map((product, i) => (
               <Reveal
                 key={product._id}
                 variant="up"

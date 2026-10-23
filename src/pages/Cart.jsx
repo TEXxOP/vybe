@@ -10,6 +10,7 @@ import { useCart } from '../context/CartContext';
 import { money } from '../lib/format';
 import { computeTotals, FREE_SHIPPING_THRESHOLD, MAX_PER_LINE } from '../lib/cart';
 import { ROUTES } from '../lib/routes';
+import { getProductImage } from '../lib/productImages';
 import { cartEnquiryHref, COMMERCE_ENABLED } from '../lib/enquiry';
 import styles from './Cart.module.css';
 
@@ -59,7 +60,7 @@ import styles from './Cart.module.css';
 
 function Line({ item, index, busy, onQuantity, onRemove }) {
     const product = item.product || {};
-    const image = product.images?.[0];
+    const image = getProductImage(product);
     const lineTotal = (Number(item.price) || 0) * (Number(item.quantity) || 0);
     const qty = Number(item.quantity) || 1;
 

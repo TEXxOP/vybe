@@ -149,6 +149,16 @@
     min-width: 0;
 }
 
+.emptyState {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: var(--space-lg);
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-family: var(--font-body);
+    text-align: center;
+}
+
 /* ---- CARD -------------------------------------------------------------- */
 .card {
     position: relative;

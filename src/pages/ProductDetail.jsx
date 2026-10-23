@@ -14,6 +14,7 @@ import { money, discountPercent } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD, MAX_PER_LINE } from '../lib/cart';
 import { productEnquiryHref, COMMERCE_ENABLED } from '../lib/enquiry';
 import { ROUTES, shopCategory } from '../lib/routes';
+import { getProductImage, getProductImages } from '../lib/productImages';
 import styles from './ProductDetail.module.css';
 
 /**
@@ -141,8 +142,8 @@ function RelatedRail({ category, exceptId }) {
                                 to={ROUTES.product(item._id)}
                             >
                                 <Ink
-                                    src={item.images?.[0]?.url || ''}
-                                    alt={item.images?.[0]?.alt || item.name}
+                                    src={getProductImage(item)?.url || ''}
+                                    alt={getProductImage(item)?.alt || item.name}
                                     ratio="4 / 5"
                                     plate={['pink', 'orange', 'blue'][i % 3]}
                                     sizes="(min-width: 900px) 22vw, 45vw"
@@ -257,7 +258,7 @@ function ProductView({ id }) {
     }
 
     const product = state.product;
-    const images = Array.isArray(product.images) ? product.images : [];
+    const images = getProductImages(product);
     const sizes = Array.isArray(product.sizes) ? product.sizes : [];
     const colors = Array.isArray(product.colors) ? product.colors : [];
 

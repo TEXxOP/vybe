@@ -4,6 +4,7 @@ import Button from '../../components/primitives/Button';
 import Field from '../../components/primitives/Field';
 import { Icons } from '../../components/Icons';
 import { useDialog } from '../../lib/useDialog';
+import { getCanonicalProductImages } from '../../lib/productImages';
 
 import styles from './AdminProductForm.module.css';
 
@@ -128,7 +129,8 @@ function normaliseHex(value) {
    --------------------------------------------------------------------------- */
 function fromProduct(product) {
     const p = product || {};
-    const images = Array.isArray(p.images) && p.images.length ? p.images : [{}];
+    const productImages = getCanonicalProductImages(p);
+    const images = productImages.length ? productImages : [{}];
     const sizes =
         Array.isArray(p.sizes) && p.sizes.length ? p.sizes : [{ size: 'M' }];
     const colors = Array.isArray(p.colors) && p.colors.length ? p.colors : [{}];
