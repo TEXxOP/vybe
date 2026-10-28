@@ -4,6 +4,9 @@ const test = require('node:test');
 
 const {
     PineLabsConfigurationError,
+    PineLabsAccessError,
+    assertPineLabsCheckoutAllowed,
+    isPineLabsAvailableTo,
     merchantOrderReference,
     toPaisa,
     verifyPineLabsWebhook,
@@ -36,6 +39,31 @@ test('creates a short, stable Pine Labs merchant order reference', () => {
     const reference = merchantOrderReference('66d55efed1dc5e8fcb8cac44');
     assert.equal(reference, 'VYBE-PL-66d55efed1dc5e8fcb8cac44');
     assert.ok(reference.length <= 50);
+});
+
+test('limits sandbox checkout to an admin or an explicit UAT tester', () => {
+    const secret = Buffer.from('pine-labs-test-secret').toString('base64');
+    withPineLabsEnvironment(
+        {
+            PINELABS_ENABLED: 'true',
+            PINELABS_ENV: 'sandbox',
+            PINELABS_CLIENT_ID: 'client-id',
+            PINELABS_CLIENT_SECRET: 'client-secret',
+            PINELABS_WEBHOOK_SECRET: secret,
+            PINELABS_UAT_TESTER_EMAILS: 'tester@example.test',
+            FRONTEND_URL: 'https://example.test',
+        },
+        () => {
+            assert.equal(isPineLabsAvailableTo(), false);
+            assert.equal(isPineLabsAvailableTo({ role: 'customer', email: 'tester@example.test' }), true);
+            assert.equal(isPineLabsAvailableTo({ role: 'admin', email: 'admin@example.test' }), true);
+            assert.equal(isPineLabsAvailableTo({ role: 'customer', email: 'other@example.test' }), false);
+            assert.throws(
+                () => assertPineLabsCheckoutAllowed({ role: 'customer', email: 'other@example.test' }),
+                PineLabsAccessError
+            );
+        }
+    );
 });
 
 test('accepts only an authentic, fresh Pine Labs webhook signature', () => {

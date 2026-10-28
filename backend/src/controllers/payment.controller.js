@@ -16,11 +16,13 @@ const {
 const {
     createPineLabsCheckout,
     getPineLabsOrderStatus,
-    isPineLabsConfigured,
+    isPineLabsAvailableTo,
+    assertPineLabsCheckoutAllowed,
     merchantOrderReference,
     toPaisa: pineLabsToPaisa,
     verifyPineLabsWebhook,
     PineLabsConfigurationError,
+    PineLabsAccessError,
 } = require('../services/pinelabs.service');
 
 function paymentDetailsFromProvider(data = {}) {
@@ -118,7 +120,9 @@ async function applyPhonePeStatus(order, providerData, source) {
 
 function sendPaymentError(res, error, fallbackMessage) {
     const configurationError =
-        error instanceof PhonePeConfigurationError || error instanceof PineLabsConfigurationError;
+        error instanceof PhonePeConfigurationError ||
+        error instanceof PineLabsConfigurationError ||
+        error instanceof PineLabsAccessError;
     const status = error.statusCode || (configurationError ? 503 : 502);
     const message =
         error instanceof OrderValidationError || configurationError
@@ -215,7 +219,7 @@ exports.getPaymentProviders = (req, res) => {
         success: true,
         providers: {
             phonepe: isPhonePeConfigured(),
-            pinelabs: isPineLabsConfigured(),
+            pinelabs: isPineLabsAvailableTo(req.user),
         },
     });
 };
@@ -341,9 +345,7 @@ exports.handlePhonePeWebhook = async (req, res) => {
 // @access  Private
 exports.createPineLabsCheckout = async (req, res) => {
     try {
-        if (!isPineLabsConfigured()) {
-            throw new PineLabsConfigurationError('Pine Labs payments are not configured yet');
-        }
+        assertPineLabsCheckoutAllowed(req.user);
 
         const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
             expectedTotal: req.body.expectedTotal,

@@ -59,6 +59,12 @@ uses Pine Labs' documented UAT endpoint by default; an explicit
 `PINELABS_API_BASE_URL` is available only when Pine Labs supplies a different
 tenant endpoint.
 
+When UAT is configured on an API that also serves the public storefront, the
+gateway is restricted server-side to admin accounts and any addresses listed in
+`PINELABS_UAT_TESTER_EMAILS`. This prevents sandbox checkout from appearing to
+ordinary customers. Use a comma-separated allow-list only for named UAT testers
+and clear it when production credentials are enabled.
+
 ## Go-live verification
 
 1. Deploy the backend and frontend together.

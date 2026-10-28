@@ -22,6 +22,14 @@ class PineLabsConfigurationError extends Error {
     }
 }
 
+class PineLabsAccessError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'PineLabsAccessError';
+        this.statusCode = 403;
+    }
+}
+
 class PineLabsApiError extends Error {
     constructor(message, { statusCode = 502, providerStatus } = {}) {
         super(message);
@@ -135,6 +143,43 @@ function isPineLabsConfigured() {
         return true;
     } catch {
         return false;
+    }
+}
+
+function uatTesterEmails() {
+    return new Set(
+        String(process.env.PINELABS_UAT_TESTER_EMAILS || '')
+            .split(',')
+            .map((email) => email.trim().toLowerCase())
+            .filter(Boolean)
+    );
+}
+
+/**
+ * UAT credentials may be configured on the live API domain while Pine Labs
+ * validates the integration. In that case, never expose a sandbox checkout to
+ * ordinary customers: only admins and explicitly allow-listed accounts may
+ * see or start it. Production credentials remain available to every shopper.
+ */
+function isPineLabsAvailableTo(user) {
+    try {
+        const config = getPineLabsConfig();
+        if (config.environment !== 'sandbox') return true;
+        if (!user) return false;
+
+        if (String(user.role || '').toLowerCase() === 'admin') return true;
+        return uatTesterEmails().has(String(user.email || '').trim().toLowerCase());
+    } catch {
+        return false;
+    }
+}
+
+function assertPineLabsCheckoutAllowed(user) {
+    if (!isPineLabsConfigured()) {
+        throw new PineLabsConfigurationError('Pine Labs payments are not configured yet');
+    }
+    if (!isPineLabsAvailableTo(user)) {
+        throw new PineLabsAccessError('Pine Labs UAT is limited to approved test accounts.');
     }
 }
 
@@ -372,11 +417,14 @@ function verifyPineLabsWebhook({ webhookId, webhookTimestamp, webhookSignature, 
 }
 
 module.exports = {
+    PineLabsAccessError,
     PineLabsApiError,
     PineLabsConfigurationError,
+    assertPineLabsCheckoutAllowed,
     createPineLabsCheckout,
     getPineLabsConfig,
     getPineLabsOrderStatus,
+    isPineLabsAvailableTo,
     isPineLabsConfigured,
     merchantOrderReference,
     paymentReturnUrl,
