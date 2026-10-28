@@ -8,6 +8,7 @@ const {
     assertPineLabsCheckoutAllowed,
     isPineLabsAvailableTo,
     merchantOrderReference,
+    pineLabsCallbackUrl,
     toPaisa,
     verifyPineLabsWebhook,
 } = require('../src/services/pinelabs.service');
@@ -52,6 +53,7 @@ test('limits sandbox checkout to an admin or an explicit UAT tester', () => {
             PINELABS_WEBHOOK_SECRET: secret,
             PINELABS_UAT_TESTER_EMAILS: 'tester@example.test',
             FRONTEND_URL: 'https://example.test',
+            PINELABS_CALLBACK_URL: 'https://api.example.test/api/payments/pinelabs/return',
         },
         () => {
             assert.equal(isPineLabsAvailableTo(), false);
@@ -88,6 +90,7 @@ test('accepts only an authentic, fresh Pine Labs webhook signature', () => {
             PINELABS_WEBHOOK_SECRET: secret,
             PINELABS_WEBHOOK_TOLERANCE_SECONDS: '300',
             FRONTEND_URL: 'https://example.test',
+            PINELABS_CALLBACK_URL: 'https://api.example.test/api/payments/pinelabs/return',
         },
         () => {
             assert.deepEqual(
@@ -110,5 +113,16 @@ test('accepts only an authentic, fresh Pine Labs webhook signature', () => {
                 /Invalid Pine Labs webhook signature/
             );
         }
+    );
+});
+
+test('uses the API callback URL so hosted POST returns can become frontend GETs', () => {
+    const url = pineLabsCallbackUrl(
+        '66d55efed1dc5e8fcb8cac44',
+        new URL('https://api.example.test/api/payments/pinelabs/return?flow=hosted')
+    );
+    assert.equal(
+        url,
+        'https://api.example.test/api/payments/pinelabs/return?flow=hosted&order=66d55efed1dc5e8fcb8cac44'
     );
 });

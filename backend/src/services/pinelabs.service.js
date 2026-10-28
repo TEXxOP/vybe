@@ -62,6 +62,23 @@ function frontendUrl() {
     }
 }
 
+function callbackBaseUrl() {
+    const configured = process.env.PINELABS_CALLBACK_URL;
+    if (!configured) {
+        throw new PineLabsConfigurationError('PINELABS_CALLBACK_URL is required for the Pine Labs browser return');
+    }
+
+    try {
+        const url = new URL(configured);
+        if (url.protocol !== 'https:' && process.env.NODE_ENV === 'production') {
+            throw new Error('Production callback URL must use HTTPS');
+        }
+        return url;
+    } catch {
+        throw new PineLabsConfigurationError('PINELABS_CALLBACK_URL must be an absolute URL');
+    }
+}
+
 function allowedPaymentMethods() {
     const methods = String(process.env.PINELABS_ALLOWED_PAYMENT_METHODS || 'UPI,CARD,NETBANKING')
         .split(',')
@@ -116,6 +133,7 @@ function getPineLabsConfig() {
         ),
         allowedPaymentMethods: allowedPaymentMethods(),
         frontendUrl: frontendUrl(),
+        callbackUrl: callbackBaseUrl(),
     };
 
     const missing = ['clientId', 'clientSecret', 'webhookSecret'].filter((key) => !config[key]);
@@ -199,6 +217,17 @@ function merchantOrderReference(orderId) {
 function paymentReturnUrl(orderId, baseUrl) {
     const url = new URL(baseUrl.toString());
     url.pathname = `${url.pathname.replace(/\/$/, '')}/payment/pinelabs/return`;
+    url.searchParams.set('order', String(orderId));
+    return url.toString();
+}
+
+/**
+ * Pine Labs can submit the hosted-checkout return as a browser POST. A static
+ * frontend cannot accept that method, so callbacks first land on the API;
+ * the API turns it into a 303 GET to the SPA status page.
+ */
+function pineLabsCallbackUrl(orderId, baseUrl) {
+    const url = new URL(baseUrl.toString());
     url.searchParams.set('order', String(orderId));
     return url.toString();
 }
@@ -314,7 +343,7 @@ async function pineLabsRequest(path, options = {}, config = getPineLabsConfig())
 
 async function createPineLabsCheckout({ order, customer }) {
     const config = getPineLabsConfig();
-    const callbackUrl = paymentReturnUrl(order._id, config.frontendUrl);
+    const callbackUrl = pineLabsCallbackUrl(order._id, config.callbackUrl);
     const response = await pineLabsRequest(
         '/api/checkout/v1/orders',
         {
@@ -427,6 +456,7 @@ module.exports = {
     isPineLabsAvailableTo,
     isPineLabsConfigured,
     merchantOrderReference,
+    pineLabsCallbackUrl,
     paymentReturnUrl,
     toPaisa,
     verifyPineLabsWebhook,

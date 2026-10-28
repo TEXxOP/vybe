@@ -45,6 +45,8 @@ PINELABS_ENV=production
 PINELABS_CLIENT_ID=<Online Payments production client ID>
 PINELABS_CLIENT_SECRET=<Online Payments production client secret>
 PINELABS_WEBHOOK_SECRET=<Base64 webhook signing secret>
+# Must be served by the API: Pine Labs may POST its browser return here.
+PINELABS_CALLBACK_URL=https://api.<your-domain>/api/payments/pinelabs/return
 PINELABS_WEBHOOK_TOLERANCE_SECONDS=300
 PINELABS_ALLOWED_PAYMENT_METHODS=UPI,CARD,NETBANKING
 ```
@@ -58,6 +60,12 @@ For UAT, use `PINELABS_ENV=sandbox` and Pine Labs' UAT credentials. The service
 uses Pine Labs' documented UAT endpoint by default; an explicit
 `PINELABS_API_BASE_URL` is available only when Pine Labs supplies a different
 tenant endpoint.
+
+Pine Labs can return hosted checkout in a browser `POST`. Set
+`PINELABS_CALLBACK_URL` to the API endpoint above: it accepts `POST` and
+`GET`, then responds with a `303` redirect to the storefront return page. The
+browser return is never trusted to mark an order paid; the authenticated status
+request and signed webhook both re-fetch the canonical order state from Pine Labs.
 
 When UAT is configured on an API that also serves the public storefront, the
 gateway is restricted server-side to admin accounts and any addresses listed in

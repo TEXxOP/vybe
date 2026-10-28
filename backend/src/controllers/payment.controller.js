@@ -19,6 +19,7 @@ const {
     isPineLabsAvailableTo,
     assertPineLabsCheckoutAllowed,
     merchantOrderReference,
+    paymentReturnUrl,
     toPaisa: pineLabsToPaisa,
     verifyPineLabsWebhook,
     PineLabsConfigurationError,
@@ -409,6 +410,32 @@ exports.getPineLabsPaymentStatus = async (req, res) => {
     } catch (error) {
         console.error('Pine Labs status lookup failed:', error.message);
         return sendPaymentError(res, error, 'Could not verify the Pine Labs payment yet. Please try again.');
+    }
+};
+
+/**
+ * Pine Labs may send the browser back from hosted checkout with POST. Vercel's
+ * SPA rewrite accepts GET only, so the API accepts both methods and turns the
+ * request into a 303 redirect. It deliberately does not trust or process a
+ * browser-supplied payment result: the protected status route and webhook
+ * both obtain the canonical order state from Pine Labs.
+ */
+exports.handlePineLabsReturn = (req, res) => {
+    const orderId = String(req.query?.order || '');
+    if (!/^[a-f\d]{24}$/i.test(orderId)) {
+        return res.status(400).json({ success: false, message: 'Invalid Pine Labs return order' });
+    }
+
+    try {
+        const frontendOrigin = String(process.env.FRONTEND_URL || '')
+            .split(',')
+            .map((origin) => origin.trim())
+            .find(Boolean);
+        if (!frontendOrigin) throw new Error('FRONTEND_URL is missing');
+
+        return res.redirect(303, paymentReturnUrl(orderId, new URL(frontendOrigin)));
+    } catch {
+        return res.status(503).json({ success: false, message: 'Pine Labs return URL is unavailable' });
     }
 };
 

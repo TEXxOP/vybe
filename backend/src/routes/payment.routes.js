@@ -11,5 +11,7 @@ router.post('/phonepe/checkout', protect, sanitizeInput, paymentController.creat
 router.get('/phonepe/orders/:id/status', protect, paymentController.getPhonePePaymentStatus);
 router.post('/pinelabs/checkout', protect, sanitizeInput, paymentController.createPineLabsCheckout);
 router.get('/pinelabs/orders/:id/status', protect, paymentController.getPineLabsPaymentStatus);
+router.get('/pinelabs/return', paymentController.handlePineLabsReturn);
+router.post('/pinelabs/return', paymentController.handlePineLabsReturn);
 
 module.exports = router;
