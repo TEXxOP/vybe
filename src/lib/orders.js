@@ -78,7 +78,7 @@ const CANCELLABLE = new Set(['pending', 'confirmed']);
 
 export function canCancel(order) {
     return !(
-        ['phonepe', 'pinelabs'].includes(order?.paymentMethod) && order?.paymentStatus === 'paid'
+        ['phonepe', 'pinelabs', 'paytm'].includes(order?.paymentMethod) && order?.paymentStatus === 'paid'
     ) && CANCELLABLE.has(order?.status);
 }
 
@@ -87,6 +87,7 @@ export const PAYMENT_LABELS = {
     cod: 'Cash on delivery',
     phonepe: 'PhonePe',
     pinelabs: 'Pine Labs',
+    paytm: 'Paytm',
     upi: 'UPI, on delivery',
     card: 'Card, on delivery',
     netbanking: 'Net banking, on delivery',

@@ -53,9 +53,11 @@ export function includedTax(inclusiveAmount, rate = GST_RATE) {
   return Math.round((amount * rate) / (1 + rate));
 }
 
-export function computeTotals(subtotal = 0) {
+export function computeTotals(subtotal = 0, { shippingExempt = false } = {}) {
   const safeSubtotal = Number.isFinite(subtotal) && subtotal > 0 ? subtotal : 0;
-  const shipping = safeSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT;
+  const exempt = Boolean(shippingExempt);
+  const shipping =
+    exempt || safeSubtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FLAT;
   /* Already inside safeSubtotal. Reported, never added. */
   const tax = includedTax(safeSubtotal);
 
@@ -64,7 +66,8 @@ export function computeTotals(subtotal = 0) {
     shipping,
     tax,
     total: safeSubtotal + shipping,
-    freeShipping: shipping === 0,
+    freeShipping: !exempt && shipping === 0,
+    shippingExempt: exempt,
     /** How much more to spend to clear the threshold. 0 once cleared. */
     amountToFreeShipping: Math.max(0, FREE_SHIPPING_THRESHOLD - safeSubtotal),
   };

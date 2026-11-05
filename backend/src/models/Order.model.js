@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         // Legacy values remain readable for historical orders. New online
         // payments use one of the hosted gateways below.
-        enum: ['cod', 'phonepe', 'pinelabs', 'card', 'upi', 'netbanking'],
+        enum: ['cod', 'phonepe', 'pinelabs', 'paytm', 'card', 'upi', 'netbanking'],
         default: 'cod'
     },
     paymentStatus: {
@@ -53,10 +53,11 @@ const orderSchema = new mongoose.Schema({
         default: 'pending'
     },
     paymentDetails: {
-        provider: { type: String, enum: ['phonepe', 'pinelabs', null] },
+        provider: { type: String, enum: ['phonepe', 'pinelabs', 'paytm', null] },
         merchantOrderId: String,
         phonepeOrderId: String,
         pineLabsOrderId: String,
+        paytmOrderId: String,
         checkoutToken: String,
         transactionId: String,
         paymentMode: String,
@@ -131,5 +132,6 @@ orderSchema.pre('save', async function (next) {
 // requests and callbacks. Sparse keeps existing cash-on-delivery orders valid.
 orderSchema.index({ 'paymentDetails.merchantOrderId': 1 }, { unique: true, sparse: true });
 orderSchema.index({ 'paymentDetails.pineLabsOrderId': 1 }, { unique: true, sparse: true });
+orderSchema.index({ 'paymentDetails.paytmOrderId': 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model('Order', orderSchema);

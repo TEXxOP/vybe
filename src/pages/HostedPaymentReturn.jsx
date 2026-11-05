@@ -14,6 +14,7 @@ import styles from './OrderSuccess.module.css';
 const PROVIDERS = {
     phonepe: { label: 'PhonePe', getStatus: paymentsAPI.getPhonePeStatus },
     pinelabs: { label: 'Pine Labs', getStatus: paymentsAPI.getPineLabsStatus },
+    paytm: { label: 'Paytm', getStatus: paymentsAPI.getPaytmStatus },
 };
 
 /** A redirect is navigation only; the server verifies payment status directly. */

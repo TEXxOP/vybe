@@ -13,5 +13,8 @@ router.post('/pinelabs/checkout', protect, sanitizeInput, paymentController.crea
 router.get('/pinelabs/orders/:id/status', protect, paymentController.getPineLabsPaymentStatus);
 router.get('/pinelabs/return', paymentController.handlePineLabsReturn);
 router.post('/pinelabs/return', paymentController.handlePineLabsReturn);
+router.post('/paytm/checkout', protect, sanitizeInput, paymentController.createPaytmCheckout);
+router.get('/paytm/orders/:id/status', protect, paymentController.getPaytmPaymentStatus);
+router.post('/paytm/callback', paymentController.handlePaytmCallback);
 
 module.exports = router;

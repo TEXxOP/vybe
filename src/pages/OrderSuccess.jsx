@@ -57,7 +57,7 @@ function addDays(days) {
 export default function OrderSuccess() {
     const { state } = useLocation();
     const { orderNumber, total, itemCount, paymentMethod, email } = state || {};
-    const paidOnline = ['phonepe', 'pinelabs'].includes(paymentMethod);
+    const paidOnline = ['phonepe', 'pinelabs', 'paytm'].includes(paymentMethod);
 
     /* No state means a reload or a direct hit. Send them to the order list —
        the order is genuinely there, which is more use than the homepage. */

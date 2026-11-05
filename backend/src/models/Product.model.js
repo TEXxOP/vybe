@@ -17,6 +17,12 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Price is required'],
         min: [0, 'Price cannot be negative']
     },
+    // Payment-only test items are not shipped. Orders containing only these
+    // admin-created items waive the normal delivery charge.
+    isPaymentTest: {
+        type: Boolean,
+        default: false
+    },
     comparePrice: {
         type: Number,
         min: [0, 'Compare price cannot be negative']

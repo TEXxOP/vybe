@@ -21,11 +21,19 @@ import { createContext, useContext } from 'react';
 
 export const CartContext = createContext(null);
 
-export const EMPTY_CART = { items: [], totalItems: 0, totalPrice: 0 };
+export const EMPTY_CART = {
+    items: [],
+    totalItems: 0,
+    totalPrice: 0,
+    shippingExempt: false,
+};
 export const GUEST_KEY = 'vybe_guest_cart';
 
 /** Totals were recomputed by hand in five places. Now once, here. */
 export function withTotals(items) {
+    const shippingExempt =
+        items.length > 0 && items.every((item) => item.product?.isPaymentTest === true);
+
     return {
         items,
         totalItems: items.reduce((sum, item) => sum + item.quantity, 0),
@@ -33,6 +41,7 @@ export function withTotals(items) {
             (sum, item) => sum + item.price * item.quantity,
             0
         ),
+        shippingExempt,
     };
 }
 

@@ -22,6 +22,8 @@ export const ROUTES = {
   orderSuccess: '/order-success',
   phonepeReturn: '/payment/phonepe/return',
   pinelabsReturn: '/payment/pinelabs/return',
+  paytmReturn: '/payment/paytm/return',
+  paytmCheckout: '/payment/paytm/checkout',
 
   // Account
   login: '/login',

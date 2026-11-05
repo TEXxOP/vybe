@@ -118,6 +118,12 @@ const PAYMENTS = [
         title: 'Pine Labs secure payment',
         note: 'UPI, cards, and net banking',
     },
+    {
+        value: 'paytm',
+        icon: 'CreditCard',
+        title: 'Paytm secure payment',
+        note: 'UPI, cards, and net banking',
+    },
 ];
 
 const BLANK = {
@@ -166,7 +172,9 @@ function CheckoutForm({ user }) {
     const [providers, setProviders] = useState(null);
 
     const items = Array.isArray(cart?.items) ? cart.items : [];
-    const totals = computeTotals(cart?.totalPrice || 0);
+    const totals = computeTotals(cart?.totalPrice || 0, {
+        shippingExempt: cart?.shippingExempt,
+    });
 
     useEffect(() => {
         let active = true;
@@ -184,9 +192,16 @@ function CheckoutForm({ user }) {
         };
     }, []);
 
-    const availablePayments = PAYMENTS.filter(
-        (option) => option.value === 'cod' || providers?.[option.value] === true
-    );
+    const availablePayments = PAYMENTS.filter((option) => {
+        if (cart?.shippingExempt) {
+            return option.value === 'paytm' && providers?.paytm === true;
+        }
+        return option.value === 'cod' || providers?.[option.value] === true;
+    });
+
+    useEffect(() => {
+        setPayment(cart?.shippingExempt ? 'paytm' : 'cod');
+    }, [cart?.shippingExempt]);
 
     const change = (e) => {
         const { name, value } = e.target;
@@ -233,7 +248,7 @@ function CheckoutForm({ user }) {
                 country: form.country,
             };
 
-            if (payment === 'phonepe' || payment === 'pinelabs') {
+            if (payment === 'phonepe' || payment === 'pinelabs' || payment === 'paytm') {
                 /* `expectedTotal` is the figure on the button the customer just
                    pressed. The server recomputes the price from its own cart
                    and refuses the order if the two disagree, so a bag that
@@ -242,7 +257,9 @@ function CheckoutForm({ user }) {
                 const createCheckout =
                     payment === 'phonepe'
                         ? paymentsAPI.createPhonePeCheckout
-                        : paymentsAPI.createPineLabsCheckout;
+                        : payment === 'pinelabs'
+                          ? paymentsAPI.createPineLabsCheckout
+                          : paymentsAPI.createPaytmCheckout;
                 const data = await createCheckout({
                     shippingAddress,
                     expectedTotal: totals.total,
@@ -251,6 +268,13 @@ function CheckoutForm({ user }) {
                 // Leave the cart alone. The backend removes only the paid line
                 // items after a server-verified payment success, so an aborted
                 // or failed checkout never loses a customer's bag.
+                if (payment === 'paytm') {
+                    navigate(ROUTES.paytmCheckout, {
+                        replace: true,
+                        state: { checkout: data.checkout },
+                    });
+                    return;
+                }
                 window.location.assign(data.checkoutUrl);
                 return;
             }
@@ -333,7 +357,10 @@ function CheckoutForm({ user }) {
                         <div className={styles.stepHead}>
                             <span className={styles.stepNo} aria-hidden="true">01</span>
                             <h2 className={styles.stepTitle} id="step-address">
-                                <Icons.MapPin size={17} /> Where it ships
+                                <Icons.MapPin size={17} />{' '}
+                                {cart?.shippingExempt
+                                    ? 'Payment test details'
+                                    : 'Where it ships'}
                             </h2>
                         </div>
 
@@ -361,7 +388,11 @@ function CheckoutForm({ user }) {
                                 inputMode="numeric"
                                 maxLength={10}
                                 placeholder="9876543210"
-                                hint="For delivery updates only."
+                                hint={
+                                    cart?.shippingExempt
+                                        ? 'Required by the payment provider; no item will ship.'
+                                        : 'For delivery updates only.'
+                                }
                             />
 
                             <Field
@@ -471,8 +502,15 @@ function CheckoutForm({ user }) {
                         </fieldset>
 
                         <p className={styles.payDisclosure}>
-                            Online payments open on the selected provider&apos;s secure checkout.
-                            We confirm your order only after the provider verifies the result.
+                            {cart?.shippingExempt && providers?.paytm !== true ? (
+                                'Paytm is currently unavailable for this payment-test item.'
+                            ) : (
+                                <>
+                                    Online payments open on the selected provider&apos;s secure
+                                    checkout. We confirm your order only after the provider
+                                    verifies the result.
+                                </>
+                            )}
                         </p>
                     </section>
                 </div>
@@ -514,9 +552,17 @@ function CheckoutForm({ user }) {
                             <dd>{money(totals.subtotal)}</dd>
                         </div>
                         <div className={styles.row}>
-                            <dt>Delivery</dt>
+                            <dt>
+                                {totals.shippingExempt
+                                    ? 'Delivery (test item)'
+                                    : 'Delivery'}
+                            </dt>
                             <dd className={totals.freeShipping ? styles.free : undefined}>
-                                {totals.freeShipping ? 'Free' : money(totals.shipping)}
+                                {totals.shippingExempt
+                                    ? 'Not applicable'
+                                    : totals.freeShipping
+                                      ? 'Free'
+                                      : money(totals.shipping)}
                             </dd>
                         </div>
                         <div className={styles.row}>
@@ -535,7 +581,10 @@ function CheckoutForm({ user }) {
                         size="lg"
                         full
                         loading={busy}
-                        disabled={cartStale}
+                        disabled={
+                            cartStale ||
+                            !availablePayments.some((option) => option.value === payment)
+                        }
                     >
                         <Icons.Lock size={16} /> Place order · {money(totals.total)}
                     </Button>
@@ -561,12 +610,18 @@ function CheckoutForm({ user }) {
                     ) : null}
 
                     <p className={styles.docketNote}>
-                        Delivery in 4–7 working days. Returns within 7 days of
-                        delivery — see{' '}
-                        <Link className={styles.docketLink} to={ROUTES.returns}>
-                            our returns policy
-                        </Link>
-                        .
+                        {cart?.shippingExempt ? (
+                            'Payment test only. No item will be shipped.'
+                        ) : (
+                            <>
+                                Delivery in 4–7 working days. Returns within 7 days of
+                                delivery — see{' '}
+                                <Link className={styles.docketLink} to={ROUTES.returns}>
+                                    our returns policy
+                                </Link>
+                                .
+                            </>
+                        )}
                     </p>
                 </aside>
             </form>

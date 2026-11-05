@@ -25,6 +25,15 @@ const {
     PineLabsConfigurationError,
     PineLabsAccessError,
 } = require('../services/pinelabs.service');
+const {
+    createPaytmCheckout,
+    frontendReturnUrl: paytmFrontendReturnUrl,
+    getPaytmOrderStatus,
+    isPaytmConfigured,
+    merchantOrderId: paytmMerchantOrderId,
+    PaytmConfigurationError,
+    verifyPaytmCallback,
+} = require('../services/paytm.service');
 
 function paymentDetailsFromProvider(data = {}) {
     const completedAttempt = Array.isArray(data.paymentDetails)
@@ -123,7 +132,8 @@ function sendPaymentError(res, error, fallbackMessage) {
     const configurationError =
         error instanceof PhonePeConfigurationError ||
         error instanceof PineLabsConfigurationError ||
-        error instanceof PineLabsAccessError;
+        error instanceof PineLabsAccessError ||
+        error instanceof PaytmConfigurationError;
     const status = error.statusCode || (configurationError ? 503 : 502);
     const message =
         error instanceof OrderValidationError || configurationError
@@ -149,6 +159,21 @@ function pineLabsPaymentDetails(data = {}) {
         failureCode: payment?.error_detail?.code,
         failureDetail: payment?.error_detail?.message,
         providerUpdatedAt: data.updated_at ? new Date(data.updated_at) : new Date(),
+    };
+}
+
+function paytmPaymentDetails(data = {}) {
+    const resultInfo = data.resultInfo || {};
+    const txnAmount = Number(data.txnAmount);
+    return {
+        paytmOrderId: data.orderId,
+        transactionId: data.txnId,
+        paymentMode: data.paymentMode,
+        providerState: resultInfo.resultStatus,
+        amountPaisa: Number.isFinite(txnAmount) ? Math.round(txnAmount * 100) : undefined,
+        failureCode: resultInfo.resultCode,
+        failureDetail: resultInfo.resultMsg,
+        providerUpdatedAt: data.transactionDate ? new Date(data.transactionDate) : new Date(),
     };
 }
 
@@ -212,6 +237,68 @@ async function applyPineLabsStatus(order, providerData, source) {
     );
 }
 
+/**
+ * Paytm callbacks are only a signal. The server re-queries Paytm's status API
+ * and compares the amount before marking an order paid.
+ */
+async function applyPaytmStatus(order, providerData, source) {
+    const providerState = String(providerData?.resultInfo?.resultStatus || '').toUpperCase();
+    const amountPaisa = Math.round(Number(providerData?.txnAmount) * 100);
+    const expectedAmountPaisa = toPaisa(order.totalPrice);
+
+    if (!providerState) {
+        throw new Error('Paytm response did not contain a transaction state');
+    }
+    if (
+        (Number.isFinite(amountPaisa) && amountPaisa !== expectedAmountPaisa) ||
+        (providerState === 'TXN_SUCCESS' && (!Number.isSafeInteger(amountPaisa) || amountPaisa !== expectedAmountPaisa))
+    ) {
+        const error = new Error('Paytm payment amount did not match the order total');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const details = paytmPaymentDetails(providerData);
+    const providerDetailsUpdate = Object.fromEntries(
+        Object.entries(details)
+            .filter(([, value]) => value !== undefined && !(value instanceof Date && Number.isNaN(value.valueOf())))
+            .map(([key, value]) => [`paymentDetails.${key}`, value])
+    );
+    const baseUpdate = {
+        'paymentDetails.provider': 'paytm',
+        'paymentDetails.lastSource': source,
+        ...providerDetailsUpdate,
+    };
+
+    if (providerState === 'TXN_SUCCESS') {
+        const paidOrder = await Order.findOneAndUpdate(
+            { _id: order._id, paymentStatus: { $in: ['pending', 'initiated', 'failed'] } },
+            {
+                $set: {
+                    ...baseUpdate,
+                    paymentStatus: 'paid',
+                    status: 'confirmed',
+                    'paymentDetails.paidAt': new Date(),
+                },
+            },
+            { new: true }
+        );
+
+        if (paidOrder) {
+            await fulfilOrder(paidOrder);
+            return paidOrder;
+        }
+        return Order.findById(order._id);
+    }
+
+    const paymentStatus = ['TXN_FAILURE', 'NO_RECORD_FOUND'].includes(providerState) ? 'failed' : 'initiated';
+    return Order.findOneAndUpdate(
+        { _id: order._id, paymentStatus: { $in: ['pending', 'initiated', 'failed', 'expired'] } },
+        { $set: { ...baseUpdate, paymentStatus } },
+        { new: true }
+    );
+}
+
 // @desc    Report which hosted gateways are completely configured server-side
 // @route   GET /api/payments/providers
 // @access  Public (contains no credentials)
@@ -221,6 +308,7 @@ exports.getPaymentProviders = (req, res) => {
         providers: {
             phonepe: isPhonePeConfigured(),
             pinelabs: isPineLabsAvailableTo(req.user),
+            paytm: isPaytmConfigured(),
         },
     });
 };
@@ -237,6 +325,9 @@ exports.createPhonePeCheckout = async (req, res) => {
         const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
             expectedTotal: req.body.expectedTotal,
         });
+        if (orderData.isPaymentTestOrder) {
+            throw new OrderValidationError('Payment test items must be paid through Paytm');
+        }
         const order = new Order({
             user: req.user.id,
             ...orderData,
@@ -351,6 +442,9 @@ exports.createPineLabsCheckout = async (req, res) => {
         const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
             expectedTotal: req.body.expectedTotal,
         });
+        if (orderData.isPaymentTestOrder) {
+            throw new OrderValidationError('Payment test items must be paid through Paytm');
+        }
         const order = new Order({
             user: req.user.id,
             ...orderData,
@@ -479,5 +573,132 @@ exports.handlePineLabsWebhook = async (req, res) => {
             success: false,
             message: callbackVerified ? 'Could not process Pine Labs webhook' : 'Invalid Pine Labs webhook',
         });
+    }
+};
+
+// @desc    Create a Paytm Standard Checkout session
+// @route   POST /api/payments/paytm/checkout
+// @access  Private
+exports.createPaytmCheckout = async (req, res) => {
+    try {
+        if (!isPaytmConfigured()) {
+            throw new PaytmConfigurationError('Paytm payments are not configured yet');
+        }
+
+        const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
+            expectedTotal: req.body.expectedTotal,
+        });
+        if (
+            orderData.isPaymentTestOrder &&
+            (orderData.items.length !== 1 ||
+                orderData.items[0].quantity !== 1 ||
+                orderData.totalPrice !== 1)
+        ) {
+            throw new OrderValidationError(
+                'A payment-test checkout must contain exactly one ₹1 item with no delivery charge'
+            );
+        }
+        const order = new Order({
+            user: req.user.id,
+            ...orderData,
+            paymentMethod: 'paytm',
+            paymentStatus: 'pending',
+            paymentDetails: { provider: 'paytm' },
+        });
+        order.paymentDetails.merchantOrderId = paytmMerchantOrderId(order._id);
+        await order.save();
+
+        try {
+            const checkout = await createPaytmCheckout({ order, customer: req.user });
+            order.paymentStatus = 'initiated';
+            order.paymentDetails.paytmOrderId = checkout.orderId;
+            order.paymentDetails.amountPaisa = checkout.amountPaisa;
+            order.paymentDetails.providerState = 'INITIATED';
+            await order.save();
+
+            return res.status(201).json({
+                success: true,
+                checkout: {
+                    checkoutScriptUrl: checkout.checkoutScriptUrl,
+                    merchantId: checkout.merchantId,
+                    internalOrderId: checkout.internalOrderId,
+                    orderId: checkout.orderId,
+                    txnToken: checkout.txnToken,
+                    amount: checkout.amount,
+                },
+                order: safeOrder(order),
+            });
+        } catch (error) {
+            order.paymentStatus = 'failed';
+            order.paymentDetails.failureCode = 'CHECKOUT_CREATION_FAILED';
+            order.paymentDetails.providerUpdatedAt = new Date();
+            await order.save();
+            throw error;
+        }
+    } catch (error) {
+        console.error('Paytm checkout creation failed:', error.message);
+        return sendPaymentError(res, error, 'Could not start Paytm checkout. Please try again.');
+    }
+};
+
+// @desc    Check and synchronise a Paytm payment status
+// @route   GET /api/payments/paytm/orders/:id/status
+// @access  Private
+exports.getPaytmPaymentStatus = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order || order.paymentMethod !== 'paytm') {
+            return res.status(404).json({ success: false, message: 'Paytm order not found' });
+        }
+        if (!belongsToUser(order, req.user) && req.user.role !== 'admin') {
+            return res.status(403).json({ success: false, message: 'Not authorized to view this payment' });
+        }
+        if (order.paymentStatus === 'paid') {
+            return res.json({ success: true, order: safeOrder(order) });
+        }
+
+        const providerData = await getPaytmOrderStatus(
+            order.paymentDetails.paytmOrderId || order.paymentDetails.merchantOrderId
+        );
+        const syncedOrder = await applyPaytmStatus(order, providerData, 'status-api');
+        return res.json({ success: true, order: safeOrder(syncedOrder || order) });
+    } catch (error) {
+        console.error('Paytm status lookup failed:', error.message);
+        return sendPaymentError(res, error, 'Could not verify the Paytm payment yet. Please try again.');
+    }
+};
+
+// @desc    Receive Paytm's form POST callback and re-verify server-side
+// @route   POST /api/payments/paytm/callback
+// @access  Public (authenticated with Paytm's checksum)
+exports.handlePaytmCallback = async (req, res) => {
+    let callbackVerified = false;
+    try {
+        const callback = verifyPaytmCallback(req.body);
+        callbackVerified = true;
+        const providerOrderId = callback.ORDERID || callback.orderId;
+        if (!providerOrderId) {
+            return res.status(400).send('Paytm callback has no order ID');
+        }
+
+        const order = await Order.findOne({
+            paymentMethod: 'paytm',
+            'paymentDetails.merchantOrderId': providerOrderId,
+        });
+        if (!order) {
+            return res.status(404).send('Paytm order not found');
+        }
+
+        const providerData = await getPaytmOrderStatus(
+            order.paymentDetails.paytmOrderId || providerOrderId
+        );
+        await applyPaytmStatus(order, providerData, 'callback');
+        return res.redirect(paytmFrontendReturnUrl(order._id));
+    } catch (error) {
+        console.error('Paytm callback rejected:', error.message);
+        const status =
+            error.statusCode ||
+            (error instanceof PaytmConfigurationError ? 503 : callbackVerified ? 500 : 401);
+        return res.status(status).send(callbackVerified ? 'Could not process Paytm callback' : 'Invalid Paytm callback');
     }
 };

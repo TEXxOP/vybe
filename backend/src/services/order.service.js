@@ -118,7 +118,20 @@ async function buildOrderFromCart(userId, shippingAddress, { expectedTotal } = {
     });
 
     const itemsPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shippingPrice = itemsPrice >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_PRICE;
+    const containsPaymentTest = items.some((item) => {
+        const product = productsById.get(String(item.product));
+        return product?.isPaymentTest === true;
+    });
+    const paymentTestOnly = containsPaymentTest && items.every((item) => {
+        const product = productsById.get(String(item.product));
+        return product?.isPaymentTest === true;
+    });
+    if (containsPaymentTest && !paymentTestOnly) {
+        throw new OrderValidationError('Payment test items must be purchased separately');
+    }
+    const shippingPrice = paymentTestOnly || itemsPrice >= FREE_SHIPPING_THRESHOLD
+        ? 0
+        : SHIPPING_PRICE;
     // Already inside itemsPrice — recorded for the invoice, not charged on top.
     const taxPrice = includedTax(itemsPrice);
     const totalPrice = itemsPrice + shippingPrice;
@@ -148,6 +161,7 @@ async function buildOrderFromCart(userId, shippingAddress, { expectedTotal } = {
         shippingPrice,
         taxPrice,
         totalPrice,
+        isPaymentTestOrder: paymentTestOnly,
     };
 }
 

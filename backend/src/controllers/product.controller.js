@@ -8,6 +8,7 @@ exports.getProducts = async (req, res) => {
     try {
         const { page, limit, skip } = paginate(req.query.page, req.query.limit);
         const filters = buildFilters(req.query);
+        if (req.user?.role !== 'admin') filters.isPaymentTest = { $ne: true };
 
         // Sorting
         let sort = {};
@@ -150,10 +151,13 @@ exports.searchProducts = async (req, res) => {
             });
         }
 
-        const products = await Product.find({
+        const filters = {
             $text: { $search: q },
             isActive: true
-        })
+        };
+        filters.isPaymentTest = { $ne: true };
+
+        const products = await Product.find(filters)
             .limit(20)
             .select('-__v');
 

@@ -270,6 +270,15 @@ export const paymentsAPI = {
 
     getPineLabsStatus: (orderId) =>
         apiCall(`/payments/pinelabs/orders/${encodeURIComponent(orderId)}/status`),
+
+    createPaytmCheckout: (paymentData) =>
+        apiCall('/payments/paytm/checkout', {
+            method: 'POST',
+            body: JSON.stringify(paymentData),
+        }),
+
+    getPaytmStatus: (orderId) =>
+        apiCall(`/payments/paytm/orders/${encodeURIComponent(orderId)}/status`),
 };
 
 // ============ ADMIN =========================================================

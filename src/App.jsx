@@ -18,6 +18,8 @@ import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import PhonePeReturn from './pages/PhonePeReturn';
 import PineLabsReturn from './pages/PineLabsReturn';
+import PaytmReturn from './pages/PaytmReturn';
+import PaytmCheckout from './pages/PaytmCheckout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Orders from './pages/Orders';
@@ -103,6 +105,8 @@ function Shell() {
                     <Route path={ROUTES.orderSuccess} element={<OrderSuccess />} />
                     <Route path={ROUTES.phonepeReturn} element={<PhonePeReturn />} />
                     <Route path={ROUTES.pinelabsReturn} element={<PineLabsReturn />} />
+                    <Route path={ROUTES.paytmReturn} element={<PaytmReturn />} />
+                    <Route path={ROUTES.paytmCheckout} element={<PaytmCheckout />} />
                     <Route path={ROUTES.login} element={<Login />} />
                     <Route path={ROUTES.register} element={<Register />} />
                     <Route path={ROUTES.orders} element={<Orders />} />

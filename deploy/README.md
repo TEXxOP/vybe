@@ -61,3 +61,20 @@ The POS transaction-summary integration is independent of the checkout
 gateway. Add the `PINELABS_POS_*` values to `deploy/.env`, rebuild with
 `docker compose up -d --build`, and access reports only through the authenticated
 admin API. See [`backend/PINELABS_POS_REPORTING.md`](../backend/PINELABS_POS_REPORTING.md).
+
+## Paytm JS Checkout
+
+1. Keep `PAYTM_MERCHANT_KEY` on the API host only. Production uses
+   `PAYTM_ENV=production` and Paytm's `https://secure.paytmpayments.com` host.
+2. Register `https://api.restoralai.com/api/payments/paytm/callback` with
+   Paytm. Add the production MID and key to `deploy/.env` and set
+   `PAYTM_ENABLED=true`.
+3. Rebuild the API with `docker compose up -d --build api` and verify
+   `GET /api/payments/providers` includes `"paytm":true`. This confirms
+   configuration presence only, not a successful payment.
+4. UAT credentials were not generated in the Paytm portal, so UAT testing is
+   pending. A production payment test is a real charge; the one-rupee test
+   product must show a ₹1 total and no delivery before the customer proceeds.
+
+See [`backend/PAYTM_SETUP.md`](../backend/PAYTM_SETUP.md) for callback and
+verification details.

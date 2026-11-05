@@ -24,6 +24,13 @@ exports.createOrder = async (req, res) => {
 
         const orderData = await buildOrderFromCart(req.user.id, shippingAddress, { expectedTotal });
 
+        if (orderData.isPaymentTestOrder) {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment test items must be paid online through Paytm',
+            });
+        }
+
         // Create order
         const order = await Order.create({
             user: req.user.id,
@@ -150,7 +157,7 @@ exports.cancelOrder = async (req, res) => {
         // A paid gateway order cannot be silently turned into "cancelled": it
         // first needs a real, auditable refund through its gateway. Keep this as a
         // support workflow until the dedicated refund endpoint is implemented.
-        if (['phonepe', 'pinelabs'].includes(order.paymentMethod) && order.paymentStatus === 'paid') {
+        if (['phonepe', 'pinelabs', 'paytm'].includes(order.paymentMethod) && order.paymentStatus === 'paid') {
             return res.status(400).json({
                 success: false,
                 message: 'Please contact support to cancel a paid online order and arrange its refund'
@@ -238,7 +245,7 @@ exports.updateOrderStatus = async (req, res) => {
 
         if (
             status === 'cancelled' &&
-            ['phonepe', 'pinelabs'].includes(order.paymentMethod) &&
+            ['phonepe', 'pinelabs', 'paytm'].includes(order.paymentMethod) &&
             order.paymentStatus === 'paid'
         ) {
             return res.status(400).json({

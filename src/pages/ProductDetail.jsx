@@ -635,19 +635,24 @@ function ProductView({ id }) {
                         <ul className={styles.promises}>
                             <li className={styles.promise}>
                                 <Icons.Truck size={17} />
-                                {/* Same constant the checkout charges against. */}
-                                Free delivery from {money(FREE_SHIPPING_THRESHOLD)}
+                                {product.isPaymentTest
+                                    ? 'Payment test only — no item will be shipped'
+                                    : `Free delivery from ${money(FREE_SHIPPING_THRESHOLD)}`}
                             </li>
-                            <li className={styles.promise}>
-                                <Icons.RefreshCw size={17} />
-                                <Link className={styles.promiseLink} to={ROUTES.returns}>
-                                    7-day returns
-                                </Link>
-                            </li>
-                            <li className={styles.promise}>
-                                <Icons.Shield size={17} />
-                                Printed and packed by us
-                            </li>
+                            {product.isPaymentTest ? null : (
+                                <>
+                                    <li className={styles.promise}>
+                                        <Icons.RefreshCw size={17} />
+                                        <Link className={styles.promiseLink} to={ROUTES.returns}>
+                                            7-day returns
+                                        </Link>
+                                    </li>
+                                    <li className={styles.promise}>
+                                        <Icons.Shield size={17} />
+                                        Printed and packed by us
+                                    </li>
+                                </>
+                            )}
                         </ul>
                     </div>
                 </div>
