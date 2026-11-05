@@ -24,13 +24,6 @@ exports.createOrder = async (req, res) => {
 
         const orderData = await buildOrderFromCart(req.user.id, shippingAddress, { expectedTotal });
 
-        if (orderData.isPaymentTestOrder) {
-            return res.status(400).json({
-                success: false,
-                message: 'Payment test items must be paid online through Paytm',
-            });
-        }
-
         // Create order
         const order = await Order.create({
             user: req.user.id,

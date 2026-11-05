@@ -7,7 +7,7 @@ const Product = require('../models/Product.model');
 exports.getCart = async (req, res) => {
     try {
         let cart = await Cart.findOne({ user: req.user.id })
-            .populate('items.product', 'name images price isPaymentTest');
+            .populate('items.product', 'name images price');
 
         if (!cart) {
             cart = await Cart.create({ user: req.user.id, items: [] });
@@ -73,7 +73,7 @@ exports.addToCart = async (req, res) => {
         await cart.save();
 
         // Populate and return
-        await cart.populate('items.product', 'name images price isPaymentTest');
+        await cart.populate('items.product', 'name images price');
 
         res.status(200).json({
             success: true,
@@ -124,7 +124,7 @@ exports.updateCartItem = async (req, res) => {
         }
 
         await cart.save();
-        await cart.populate('items.product', 'name images price isPaymentTest');
+        await cart.populate('items.product', 'name images price');
 
         res.status(200).json({
             success: true,
@@ -159,7 +159,7 @@ exports.removeFromCart = async (req, res) => {
         );
 
         await cart.save();
-        await cart.populate('items.product', 'name images price isPaymentTest');
+        await cart.populate('items.product', 'name images price');
 
         res.status(200).json({
             success: true,

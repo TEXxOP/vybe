@@ -154,7 +154,6 @@ export const CartProvider = ({ children }) => {
                                 name: product.name,
                                 price: product.price,
                                 images: getProductImages(product),
-                                isPaymentTest: product.isPaymentTest === true,
                             },
                             quantity,
                             size,

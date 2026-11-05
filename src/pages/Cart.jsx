@@ -212,9 +212,7 @@ export default function Cart() {
         );
     }
 
-    const totals = computeTotals(cart.totalPrice || 0, {
-        shippingExempt: cart.shippingExempt,
-    });
+    const totals = computeTotals(cart.totalPrice || 0);
     const count = cart.totalItems || items.length;
     const progress = Math.min(
         100,
@@ -296,11 +294,9 @@ export default function Cart() {
                                             totals.freeShipping ? styles.free : undefined
                                         }
                                     >
-                                        {totals.shippingExempt
-                                            ? 'Not applicable'
-                                            : totals.freeShipping
-                                              ? 'Free'
-                                              : money(totals.shipping)}
+                                        {totals.freeShipping
+                                            ? 'Free'
+                                            : money(totals.shipping)}
                                     </dd>
                                 </div>
 
@@ -324,11 +320,7 @@ export default function Cart() {
 
                     {/* A progress bar that measures something real, against the
                         same constant the delivery charge is computed from. */}
-                    {totals.shippingExempt ? (
-                        <p className={styles.shipNote}>
-                            Payment test item — no delivery or fulfilment.
-                        </p>
-                    ) : totals.freeShipping ? (
+                    {totals.freeShipping ? (
                         <p className={styles.shipNote}>
                             <Icons.Truck size={15} /> Delivery is on us.
                         </p>

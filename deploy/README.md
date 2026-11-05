@@ -73,8 +73,8 @@ admin API. See [`backend/PINELABS_POS_REPORTING.md`](../backend/PINELABS_POS_REP
    `GET /api/payments/providers` includes `"paytm":true`. This confirms
    configuration presence only, not a successful payment.
 4. UAT credentials were not generated in the Paytm portal, so UAT testing is
-   pending. A production payment test is a real charge; the one-rupee test
-   product must show a ₹1 total and no delivery before the customer proceeds.
+   pending. A production payment is a real charge and should use a normal
+   customer order only after the business approves the amount.
 
 See [`backend/PAYTM_SETUP.md`](../backend/PAYTM_SETUP.md) for callback and
 verification details.

@@ -155,7 +155,6 @@ function fromProduct(product) {
         badge: p.badge || '',
         isFeatured: Boolean(p.isFeatured),
         isLimited: Boolean(p.isLimited),
-        isPaymentTest: Boolean(p.isPaymentTest),
         limitedStock: p.limitedStock ?? '',
         /* Absent means true — that's the schema default, and a new product is
            listed unless someone says otherwise. */
@@ -195,7 +194,6 @@ function toPayload(form) {
         badge: form.badge || null,
         isFeatured: form.isFeatured,
         isLimited: form.isLimited,
-        isPaymentTest: form.isPaymentTest,
         limitedStock:
             form.isLimited && form.limitedStock !== ''
                 ? Number(form.limitedStock)
@@ -921,21 +919,6 @@ export default function AdminProductForm({ product, onSave, onClose }) {
                                     </span>
                                 </label>
 
-                                <label className={styles.check}>
-                                    <input
-                                        type="checkbox"
-                                        checked={form.isPaymentTest}
-                                        onChange={(e) =>
-                                            set('isPaymentTest', e.target.checked)
-                                        }
-                                    />
-                                    <span>
-                                        Payment test only
-                                        <span className={styles.checkNote}>
-                                            Waives delivery only when the cart contains one payment-test item. No shipment or delivery.
-                                        </span>
-                                    </span>
-                                </label>
                             </div>
 
                             {/* Only asked for when it applies. A run-size box

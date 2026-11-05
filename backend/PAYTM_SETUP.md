@@ -44,15 +44,6 @@ https://www.restoralai.com/payment/paytm/return
    server-calculated total.
 
 Check `GET /api/payments/providers` to confirm the provider is configured.
-That only checks configuration presence; a successful production payment is
-still required to verify end-to-end processing. UAT credentials were not
-generated in the merchant portal, so no UAT sign-off should be claimed.
-
-## One-rupee production test item
-
-An admin-only payment-test flag suppresses shipping for a test-only cart. The
-backend accepts only one item, quantity one, at a total of exactly ₹1, and only
-the Paytm checkout endpoint accepts the order. These items are hidden from
-catalog and search results and no shipment or delivery is created. A production
-test is a real ₹1 payment; do not use a customer order or claim UAT completion
-from it.
+That only checks configuration presence. A production checkout was confirmed
+by the merchant; UAT credentials were not generated in the portal, so UAT
+sign-off remains pending.

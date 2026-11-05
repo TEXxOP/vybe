@@ -325,9 +325,6 @@ exports.createPhonePeCheckout = async (req, res) => {
         const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
             expectedTotal: req.body.expectedTotal,
         });
-        if (orderData.isPaymentTestOrder) {
-            throw new OrderValidationError('Payment test items must be paid through Paytm');
-        }
         const order = new Order({
             user: req.user.id,
             ...orderData,
@@ -442,9 +439,6 @@ exports.createPineLabsCheckout = async (req, res) => {
         const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
             expectedTotal: req.body.expectedTotal,
         });
-        if (orderData.isPaymentTestOrder) {
-            throw new OrderValidationError('Payment test items must be paid through Paytm');
-        }
         const order = new Order({
             user: req.user.id,
             ...orderData,
@@ -588,16 +582,6 @@ exports.createPaytmCheckout = async (req, res) => {
         const orderData = await buildOrderFromCart(req.user.id, req.body.shippingAddress, {
             expectedTotal: req.body.expectedTotal,
         });
-        if (
-            orderData.isPaymentTestOrder &&
-            (orderData.items.length !== 1 ||
-                orderData.items[0].quantity !== 1 ||
-                orderData.totalPrice !== 1)
-        ) {
-            throw new OrderValidationError(
-                'A payment-test checkout must contain exactly one ₹1 item with no delivery charge'
-            );
-        }
         const order = new Order({
             user: req.user.id,
             ...orderData,

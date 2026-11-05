@@ -172,9 +172,7 @@ function CheckoutForm({ user }) {
     const [providers, setProviders] = useState(null);
 
     const items = Array.isArray(cart?.items) ? cart.items : [];
-    const totals = computeTotals(cart?.totalPrice || 0, {
-        shippingExempt: cart?.shippingExempt,
-    });
+    const totals = computeTotals(cart?.totalPrice || 0);
 
     useEffect(() => {
         let active = true;
@@ -192,16 +190,9 @@ function CheckoutForm({ user }) {
         };
     }, []);
 
-    const availablePayments = PAYMENTS.filter((option) => {
-        if (cart?.shippingExempt) {
-            return option.value === 'paytm' && providers?.paytm === true;
-        }
-        return option.value === 'cod' || providers?.[option.value] === true;
-    });
-
-    useEffect(() => {
-        setPayment(cart?.shippingExempt ? 'paytm' : 'cod');
-    }, [cart?.shippingExempt]);
+    const availablePayments = PAYMENTS.filter(
+        (option) => option.value === 'cod' || providers?.[option.value] === true
+    );
 
     const change = (e) => {
         const { name, value } = e.target;
@@ -358,9 +349,7 @@ function CheckoutForm({ user }) {
                             <span className={styles.stepNo} aria-hidden="true">01</span>
                             <h2 className={styles.stepTitle} id="step-address">
                                 <Icons.MapPin size={17} />{' '}
-                                {cart?.shippingExempt
-                                    ? 'Payment test details'
-                                    : 'Where it ships'}
+                                Where it ships
                             </h2>
                         </div>
 
@@ -388,11 +377,7 @@ function CheckoutForm({ user }) {
                                 inputMode="numeric"
                                 maxLength={10}
                                 placeholder="9876543210"
-                                hint={
-                                    cart?.shippingExempt
-                                        ? 'Required by the payment provider; no item will ship.'
-                                        : 'For delivery updates only.'
-                                }
+                                hint="For delivery updates only."
                             />
 
                             <Field
@@ -502,15 +487,9 @@ function CheckoutForm({ user }) {
                         </fieldset>
 
                         <p className={styles.payDisclosure}>
-                            {cart?.shippingExempt && providers?.paytm !== true ? (
-                                'Paytm is currently unavailable for this payment-test item.'
-                            ) : (
-                                <>
-                                    Online payments open on the selected provider&apos;s secure
-                                    checkout. We confirm your order only after the provider
-                                    verifies the result.
-                                </>
-                            )}
+                            Online payments open on the selected provider&apos;s secure
+                            checkout. We confirm your order only after the provider
+                            verifies the result.
                         </p>
                     </section>
                 </div>
@@ -552,17 +531,9 @@ function CheckoutForm({ user }) {
                             <dd>{money(totals.subtotal)}</dd>
                         </div>
                         <div className={styles.row}>
-                            <dt>
-                                {totals.shippingExempt
-                                    ? 'Delivery (test item)'
-                                    : 'Delivery'}
-                            </dt>
+                            <dt>Delivery</dt>
                             <dd className={totals.freeShipping ? styles.free : undefined}>
-                                {totals.shippingExempt
-                                    ? 'Not applicable'
-                                    : totals.freeShipping
-                                      ? 'Free'
-                                      : money(totals.shipping)}
+                                {totals.freeShipping ? 'Free' : money(totals.shipping)}
                             </dd>
                         </div>
                         <div className={styles.row}>
@@ -610,18 +581,12 @@ function CheckoutForm({ user }) {
                     ) : null}
 
                     <p className={styles.docketNote}>
-                        {cart?.shippingExempt ? (
-                            'Payment test only. No item will be shipped.'
-                        ) : (
-                            <>
-                                Delivery in 4–7 working days. Returns within 7 days of
-                                delivery — see{' '}
-                                <Link className={styles.docketLink} to={ROUTES.returns}>
-                                    our returns policy
-                                </Link>
-                                .
-                            </>
-                        )}
+                        Delivery in 4–7 working days. Returns within 7 days of
+                        delivery — see{' '}
+                        <Link className={styles.docketLink} to={ROUTES.returns}>
+                            our returns policy
+                        </Link>
+                        .
                     </p>
                 </aside>
             </form>
